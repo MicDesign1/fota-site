@@ -1,4 +1,4 @@
-:root{--bg:#060607;--fg:#cfd6d4;--dim:#5b6664;--or:#ff7a1a;--tq:#3fb8b0}
+:root{--bg:#060607;--fg:#cfd6d4;--dim:#5b6664;--or:#ff7f24;--or2:#ffa04d;--tq:#3fb8b0}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 "Courier New",ui-monospace,monospace}
 ::selection{background:var(--or);color:#000}
 .grain{position:fixed;inset:-50%;pointer-events:none;z-index:5;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:g .4s steps(4) infinite}
@@ -35,3 +35,24 @@ input:focus{border-color:var(--tq)}input::placeholder{color:#3a4443}
 footer{position:relative;z-index:2;text-align:center;font-size:11px;padding:30px 0 40px;color:var(--dim)}
 footer a{color:var(--dim);text-decoration:none}footer a:hover{color:var(--tq)}
 @media (prefers-reduced-motion:reduce){.grain,.scan,.ph::before{animation:none}}
+
+.who{margin-bottom:14px;letter-spacing:.12em}.who a{color:#7d8987}
+.cas{max-width:680px}.cas .back{font-size:11px;color:var(--dim);text-decoration:none;letter-spacing:.3em}.cas .back:hover{color:var(--or)}
+.cas h2{font-weight:400;font-size:clamp(20px,3vw,26px);letter-spacing:.2em;margin:10vh 0 4vh;color:var(--fg)}
+.cas p{font-size:15px;margin:0 0 1.3em}.cas p em{font-style:normal;color:var(--or)}.cas p.q{color:var(--tq);padding-left:1em;border-left:1px solid #1d2726}
+.cas figure{margin:7vh 0;position:relative}
+.cas figure img{display:block;width:100%;max-height:80vh;object-fit:contain;filter:contrast(1.1);border:1px solid #1a2322}
+.cas figure.r{margin-left:18%}.cas figure.l{margin-right:18%}
+.cas figcaption{font-size:11px;color:var(--dim);margin-top:8px;letter-spacing:.05em}.cas figcaption a{color:var(--dim)}
+@media (max-width:600px){.cas figure.r,.cas figure.l{margin-left:0;margin-right:0}}
+
+/* claudia orange accents */
+.count .digits .sep{font-weight:400;color:var(--or);text-shadow:0 0 14px rgba(255,127,36,.45)}
+.count::before{content:"\2605";display:block;color:var(--or);font-size:11px;margin-bottom:6px;opacity:.85}
+.chat{box-shadow:inset 48px 1px 0 -47px var(--or)}
+.caret{text-shadow:0 0 8px rgba(255,127,36,.6)}input:focus{border-color:var(--or)}
+footer a:hover,.who a:hover,.cas figcaption a:hover{color:var(--or2)}
+.who a{color:#a9b6b3}
+body::after{content:"";position:fixed;top:0;bottom:0;right:0;width:22vw;pointer-events:none;z-index:3;background:radial-gradient(ellipse at 100% 30%,rgba(255,127,36,.07),transparent 70%)}
+.cas figcaption::before{content:"\2605 ";color:var(--or)}
+.cas p.q{border-left-color:rgba(255,127,36,.45)}

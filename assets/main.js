@@ -12,10 +12,10 @@ function type(lines,done){tx.innerHTML='';let i=0,j=0;const c=document.createEle
 const arrived=()=>Date.now()>=T;
 type(arrived()?post:pre);
 const cd=document.getElementById('count'),lab=document.getElementById('countLabel'),st=document.getElementById('status'),clk=document.getElementById('clock');
-const p=n=>String(n).padStart(2,'0');
+const p=n=>String(n).padStart(2,'0');const fmt=t=>t.replace(/:/g,'<b class="sep">:</b>');
 function tick(){const now=new Date();clk.textContent=now.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Chicago'})+' CT';
- let d=T-now;if(d<=0){lab.textContent='transmission received';const a=-d;cd.textContent='+'+Math.floor(a/864e5)+'d '+p(Math.floor(a/36e5)%24)+':'+p(Math.floor(a/6e4)%60)+':'+p(Math.floor(a/1e3)%60);st.textContent='signal: received';return}
- cd.textContent=Math.floor(d/864e5)+'d '+p(Math.floor(d/36e5)%24)+':'+p(Math.floor(d/6e4)%60)+':'+p(Math.floor(d/1e3)%60);
+ let d=T-now;if(d<=0){lab.textContent='transmission received';const a=-d;cd.innerHTML=fmt('+'+Math.floor(a/864e5)+'d '+p(Math.floor(a/36e5)%24)+':'+p(Math.floor(a/6e4)%60)+':'+p(Math.floor(a/1e3)%60));st.textContent='signal: received';return}
+ cd.innerHTML=fmt(Math.floor(d/864e5)+'d '+p(Math.floor(d/36e5)%24)+':'+p(Math.floor(d/6e4)%60)+':'+p(Math.floor(d/1e3)%60));
  st.textContent=Math.random()<.04?'signal: she\u2019s close':'signal: faint';}
 tick();setInterval(tick,1000);
 // stills: slow crossfade + rare glitch
