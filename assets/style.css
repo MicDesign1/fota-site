@@ -56,3 +56,14 @@ footer a:hover,.who a:hover,.cas figcaption a:hover{color:var(--or2)}
 body::after{content:"";position:fixed;top:0;bottom:0;right:0;width:22vw;pointer-events:none;z-index:3;background:radial-gradient(ellipse at 100% 30%,rgba(255,127,36,.07),transparent 70%)}
 .cas figcaption::before{content:"\2605 ";color:var(--or)}
 .cas p.q{border-left-color:rgba(255,127,36,.45)}
+
+/* believe me later launch */
+.xpost{margin:6vh 0 4vh;text-align:center}
+.xpost .twitter-tweet{margin:0 auto !important}
+.xpost blockquote.twitter-tweet{max-width:550px;border-left:2px solid var(--or);padding:10px 16px;text-align:left;color:var(--fg)}
+.xpost blockquote a{color:var(--tq)}
+.xpost .entry{font-size:14px;color:var(--fg);margin:18px 0 6px}
+.xpost .credit,.xpost .studio{font-size:12px;color:var(--dim);margin:4px 0}
+.xpost .credit a{color:#a9b6b3;text-decoration:none}.xpost .credit a:hover{color:var(--or2)}
+.xpost .follow a{font-size:12px;color:var(--tq);text-decoration:none;letter-spacing:.1em}.xpost .follow a:hover{color:var(--or)}
+.xpost .studio::before{content:"\2605 ";color:var(--or)}
