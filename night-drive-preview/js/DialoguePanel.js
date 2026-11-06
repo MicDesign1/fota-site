@@ -8,6 +8,7 @@ export default class DialoguePanel {
     this.onChoose = onChoose;
     this.onClose = onClose;
     this.onDrive = onDrive;
+    this._choiceLockUntil = 0;
     this.root = document.createElement("div");
     this.root.id = "dialoguePanel";
     this.root.hidden = true;
@@ -43,25 +44,23 @@ export default class DialoguePanel {
     );
   }
 
+  _activateOnce(handler) {
+    const now = Date.now();
+    // Panel-level lock: a phone tap often synthesizes click on the *new*
+    // buttons after show() rebuilds the DOM; ignore that ghost event.
+    if (now < this._choiceLockUntil) return false;
+    this._choiceLockUntil = now + 450;
+    handler();
+    return true;
+  }
+
   _bindActivate(el, handler) {
-    let lastTs = 0;
-    const run = (event) => {
-      const now = Date.now();
-      if (now - lastTs < 350) {
-        event.preventDefault();
-        event.stopPropagation();
-        return;
-      }
-      lastTs = now;
+    // Single path only (click). No pointerup/touchstart twin listeners.
+    el.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      handler();
-    };
-    el.addEventListener("pointerup", (event) => {
-      if (event.button != null && event.button !== 0) return;
-      run(event);
+      this._activateOnce(handler);
     });
-    el.addEventListener("click", run);
   }
 
   _historyEntries(view) {
