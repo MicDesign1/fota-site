@@ -160,7 +160,16 @@ class EyeGazeInput extends Input {
   }
 }
 
+class AutopilotInput extends Input {
+  constructor() {
+    super();
+    this.minCruiseSpeed = 0.5;
+    this.manualSteerSensitivity = 0;
+  }
+}
+
 const controlSchemesByName = new Map([
+  ["autopilot", new AutopilotInput()],
   ["touch", new TouchInput()],
   ["arrows", new KeyboardInput()],
   ["1 switch", new OneSwitchInput()],

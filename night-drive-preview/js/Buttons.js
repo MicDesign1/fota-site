@@ -11,36 +11,50 @@ export default class Buttons {
     document.body.appendChild(this.buttonsContainer);
     this.buttonsContainer.appendChild(this.element);
 
-    // Glance at Claudia (side view, no Talk panel).
     this.addActionButton("checkClaudia", () => `<div class='label'>claudia</div>`);
-    // Enter side view + open dialogue panel.
+    this.addActionButton("drive", () => `<div class='label'>Drive</div>`);
     this.addActionButton("talkClaudia", () => `<div class='label'>Talk to Claudia</div>`);
-    // Music: opens/closes the manual track list (empty until tracks are added).
-    this.addActionButton("music", () => `<div class='label'>music</div>`);
 
+    // Compact music transport in the bar
+    this.musicGroup = document.createElement("div");
+    this.musicGroup.id = "musicTransport";
+    this.musicGroup.innerHTML = `
+      <button type="button" id="button_musicPrev" title="Previous"><div class="label">⏮</div></button>
+      <button type="button" id="button_musicToggle" title="Play/Pause"><div class="label">▶</div></button>
+      <button type="button" id="button_musicNext" title="Next"><div class="label">⏭</div></button>
+      <div id="musicTitle" class="music-title"></div>
+    `;
+    this.element.appendChild(this.musicGroup);
+    this.musicGroup.querySelector("#button_musicPrev").addEventListener("click", () => this.dispatch("musicPrev", "trigger"));
+    this.musicGroup.querySelector("#button_musicToggle").addEventListener("click", () => this.dispatch("musicToggle", "trigger"));
+    this.musicGroup.querySelector("#button_musicNext").addEventListener("click", () => this.dispatch("musicNext", "trigger"));
+    this.musicTitleEl = this.musicGroup.querySelector("#musicTitle");
+    this.musicToggleBtn = this.musicGroup.querySelector("#button_musicToggle .label");
+
+    this.addActionButton("controls", () => `<div class='label'>⚙</div>`);
+
+    this.controlsMenu = document.createElement("div");
+    this.controlsMenu.id = "controlsMenu";
+    this.controlsMenu.hidden = true;
+    document.body.appendChild(this.controlsMenu);
+
+    // Keep empty musicMenu node for any legacy CSS; unused
     this.musicMenu = document.createElement("div");
     this.musicMenu.id = "musicMenu";
     this.musicMenu.hidden = true;
-    this.musicMenu.innerHTML = `<div class="music-empty">No tracks yet</div>`;
     document.body.appendChild(this.musicMenu);
 
     const stylesheet = Array.from(document.styleSheets).find((sheet) => sheet.title === "main");
     this.bodyRule = Array.from(stylesheet.cssRules).find((rule) => rule.selectorText === "body, colors");
 
-    document.addEventListener("mousemove", this.onMouse.bind(this), false);
-    document.addEventListener("mousedown", this.onMouse.bind(this), false);
-    document.addEventListener("mouseup", this.onMouse.bind(this), false);
-    document.addEventListener("touchstart", this.onMouse.bind(this), false);
-    document.addEventListener("touchmove", this.onMouse.bind(this), false);
-    document.addEventListener("touchend", this.onMouse.bind(this), false);
-
+    for (const ev of ["mousemove", "mousedown", "mouseup", "touchstart", "touchmove", "touchend"]) {
+      document.addEventListener(ev, this.onMouse.bind(this), false);
+    }
     this.element.addEventListener("mouseover", () => (this.isMouseOver = true));
     this.element.addEventListener("mouseout", () => (this.isMouseOver = false));
   }
 
-  onMouse() {
-    this.wakeUp();
-  }
+  onMouse() { this.wakeUp(); }
 
   wakeUp() {
     if (this.buttonsContainer.classList.contains("awake")) return;
@@ -48,22 +62,16 @@ export default class Buttons {
     this.buttonsContainer.classList.toggle("awake", true);
     this.awakeTimer = setTimeout(() => {
       this.buttonsContainer.classList.toggle("awake", false);
-      if (this.isMouseOver || this.isMouseOverEmbeddedPlaylist) {
-        this.wakeUp();
-      }
+      if (this.isMouseOver || this.isMouseOverEmbeddedPlaylist) this.wakeUp();
     }, 4000);
   }
 
   addListener(func) {
-    if (!this.listeners.includes(func)) {
-      this.listeners.push(func);
-    }
+    if (!this.listeners.includes(func)) this.listeners.push(func);
   }
 
   dispatch(id, value) {
-    for (const listener of this.listeners) {
-      listener(id, value);
-    }
+    for (const listener of this.listeners) listener(id, value);
   }
 
   addActionButton(id, labelMaker) {
@@ -73,50 +81,49 @@ export default class Buttons {
     button.type = "button";
     button.innerHTML = labelMaker();
     this.element.appendChild(button);
-    button.addEventListener("click", () => {
-      this.dispatch(id, "trigger");
-    });
+    button.addEventListener("click", () => this.dispatch(id, "trigger"));
   }
 
-  setMusicTracks(tracks, { currentId = null, onPick = null, onSkip = null, userStarted = false } = {}) {
-    this.musicMenu.innerHTML = "";
-    if (!tracks || tracks.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "music-empty";
-      empty.textContent = "No tracks yet — add local MP3s in js/music-tracks.js";
-      this.musicMenu.appendChild(empty);
-      return;
+  setMusicStatus(st) {
+    if (!this.musicTitleEl) return;
+    this.musicTitleEl.textContent = st.title || "";
+    this.musicTitleEl.title = st.title || "";
+    if (this.musicToggleBtn) {
+      this.musicToggleBtn.textContent = !st.userStarted || st.paused ? "▶" : "❚❚";
     }
-    for (const t of tracks) {
+  }
+
+  // legacy no-op so old Drivey refresh calls don't break
+  setMusicTracks(_tracks, _opts = {}) {}
+  toggleMusicMenu() { return false; }
+
+  setControlsMenu({ current = "autopilot", onPick = null } = {}) {
+    const modes = [
+      { id: "autopilot", label: "Autopilot" },
+      { id: "touch", label: "Touch to drive" },
+      { id: "arrows", label: "Keyboard arrows" },
+    ];
+    this.controlsMenu.innerHTML = "";
+    for (const m of modes) {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "music-track" + (t.id === currentId ? " playing" : "");
-      btn.textContent = t.title || t.id;
+      btn.className = "controls-option" + (m.id === current ? " active" : "");
+      btn.textContent = m.label;
       btn.addEventListener("click", () => {
-        if (onPick) onPick(t.id);
+        if (onPick) onPick(m.id);
+        this.controlsMenu.hidden = true;
       });
-      this.musicMenu.appendChild(btn);
+      this.controlsMenu.appendChild(btn);
     }
-    const skip = document.createElement("button");
-    skip.type = "button";
-    skip.className = "music-skip";
-    skip.textContent = "Skip / next";
-    skip.disabled = false;
-    skip.addEventListener("click", () => {
-      if (onSkip) onSkip();
-    });
-    this.musicMenu.appendChild(skip);
   }
 
-  toggleMusicMenu(force) {
-    const open = force != null ? force : this.musicMenu.hidden;
-    this.musicMenu.hidden = !open;
+  toggleControlsMenu(force) {
+    const open = force != null ? force : this.controlsMenu.hidden;
+    this.controlsMenu.hidden = !open;
     return open;
   }
 
-  setButton(_id, _value) {
-    // No cycling buttons (camera / level / side / effect) in this fork.
-  }
+  setButton(_id, _value) {}
 
   setColors(backgroundColor, borderColor, lightColor) {
     if (this.bodyRule == null) return;

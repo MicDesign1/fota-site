@@ -1,9 +1,9 @@
-/*
-  User-supplied local MP3 playlist for Claudia Night Drive.
-  Add entries manually: { id, title, src } where src is a path under ./assets/music/.
-  Empty by default — no autoplay, no auto-advance, no external catalog.
-*/
+/* User-supplied local MP3s (96 kbps mono). */
 export const musicTracks = [
-  // Example (leave commented until a real file exists):
-  // { id: "night-01", title: "Night Drive 01", src: "./assets/music/night-01.mp3" },
+  { id: 'track-01', title: 'Amber City Drive', src: './assets/music/01-amber-city-drive.mp3' },
+  { id: 'track-02', title: 'Amber City Drive', src: './assets/music/02-amber-city-drive.mp3' },
+  { id: 'track-03', title: 'Night Drive with Claudia', src: './assets/music/03-night-drive-with-claudia.mp3' },
+  { id: 'track-04', title: 'Night Drive with Claudia', src: './assets/music/04-night-drive-with-claudia.mp3' },
+  { id: 'track-05', title: 'Night Drive with Claudia', src: './assets/music/05-night-drive-with-claudia.mp3' },
+  { id: 'track-06', title: 'Night Drive with Claudia', src: './assets/music/06-night-drive-with-claudia.mp3' }
 ];

@@ -307,3 +307,130 @@ div#buttons button#button_music {
 #musicMenu .music-skip:hover {
   background: rgba(110, 50, 0, 0.95);
 }
+
+/* --- Music transport in the button bar --- */
+#musicTransport {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border-left: 0.15em solid var(--dashboard-border-color);
+  border-right: 0.15em solid var(--dashboard-border-color);
+  max-width: min(42vw, 18rem);
+}
+#musicTransport button {
+  padding: 0 0.7em !important;
+  border: none !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+#musicTransport .music-title {
+  padding: 0 0.65em 0 0.2em;
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 9.5em;
+  color: var(--dashboard-light-color);
+  opacity: 0.92;
+}
+
+#controlsMenu {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5em;
+  transform: translateX(-50%);
+  min-width: 12rem;
+  background: rgba(10, 4, 0, 0.92);
+  border: 0.2em solid var(--dashboard-border-color);
+  border-radius: 0.8em;
+  padding: 0.45rem;
+  z-index: 22;
+  font-family: sans-serif;
+  color: var(--dashboard-light-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+#controlsMenu[hidden] { display: none !important; }
+#controlsMenu .controls-option {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0.4em;
+  color: inherit;
+  padding: 0.5em 0.65em;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+#controlsMenu .controls-option:hover,
+#controlsMenu .controls-option.active {
+  background: rgba(80, 36, 0, 0.95);
+}
+
+/* Portrait phone: full 16:9 drive view, chrome (buttons / Talk) below */
+body.portrait-letterbox {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+body.portrait-letterbox #viewStage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+body.portrait-letterbox #viewStage canvas#renderer {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+body.portrait-letterbox #buttonsContainer.claudia-only {
+  position: relative;
+  bottom: auto;
+  flex: 1 1 auto;
+  opacity: 1;
+  transition: none;
+  align-items: flex-start;
+  padding: 0.85em 0.4em 1.1em;
+  background: #050200;
+  z-index: 15;
+}
+body.portrait-letterbox #buttonsContainer.claudia-only #buttons {
+  font-size: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 96vw;
+  border-radius: 1.4em;
+}
+body.portrait-letterbox #musicTransport {
+  max-width: min(70vw, 16rem);
+}
+body.portrait-letterbox #musicTransport .music-title {
+  max-width: 7.5em;
+}
+body.portrait-letterbox #dialoguePanel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100vw * 9 / 16 + 0.35rem);
+  bottom: auto;
+  z-index: 25;
+}
+body.portrait-letterbox #dialoguePanel .dialogue-card {
+  width: min(36rem, 94vw);
+  max-height: calc(100dvh - 100vw * 9 / 16 - 5.5rem);
+  overflow-y: auto;
+}
+body.portrait-letterbox #controlsMenu,
+body.portrait-letterbox #musicMenu {
+  top: calc(100vw * 9 / 16 + 0.35rem);
+  bottom: auto;
+}

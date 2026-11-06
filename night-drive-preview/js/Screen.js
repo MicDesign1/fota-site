@@ -31,6 +31,7 @@ export default class Screen {
     this.time = 0;
     this.updateListeners = [];
     this.element = document.createElement("div");
+    this.element.id = "viewStage";
     document.body.appendChild(this.element);
     this.resolution = 1;
     this.active = true;
@@ -236,8 +237,22 @@ export default class Screen {
     return this.composer.readBuffer?.texture || this.composer.writeBuffer?.texture;
   }
 
+  _layoutViewport() {
+    // Portrait phone: keep a full 16:9 drive view up top; chrome (buttons/Talk) sits below.
+    // Landscape / desktop: view fills the window as before.
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const portrait = wh > ww;
+    document.body.classList.toggle("portrait-letterbox", portrait);
+    if (portrait) {
+      const viewH = Math.round(ww * 9 / 16);
+      return { width: ww, height: Math.max(1, viewH), aspect: ww / Math.max(1, viewH) };
+    }
+    return { width: ww, height: wh, aspect: ww / Math.max(1, wh) };
+  }
+
   onWindowResize() {
-    const aspect = window.innerWidth / window.innerHeight;
+    const { aspect } = this._layoutViewport();
     this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
     if (this.altCamera != null) {
@@ -249,8 +264,9 @@ export default class Screen {
 
   setResolution(amount) {
     this.resolution = amount;
-    const width = Math.ceil(window.innerWidth * this.resolution);
-    const height = Math.ceil(window.innerHeight * this.resolution);
+    const vp = this._layoutViewport();
+    const width = Math.ceil(vp.width * this.resolution);
+    const height = Math.ceil(vp.height * this.resolution);
     this.renderer.setSize(width, height);
     this.renderer.domElement.style.width = "100%";
     this.renderer.domElement.style.height = "100%";
@@ -355,11 +371,11 @@ export default class Screen {
   }
 
   get width() {
-    return window.innerWidth;
+    return this._layoutViewport().width;
   }
 
   get height() {
-    return window.innerHeight;
+    return this._layoutViewport().height;
   }
 
   get backgroundColor() {

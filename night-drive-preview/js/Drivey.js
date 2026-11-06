@@ -71,7 +71,7 @@ export default class Drivey {
   constructor() {
     this.currentEffect = "ombré";
     this.npcControlScheme = new Input();
-    this.controlScheme = controlSchemesByName.get(isTouchDevice ? "touch" : "arrows");
+    this.controlScheme = controlSchemesByName.get("autopilot");
     this.screen = new Screen();
     this.buttons = new Buttons();
     this.buttons.addListener(this.onButtonClick.bind(this));
@@ -284,14 +284,15 @@ export default class Drivey {
     this.music = new MusicPlayer();
     this._refreshMusicMenu = () => {
       const st = this.music.status();
-      this.buttons.setMusicTracks(st.tracks, {
-        currentId: st.currentId && !st.paused ? st.currentId : null,
-        userStarted: st.userStarted,
-        onPick: (id) => this.onButtonClick("musicPick", id),
-        onSkip: () => this.onButtonClick("musicSkip", "trigger"),
-      });
+      this.buttons.setMusicStatus(st);
     };
+    this.music.addListener(() => this._refreshMusicMenu());
     this._refreshMusicMenu();
+    this.controlMode = "autopilot";
+    this.buttons.setControlsMenu({
+      current: this.controlMode,
+      onPick: (id) => this.onButtonClick("controlMode", id),
+    });
 
     // Only driver is a reachable front camera. "claudia" is the side-view mount (not a free cam).
     // Satellite / aerial / hood / rear / chase / side-selector are not exposed.
@@ -308,7 +309,7 @@ export default class Drivey {
 
     // Always driving: cruise starts at full (map key 2 → 1.0×).
     this.cruiseSpeed = cruiseSpeeds.get(2);
-    this.controlScheme = controlSchemesByName.get("arrows"); // optional arrow-key steer; no panel
+    this.controlScheme = controlSchemesByName.get("autopilot"); // default: always driving, no manual steer
     this.drivingSide = -1; // SIDE RIGHT locked
     this.dashboard.drivingSide = this.drivingSide;
     this.screen.setResolution(screenResolutions.get("high"));
@@ -378,6 +379,24 @@ export default class Drivey {
 
   updateBackgroundColor() {
     this.screen.backgroundColor = blendColors(this.themeColors, this.drawBrighterGround ? 0.25 : this.level.ground);
+  }
+
+  /** Side view: keep silhouette highlights amber — never pure white (stops sky flicker). */
+  _applySideAmberTints() {
+    if (this.level == null || this.themeColors == null) return;
+    const amber = this.level.tint.clone().lerp(new Color(1, 0.75, 0.35), 0.35);
+    silhouetteMaterial.uniforms.lightTint.value.copy(amber);
+    transparentMaterial.uniforms.lightTint.value.copy(amber);
+    silhouetteMaterial.uniforms.ditherMagnitude.value = 0.008;
+    transparentMaterial.uniforms.ditherMagnitude.value = 0.008;
+  }
+
+  _restoreFrontTints() {
+    if (this.themeColors == null) return;
+    silhouetteMaterial.uniforms.lightTint.value.copy(this.themeColors.light);
+    transparentMaterial.uniforms.lightTint.value.copy(this.themeColors.light);
+    silhouetteMaterial.uniforms.ditherMagnitude.value = 0.02;
+    transparentMaterial.uniforms.ditherMagnitude.value = 0.02;
   }
 
   updateButtonTint() {
@@ -510,6 +529,23 @@ export default class Drivey {
     monochromeAttribute.needsUpdate = true;
   }
 
+  _retintSideSkyCapped(mesh, level) {
+    if (mesh == null || mesh.geometry == null) return;
+    const skyGeometry = mesh.geometry;
+    const positions = skyGeometry.getAttribute("position");
+    const numVertices = positions.count;
+    const monochromeAttribute = skyGeometry.getAttribute("monochromeValue");
+    const monochromeValues = monochromeAttribute.array;
+    const skyLow = Math.min(level.skyLow, 0.52);
+    const skyHigh = level.skyHigh;
+    for (let i = 0; i < numVertices; i++) {
+      const y = positions.array[i * 3 + 0];
+      monochromeValues[i * 3 + 0] = skyLow * (1 - y) + skyHigh * y;
+      monochromeValues[i * 3 + 1] = 1;
+    }
+    monochromeAttribute.needsUpdate = true;
+  }
+
   onButtonClick(button, value) {
     switch (button) {
       case "checkClaudia":
@@ -518,21 +554,59 @@ export default class Drivey {
       case "talkClaudia":
         this.startClaudiaGlance({ talk: true });
         break;
-      case "music":
-        this.buttons.toggleMusicMenu();
+      case "musicToggle":
+        this.music.toggleFromUser();
+        this._refreshMusicMenu();
         this.buttons.wakeUp();
         break;
-      case "musicPick":
-        this.music.select(value);
+      case "musicPrev":
+        this.music.prev({ fromUser: true });
         this._refreshMusicMenu();
+        this.buttons.wakeUp();
         break;
-      case "musicSkip":
-        this.music.skipFromUser();
+      case "musicNext":
+        this.music.next({ fromUser: true });
         this._refreshMusicMenu();
+        this.buttons.wakeUp();
+        break;
+      case "drive":
+        this.goDrive();
+        break;
+      case "controls":
+        this.buttons.toggleControlsMenu();
+        this.buttons.wakeUp();
+        break;
+      case "controlMode":
+        this.setControlMode(value);
         break;
       // No cruise / npc / side / camera / level / quality selectors.
-      // Arrow keys still steer via Input (arrows scheme). Autopilot always on (cruise ≥ 0.5).
     }
+  }
+
+  /** Return to front driving view anytime; keeps dialogue history/flags in memory. */
+  goDrive() {
+    this._openTalkWhenHeld = false;
+    this.talkMode = false;
+    if (this.dialoguePanel) this.dialoguePanel.hide();
+    // Suspend (do not exitToRoad) so runtime dialogue state survives.
+    if (this.dialogue && this.dialogue.active) this.dialogue.suspend();
+    // Prevent dialogue onExit from double-triggering return.
+    this.beginReturnToRoad();
+    this.buttons.wakeUp();
+  }
+
+  setControlMode(id) {
+    const scheme = controlSchemesByName.get(id);
+    if (scheme == null) {
+      console.warn("Unknown control mode", id);
+      return;
+    }
+    this.controlMode = id;
+    this.controlScheme = scheme;
+    this.buttons.setControlsMenu({
+      current: id,
+      onPick: (next) => this.onButtonClick("controlMode", next),
+    });
   }
 
   startClaudiaGlance({ talk = false } = {}) {
@@ -593,6 +667,7 @@ export default class Drivey {
       this.drawBrighterGround = this._sideSavedBrighter;
       this._sideSavedBrighter = null;
     }
+    this._restoreFrontTints();
     this.dashboard.object.visible = true;
     this.myCarMesh.visible = false;
     this.sky.visible = true;
@@ -616,6 +691,10 @@ export default class Drivey {
     if (this.sideSky) {
       this.sky.visible = false;
       this.sideSky.visible = true;
+      // Cap horizon shade so dither never reaches lightTint white.
+      if (this.level != null) {
+        this._retintSideSkyCapped(this.sideSky, this.level);
+      }
     } else {
       this.sky.visible = true;
     }
@@ -641,9 +720,12 @@ export default class Drivey {
     this.sideCamera.aspect = this.screen.camera.aspect;
     this.sideCamera.updateProjectionMatrix();
 
+    // Keep clear color at night ground — brighter clear + white lightTint was
+    // blowing lamps/sky through dither into flashing white. Cap lightTint to amber.
     this._sideSavedBrighter = this.drawBrighterGround;
-    this.drawBrighterGround = true;
+    this.drawBrighterGround = false;
     this.updateBackgroundColor();
+    this._applySideAmberTints();
 
     // Face-anchored cover-fit overlay; real world shows through α cutouts.
     this.claudia.attachToSideCamera(this.sideCamera, {
