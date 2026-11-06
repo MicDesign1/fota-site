@@ -742,7 +742,7 @@ export default class Drivey {
       this._ensureRive().then(() => {
         if (!this._riveOpened) {
           this._riveOpened = true;
-          const line = riveOpener(this._riveSession);
+          const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
           this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
         }
       });
@@ -767,7 +767,7 @@ export default class Drivey {
     await this._ensureRive();
     if (!this._riveOpened) {
       this._riveOpened = true;
-      const line = riveOpener(this._riveSession);
+      const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
       this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
     }
     const result = await riveReply(this._riveSession, raw);

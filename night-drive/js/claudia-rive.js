@@ -5,13 +5,16 @@
 */
 import { BRAIN } from "./claudia-rive-brain.js?v=rive1";
 
-export const OPENER =
-  "Okay, I’ll play therapist. But if I ask about your mother, we’ve run out of material.";
+export const OPENER_MUSIC =
+  "Good. Now we have music and nowhere we have to be. What’s on your mind?";
+export const OPENER_QUIET =
+  "Good. Now we have a little time and nowhere we have to be. What’s on your mind?";
+export const OPENER = OPENER_QUIET;
 
 const SAFETY_RE =
   /\b(suicid\w*|kill myself|end my life|want to die|self[-\s]?harm|cut myself|hang myself|overdose|don'?t want to be alive|do not want to be alive)\b/i;
 export const SAFETY_REPLIES = [
-  "I’m not the right place for this. Please talk to someone real who can help—friends, family, or a crisis line in your area.",
+  "I'm glad you told me. Please reach someone who can be with you now. If you're in immediate danger, call emergency services or a crisis line in your area.",
   "This matters, and I can’t do what a person can. Reach out to people who can stay with you, or a local crisis line.",
   "This is bigger than a night drive chat. Please get to someone who can help you now—a person, or emergency services if you’re in danger.",
 ];
@@ -73,10 +76,46 @@ export async function createRiveSession({ RiveScript = null, rng = Math.random }
   };
 }
 
-export function opener(session) {
+export function opener(session, musicPlaying = false) {
   session.opened = true;
-  remember(session, OPENER);
-  return OPENER;
+  const line = musicPlaying ? OPENER_MUSIC : OPENER_QUIET;
+  remember(session, line);
+  return line;
+}
+
+
+// Named-pick follow-ups (why / what's it about / tell me more). Lines reuse Claudia's
+// reviewed wording (RIVESCRIPT-CREATIVE-REVIEW); game characterization, not sourced canon.
+const PICKS = [
+  { re: /\bbliss\b/i, lines: [
+    "Bliss is my Windows XP video: I fight the cursor, then send you outside to the hill in the wallpaper.",
+    "Of mine? Bliss. I got to send someone outside. That's rare for something that lives on a screen.",
+  ] },
+  { re: /lost in translation/i, lines: [
+    "Lost in Translation. Two people in a city at night, not quite knowing what to say. I like that it leaves room.",
+    "Lost in Translation is my favourite. Paris, Texas is the one I'd recommend after a drive like this.",
+  ] },
+  { re: /paris,? texas/i, lines: [
+    "Paris, Texas. Long roads and people struggling to say what they mean. I think it would stay with you.",
+  ] },
+  { re: /invisible cities|calvino/i, lines: [
+    "Invisible Cities, by Italo Calvino. Cities made out of memory and desire. I'd like to argue with a few of them.",
+  ] },
+  { re: /\brobyn\b/i, lines: [
+    "Robyn. She lets a song be sad without making it small.",
+    "Robyn. Crying on the dancefloor is a whole genre and she owns it.",
+  ] },
+  { re: /portal 2|\bportal\b/i, lines: [
+    "Portal 2. I have complicated feelings about being cast as the ceiling.",
+  ] },
+  { re: /believe me before dawn/i, lines: [
+    "Believe Me Before Dawn. Good for the stretch where nobody's talking.",
+  ] },
+];
+const FOLLOW_RE = /^(why|why that one|why that|how come|what is it about|what is that about|what is that|tell me more|tell me more about it|more|go on|say more)$/;
+const NAMED_ASK_RE = /^(tell me about|what is|what about|why|have you seen|have you heard|do you like|what do you think of|what do you think about) /;
+function pickFor(text) {
+  return PICKS.find((p) => p.re.test(text)) || null;
 }
 
 const RECENT_N = 4;
@@ -135,13 +174,24 @@ export async function reply(session, raw) {
   }
 
   let text = "";
+  const pick = FOLLOW_RE.test(norm)
+    ? pickFor(session.lastPickText || "")
+    : NAMED_ASK_RE.test(norm) ? pickFor(norm) : null;
+  if (pick) {
+    text = pick.lines.find((l) => !session.recent.includes(l)) || pick.lines[0];
+    remember(session, text);
+    session.lastPickText = text;
+    session.lastNorm = norm;
+    return { text, kind: "rive", distressMode: false };
+  }
   for (let tries = 0; tries < 8; tries++) {
     text = await session.bot.reply(session.user, norm);
     if (!session.recent.includes(text)) break;
   }
-  if (session.recent.includes(text)) {
-    text = "We’ve covered that. Ask me something else—music, films, cities, or me.";
-    if (session.recent.includes(text)) text = "Same question, same car. Try it from another angle?";
+  // Repeated direct answers are allowed when no fresh answer exists (Claudia review: no reprimand).
+  const last = session.recent[session.recent.length - 1];
+  for (let tries = 0; tries < 8 && text === last; tries++) {
+    text = await session.bot.reply(session.user, norm);
   }
 
   if (/\b(bye|goodbye|good night|goodnight|see you|gotta go)\b/.test(norm)) session.flags.said_bye = true;
@@ -150,6 +200,7 @@ export async function reply(session, raw) {
   const kind = /have a good answer for that|past me\. I.m a passenger|I won.t make it up\. Ask me something about tonight/i.test(text)
     ? "fallback"
     : "rive";
+  if (pickFor(text)) session.lastPickText = text;
   remember(session, text);
   session.lastNorm = norm;
   return { text, kind, distressMode: false };

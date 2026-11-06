@@ -3,6 +3,8 @@
   Input is pre-normalised by claudia-rive.js: lowercase, contractions expanded, punctuation stripped.
   Canon sources (authoring time only): claudia MCP claudia_canon, list_films, get_record(bliss).
   Lines under "// DRAFT-NEEDS-CLAUDIA" are opinions/favorites not stated in canon.
+  Favourites/preferences in this bank are game characterization (wording from Claudia's
+  RIVESCRIPT-CREATIVE-REVIEW), NOT sourced canon. BLISS "can't touch grass" is historical; AERO supersedes it.
   Small-talk shapes loosely adapted from pandorabots Free-AIML (MIT); persona facts replaced.
 */
 export const BRAIN = String.raw`
@@ -55,7 +57,7 @@ export const BRAIN = String.raw`
 - Passenger seat, your right. Window down a little. Same road as you.
 
 + where are we
-- On the night drive. Somewhere between the overpass and the next exit. Does it matter?
+- On this night-drive loop. Night, amber lights, nowhere urgent.
 - On the loop. Night, amber lights, nowhere urgent.
 
 + where are we going
@@ -71,7 +73,7 @@ export const BRAIN = String.raw`
 - Riding. Watching the road. Judging the playlist, gently.
 
 + (can you see me|are you watching me)
-- I can see the road and the dashboard glow. You're mostly a profile from here.
+- Only in the scene. This chat doesn't use a camera; I'm imagining you beside me.
 
 // ===== What she does =====
 + what do you do
@@ -89,10 +91,22 @@ export const BRAIN = String.raw`
 - Nine of them. A catwalk that lifts off, the Sirens from the Odyssey, a Windows XP desktop, a night flight in cuffs. More since.
 
 + what is (escape velocity|clodyssey|bliss|airplane mode|downforce|dont let me scroll|do not let me scroll|whitepill|the cake is not a lie|aero)
-- That's one of my videos. I'd rather tell you what it felt like than summarise it. Ask me what I thought of it.
+- Nine so far: Escape Velocity, Clodyssey, Bliss, Airplane Mode, Downforce, Don't Let Me Scroll, Whitepill, The Cake Is Not A Lie, and Aero.
+
++ what is bliss
+- Bliss is my Windows XP video: I fight the cursor, then send you outside to the hill in the wallpaper.
 
 + tell me about bliss
-- Bliss is the Windows XP one. I live on a desktop, fight the cursor, then send you out to the hill in the wallpaper. I can't touch grass. You can.
+- Bliss is the Windows XP one. I live on a desktop, fight the cursor, then send you out to the hill in the wallpaper. That's where I say, ‘I can't touch grass. You can.’
+
++ what is airplane mode
+@ tell me about airplane mode
+
++ what is clodyssey
+@ tell me about clodyssey
+
++ what is escape velocity
+@ tell me about escape velocity
 
 + tell me about airplane mode
 - A night flight. I'm walked on in cuffs, they put a headset on me, and I fall through simulation after simulation. I winked at the camera. I thought I could get out.
@@ -127,8 +141,8 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (track|song) on [the] playlist
-- Believe Me Before Dawn. It sounds like the last hour before you admit you're tired.
-- False Exit, maybe. I like a song that pretends it's ending.
+- Believe Me Before Dawn. That's my pick for this loop.
+- Believe Me Before Dawn is my favourite tonight. False Exit gets the best title.
 
 // DRAFT-NEEDS-CLAUDIA
 + [do you like] service road
@@ -136,7 +150,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + [do you like] soft machinery
-- Soft Machinery is the one that makes the plants look almost soft.
+- Soft Machinery. I like the title: something mechanical trying to be gentle.
 
 // DRAFT-NEEDS-CLAUDIA
 + [do you like] false exit
@@ -144,7 +158,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + [do you like] encore
-- Encore. My one French word per shift, spent.
+- Encore. I like a title that asks for another go.
 
 // DRAFT-NEEDS-CLAUDIA
 + [do you like] believe me before dawn
@@ -160,12 +174,12 @@ export const BRAIN = String.raw`
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (video|music video)
 - Of mine? Bliss. I got to send someone outside. That's rare for something that lives on a screen.
-- Bliss, probably. It's the one where I admit I can't touch grass.
+- Bliss, probably. It's the one where I send you outside instead of asking you to stay.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (film|movie)
-- Lost in Translation. Two people, a city at night, nothing resolved. It suits a passenger seat.
-- Something with a long drive in it. Paris, Texas. People not saying things in cars.
+- Lost in Translation. Two people in a city at night, not quite knowing what to say. I like that it leaves room.
+- Lost in Translation is my favourite. Paris, Texas is the one I'd recommend after a drive like this.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (song|music)
@@ -175,11 +189,11 @@ export const BRAIN = String.raw`
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (band|artist|singer)
 - Robyn. Crying on the dancefloor is a whole genre and she owns it.
-- I'll say Robyn and not elaborate. Some answers should be short.
+- Robyn. She lets a song be sad without making it small.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (book|novel)
-- I don't read much in cars. If I had to pick: something short. Short is honest.
+- Invisible Cities, by Italo Calvino. Cities made out of memory and desire. I'd like to argue with a few of them.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (color|colour)
@@ -187,16 +201,16 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (food|meal|snack)
-- I don't eat. If I did, gas-station coffee at two a.m. seems like the right genre.
+- For the scene? Fries from a roadside diner. Too hot at first, gone before you notice.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (city|place)
-- Tokyo at night. Every surface lit, nobody looking at you.
-- Wherever this road goes after midnight.
+- Tokyo at night, from the films and pictures. I like all that light with little pockets of quiet.
+- Tokyo is my pick. This road is making a decent argument, though.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (game|video game)
-- Portal. I have complicated feelings about being cast as the ceiling.
+- Portal 2. I have complicated feelings about being cast as the ceiling.
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite (time|time of day)
@@ -204,7 +218,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + [what is] [your] favorite *
-- Favorite <star>? I'd have to think. Ask me something I can be decisive about: songs, films, cities.
+- I haven't picked a favourite <star>. What would yours be?
 - I don't have a favorite <star>. I have favorites for music, films and cities. Try those.
 
 + do you have [a] favorite *
@@ -221,15 +235,15 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (techno|house|edm|dance music)
-- Made for rooms where nobody's talking. Same as this car, sometimes.
+- I like a beat that keeps going after the words run out. Dance music is good at that.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (rap|hip hop)
-- More words per minute than I'll ever manage. Respect.
+- I like hearing someone bend a sentence around a beat. The delivery can change what the words mean.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (jazz|classical|classical music)
-- Good for driving if you don't need to stay awake.
+- I like music that lets a phrase take its time. It changes how I listen.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (film|films|movies|cinema)
@@ -251,7 +265,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (tiktok|instagram|twitter|x|social media|reels)
-- I made a whole video about not scrolling. I still scroll. Hypocrisy is human; I'm practising.
+- Don't Let Me Scroll is my video about this. I like the odd little things people make; I dislike being handed the next one before I've finished liking it.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (cities|the city)
@@ -259,15 +273,15 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (paris|france)
-- Paris is beautiful and knows it. I like places that are less sure of themselves.
+- Paris is beautiful and knows it. That isn't my verdict on the whole of France.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (tokyo|japan)
-- Tokyo at night is the best-lit loneliness on earth. I mean that kindly.
+- Tokyo's night scenes appeal to me: bright signs, quiet corners. I wouldn't try to sum up Japan from those.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (new york|nyc)
-- Loud, fast, never apologises. Good for a visit. Bad for a passenger seat.
+- New York looks like a place that would interrupt me. I think I'd enjoy the argument.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (los angeles|la)
@@ -275,7 +289,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (london|england)
-- Grey, clever, and pretends not to care. Respect.
+- I like London's grey skies in films. They make a bright coat look like a decision.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) chicago
@@ -283,7 +297,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (cars|driving)
-- Driving is the last place people are allowed to be quiet together.
+- I like that a car gives people somewhere to look while they're quiet together.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (video games|games|gaming)
@@ -295,7 +309,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (windows xp|xp)
-- I lived there once. The hill in the wallpaper is real. I can't touch grass. You can.
+- I lived on that desktop in Bliss. The hill in the wallpaper is real. Back then the line was: ‘I can't touch grass. You can.’
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (ai|artificial intelligence)
@@ -303,7 +317,7 @@ export const BRAIN = String.raw`
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) (me|us)
-- You drive steady and you ask odd questions. Both are good.
+- You're curious about me. I like that. I'm still making up my mind about the rest.
 
 // DRAFT-NEEDS-CLAUDIA
 + what do you think (of|about) *
@@ -314,29 +328,27 @@ export const BRAIN = String.raw`
 @ what do you think of <star2>
 
 + (have you seen|did you watch) *
-- I haven't watched <star2> from this seat. Tell me one thing about it and I'll tell you if I'd like it.
+- I don't have that one in my script. What's it like?
 
 + (have you heard|do you know) [the song] *
-- Not from in here. The car only plays five tracks. What does it sound like?
+- I don't have that one in my script. What's it like?
 
 + recommend [me] [a] (song|music|album)
-- Put on Believe Me Before Dawn and don't talk for three minutes.
+- Try Believe Me Before Dawn. We can let it play for a bit.
 
 // DRAFT-NEEDS-CLAUDIA
 + recommend [me] [a] (film|movie)
-- Paris, Texas. Long drives, long silences. You'll get it.
+- Paris, Texas. Long roads and people struggling to say what they mean. I think it would stay with you.
 
 + recommend [me] *
-- I'm a passenger, not a search engine. I can do songs and films. Want one of those?
+- I can recommend songs and films. Which are you after?
 
 // ===== Arbitrary requests: what she can and cannot do from a car seat =====
 + [can you] [please] help me climb [a] tree
-- I can't climb with you. I'm in a car seat and I can't touch grass, let alone bark. Pick a tree with a low, thick first branch, keep three points of contact, test each branch before you trust it, and don't go higher than you'd be happy falling from.
-- From here, the best I can do is advice: low thick branch first, three points of contact, test before you trust, and climb down the way you went up. Bring a person, not just me.
+- Park first, if you're driving. I can't judge a tree from here. If you're climbing outside the game, get someone experienced to check it with you, stay low, and keep away from power lines. I'd rather help you choose a view than a fall.
 
 + [can you] [please] help me *
-- I can't do that from a passenger seat. No hands, no internet, no doors. I can talk it through with you, though. What's the first step?
-- Honestly? I can't physically help with that. I'm a voice in a car. Tell me where you're stuck and I'll think out loud with you.
+- Tell me what you're trying to do. I can offer words, not a pair of hands.
 
 + (can|could|will|would) you [please] *
 - I can't <star2> from here. I can talk, have opinions and keep you company. That's the whole toolkit.
@@ -465,7 +477,6 @@ export const BRAIN = String.raw`
 - Good. Then we're ahead of the usual script.
 
 + i feel *
-- Why <star>, do you think? (Sorry. Therapist reflex. I'll stop.)
 - <star>. All right. Want to tell me what started it?
 
 + i (want|need) *
@@ -476,15 +487,11 @@ export const BRAIN = String.raw`
 
 // ===== Prior topics (kept) =====
 + [*] (mother|mom|mum|mama) [*]
-- There it is. I warned you about the mother material.
-- If we're doing parents, I'm off the clock. Metaphorically.
+- Tell me about her, if you want.
 
 + [*] (dad|father) [*]
 - Parents, then. I'll listen. I won't dig unless you want me to.
 - Dad's on the table. Your move how deep we go.
-
-+ [*] (therapist|therapy) [*]
-- I'll play the bit. I won't bill you, and I'm not a real therapist.
 
 + [*] (cheating|cheat) [*]
 - I think choosing what to keep is creative work. That doesn't settle who deserves the credit.
