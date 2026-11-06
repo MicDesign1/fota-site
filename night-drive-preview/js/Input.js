@@ -18,6 +18,15 @@ class Input {
 
 const touchesFrom = (event) => Array.from(event.changedTouches);
 
+const isUiControlTarget = (target) => {
+  if (target == null) return false;
+  if (target.type === "button" || target.tagName === "BUTTON") return true;
+  if (typeof target.closest === "function" && target.closest("#dialoguePanel, #buttons, #musicMenu, #controlsMenu, #musicTransport, a.gpl-source")) {
+    return true;
+  }
+  return false;
+};
+
 class TouchInput extends Input {
   constructor() {
     super();
@@ -26,7 +35,7 @@ class TouchInput extends Input {
 
     document.addEventListener("touchstart", (event) => {
       touchesFrom(event)
-        .filter((touch) => touch.target.type !== "button")
+        .filter((touch) => !isUiControlTarget(touch.target))
         .forEach((touch) => {
           this.deltas.set(touch.identifier, {
             x: touch.clientX,
@@ -53,7 +62,7 @@ class TouchInput extends Input {
     });
     document.addEventListener("touchcancel", (event) => this.deltas.clear());
     document.addEventListener("mousedown", (event) => {
-      if (event.target.type === "button") return;
+      if (isUiControlTarget(event.target)) return;
       if (event.button !== 0) return;
       this.deltas.set(-1, { x: event.clientX, y: event.clientY, dx: 0, dy: 0 });
     });
@@ -115,10 +124,10 @@ class OneSwitchInput extends Input {
     this.shiftSpeed = -0.2;
 
     document.addEventListener("click", (event) => {
-      if (event.target.type !== "button") this.shiftSpeed *= -1;
+      if (!isUiControlTarget(event.target)) this.shiftSpeed *= -1;
     });
     document.addEventListener("touchstart", (event) => {
-      if (event.target.type !== "button") this.shiftSpeed *= -1;
+      if (!isUiControlTarget(event.target)) this.shiftSpeed *= -1;
     });
   }
 

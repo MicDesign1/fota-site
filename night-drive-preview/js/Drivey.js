@@ -25,8 +25,8 @@ import Car from "./Car.js?v=20261106e";
 import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106e";
-import DialoguePanel from "./DialoguePanel.js?v=20261106e";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106t";
+import DialoguePanel from "./DialoguePanel.js?v=20261106t";
 import MusicPlayer from "./MusicPlayer.js?v=20261106e";
 
 const parser = new DOMParser();
@@ -661,7 +661,7 @@ export default class Drivey {
       const openNow = this.checkPhase === "hold" || this.screen.viewBlend >= 0.999;
       if (openNow) {
         const view = this.dialogue.currentId != null
-          ? this.dialogue._view(this.dialogue.current)
+          ? this.dialogue.resume()
           : this.dialogue.start(dialogueStartId);
         if (view) this.dialoguePanel.show(view);
       } else {
@@ -799,7 +799,7 @@ export default class Drivey {
       if (this._openTalkWhenHeld) {
         this._openTalkWhenHeld = false;
         const view = this.dialogue.current
-          ? this.dialogue._view(this.dialogue.current)
+          ? this.dialogue.resume()
           : this.dialogue.start(dialogueStartId);
         if (view) this.dialoguePanel.show(view);
       }

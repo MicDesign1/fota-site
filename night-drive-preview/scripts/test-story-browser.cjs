@@ -63,7 +63,12 @@ async function run() {
     return page.evaluate(() => ({
       id: window.drivey.dialogue.currentId,
       line: document.querySelector("#dialogueLine").textContent,
-      choices: [...document.querySelectorAll("#dialogueChoices .dialogue-choice")].map((button) => button.textContent),
+      choices: [...document.querySelectorAll("#dialogueChoices .dialogue-choice")].map((button) => {
+        const letter = button.querySelector(".dialogue-choice-letter")?.textContent?.trim();
+        const label = button.querySelector(".dialogue-choice-label")?.textContent?.trim();
+        if (letter && label) return `${letter}. ${label}`;
+        return button.textContent.trim();
+      }),
       expected: window.drivey.dialogue.current ? window.drivey.dialogue.resolveLine(window.drivey.dialogue.current) : null,
       flags: { ...window.drivey.dialogue.flags },
       history: window.drivey.dialogue.history.map((item) => ({ nodeId: item.nodeId, choiceIndex: item.choiceIndex, label: item.label })),

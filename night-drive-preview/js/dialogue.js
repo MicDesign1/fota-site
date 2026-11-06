@@ -25,7 +25,7 @@
   No AI calls. Advancement is start() / choose(index) only.
 */
 
-import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106e";
+import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106t";
 
 /** @typedef {{ label: string, next: string | null, setFlags?: Record<string, unknown>, requireFlags?: Record<string, unknown> }} DialogueChoice */
 /**
@@ -61,6 +61,8 @@ export default class Dialogue {
     this.flags = Object.create(null);
     /** @type {Array<{ nodeId: string, choiceIndex: number, label: string, next: string | null }>} */
     this.history = [];
+    /** @type {Array<{ role: "claudia" | "you", text: string, nodeId?: string }>} */
+    this.log = [];
   }
 
   get current() {
@@ -96,6 +98,23 @@ export default class Dialogue {
     return flagsMatch(node.requireFlags, this.flags);
   }
 
+
+  _appendLog(role, text, nodeId = null) {
+    const line = (text ?? "").trim();
+    if (!line) return;
+    const last = this.log[this.log.length - 1];
+    if (last && last.role === role && last.text === line && last.nodeId === nodeId) return;
+    this.log.push({ role, text: line, nodeId });
+  }
+
+  /** Re-open Talk on the current node without resetting history/flags/log. */
+  resume() {
+    if (this.currentId == null) return this.start(this.startId);
+    if (!this.nodeAllowed(this.currentId)) return null;
+    this.active = true;
+    return this._view(this.current);
+  }
+
   /** Begin at a node (default: script startId). */
   start(nodeId = this.startId) {
     const node = this.script[nodeId];
@@ -109,8 +128,10 @@ export default class Dialogue {
     }
     this.currentId = nodeId;
     this.active = true;
-    if (this.onEnter) this.onEnter(this._view(node));
-    return this._view(node);
+    this._appendLog("claudia", this.resolveLine(node), nodeId);
+    const view = this._view(node);
+    if (this.onEnter) this.onEnter(view);
+    return view;
   }
 
   _view(node) {
@@ -123,6 +144,7 @@ export default class Dialogue {
       ended: choices.length === 0,
       flags: { ...this.flags },
       history: this.history.slice(),
+      log: this.log.slice(),
     };
   }
 
@@ -153,6 +175,7 @@ export default class Dialogue {
       label: choice.label,
       next: choice.next,
     });
+    this._appendLog("you", choice.label, node.id);
     if (choice.next == null) {
       // End of branch: stay in Talk; UI shows a Drive button. Do not auto-return.
       this.currentId = null;
@@ -165,6 +188,7 @@ export default class Dialogue {
         ended: true,
         flags: { ...this.flags },
         history: this.history.slice(),
+        log: this.log.slice(),
       };
       if (this.onEnter) this.onEnter(ended);
       return ended;
@@ -181,6 +205,7 @@ export default class Dialogue {
         ended: true,
         flags: { ...this.flags },
         history: this.history.slice(),
+        log: this.log.slice(),
       };
       if (this.onEnter) this.onEnter(ended);
       return ended;
