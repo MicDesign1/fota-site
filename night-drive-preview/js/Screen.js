@@ -252,6 +252,7 @@ export default class Screen {
     const wh = window.innerHeight;
     const portrait = wh > ww;
     document.body.classList.toggle("portrait-letterbox", portrait);
+    document.documentElement.classList.toggle("portrait-letterbox", portrait);
     if (portrait) {
       const viewH = Math.round(ww * 9 / 16);
       return { width: ww, height: Math.max(1, viewH), aspect: ww / Math.max(1, viewH) };
