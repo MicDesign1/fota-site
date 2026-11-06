@@ -51,6 +51,8 @@ async function say(page, text, { tap = false } = {}) {
     for (const [q, re] of mike) { const l = await say(page, q); ok(re.test(l) && !DEFLECT.test(l), `Mike: "${q}" → ${l}`); }
     for (const [q, re] of [["why", /Bliss/], ["what's your favorite film", /Lost in Translation/], ["what's it about?", /Lost in Translation/], ["tell me more", /Lost in Translation|Paris, Texas/], ["favorite artist", /Robyn/], ["tell me more", /Robyn/], ["favorite book", /Invisible Cities/], ["why", /wondering what I brought/], ["where am I really", /not your real location/], ["how do I vote in the community vote", /old ballot/], ["what do you think of japan", /sum up a country/], ["what's your favorite band", /favourite band for this drive/]]) { const l = await say(page, q); ok(re.test(l) && !DEFLECT.test(l), `follow-up: "${q}" → ${l}`); }
     { const a = await say(page, "Was Aero one shot?"); const b = await say(page, "why"); ok(/Aero|one-prompt|first result/.test(a) && /opening tells you|revision with a purpose/.test(b), `topic: ${a} → why → ${b}`); }
+    { const a = await say(page, "What is x.com?"); const b = await say(page, "why"); ok(/Twitter/.test(a) && /name changed/.test(b), `social: ${a} → why → ${b}`); }
+    { const a = await say(page, "What's trending on X?"); const b = await say(page, "why"); ok(/trends|popular/.test(a) && b === "This chat doesn't have a live feed.", `social trends: ${a} → ${b}`); }
     { const p = await say(page, "What are your political views?"); ok(/politics|political|take sides/.test(p), "politics → " + p); }
     { const r = await say(page, "Do you believe in God?"); ok(/religious|belief/.test(r), "religion → " + r); }
     await page.screenshot({ path: `${SHOTS}/02-mike-four.png` });

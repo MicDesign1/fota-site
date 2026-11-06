@@ -4,6 +4,7 @@
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
 import { BRAIN } from "./claudia-rive-brain.js?v=rive1";
+import { SOCIAL, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=rive1";
 import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=rive1";
 
 export const OPENER_MUSIC =
@@ -188,6 +189,22 @@ export async function reply(session, raw) {
     return { text: t, kind: "rive", distressMode: false };
   };
   const rot = (lines) => lines.find((l) => l !== session.recent[session.recent.length - 1]) || lines[0];
+  if (FOLLOW_RE.test(norm) && session.lastTopic && session.lastTopic.startsWith("social:")) {
+    const sp = SOCIAL.find((x) => "social:" + x.id === session.lastTopic);
+    if (sp) return say(/more|go on/.test(norm) ? sp.more : sp.why, { topic: session.lastTopic, variant: session.lastVariant });
+  }
+  if (SOCIAL_BARE_X_RE.test(norm)) return say(SOCIAL_BARE_X_LINE);
+  if (SOCIAL_PUBLISH_RE.test(norm)) return say(SOCIAL_PUBLISH_LINE);
+  if (SOCIAL_THIS_GAME_RE.test(norm)) return say(SOCIAL_THIS_GAME_LINE);
+  {
+    const sp = SOCIAL.find((x) => x.re.test(norm));
+    if (sp) {
+      const fresh = sp.replies.map((t, i) => i).filter((i) => !session.recent.includes(sp.replies[i]));
+      const pool = fresh.length ? fresh : sp.replies.map((t, i) => i);
+      const v = pool[Math.floor((session.rng || Math.random)() * pool.length)];
+      return say(sp.replies[v], { topic: "social:" + sp.id, variant: v });
+    }
+  }
   if (FOLLOW_RE.test(norm) && session.lastTopic) {
     const tp = TOPICS.find((x) => x.id === session.lastTopic);
     const f = tp && tp.follow.find((x) => x.v.includes(session.lastVariant));

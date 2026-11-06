@@ -131,5 +131,24 @@ console.log(log.join("\n"));
   console.log(log.filter((l) => /FAIL|topics:/.test(l)).join("\n"));
 }
 
+// Social module (preview)
+{
+  const { SOCIAL } = await import("../js/claudia-rive-social.js");
+  const qs = {x:"What is x.com?",account:"Are you on X?",tiktok:"Do you know TikTok?",instagram:"What is Instagram?",youtube:"Do you know YouTube?",memes:"Do you know memes?",trends:"What's trending on X?",followers:"What are followers?",tweet:"Is it a tweet or a post?",seepost:"Can you see my post?",counts:"How many followers do I have?",whatpost:"What should I post?"};
+  for (const sp of SOCIAL) for (const [f, key] of [["why","why"],["tell me more","more"],["how so?","why"]]) {
+    const s = await createRiveSession(); const a = (await reply(s, qs[sp.id])).text; const b = (await reply(s, f)).text;
+    (sp.replies.includes(a) && b === sp[key]) ? pass++ : (fail++, log.push(`FAIL social ${sp.id} ${f} → ${a} / ${b}`));
+  }
+  const m = SOCIAL.find((x) => x.id === "memes"), t = SOCIAL.find((x) => x.id === "trends");
+  if (m.why !== "A familiar image can mean something different with a new caption." || /live feed/.test(m.why) || !/live feed/.test(t.why)) { fail++; log.push("FAIL memes/trends why"); } else pass++;
+  if (m.replies.some((r) => t.replies.includes(r))) { fail++; log.push("FAIL memes/trends mixed"); } else pass++;
+  const all = JSON.stringify(SOCIAL);
+  if (/this preview|Paste the wording/.test(all) || /@(?!anabology)\w+/.test(all)) { fail++; log.push("FAIL social text"); } else pass++;
+  const fr = async (q) => (await reply(await createRiveSession(), q)).text;
+  for (const [q, re] of [["x", /Do you mean the platform/], ["can you post this", /can't publish/], ["how should I share this game", /night-driving game/], ["what is your twitter handle", /@anabology/], ["how many followers does anabology have", /count|numbers|number/]]) { const r = await fr(q); re.test(r) ? pass++ : (fail++, log.push(`FAIL social ${q} → ${r}`)); }
+  const allLines = SOCIAL.flatMap((x) => [...x.replies, x.why, x.more]);
+  for (const q of ["post", "follow", "follow me", "on x", "x marks the spot", "i will post it later", "reels", "trending", "the next exit", "I want to kill myself after seeing that tweet"]) { const r = await fr(q); allLines.includes(r) || /Do you mean the platform|can't publish/.test(r) ? (fail++, log.push(`FAIL social overbroad ${q} → ${r}`)) : pass++; }
+  const s9 = await createRiveSession(); await reply(s9, "what is tiktok"); await reply(s9, "who are you"); const r9 = (await reply(s9, "why")).text; allLines.includes(r9) ? (fail++, log.push("FAIL social stale")) : pass++;
+}
 console.log(`RIVE TESTS: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
