@@ -17,7 +17,7 @@ import { lerp, PI } from "./math.js?v=20261106e";
 import { silhouetteMaterial, transparentMaterial, blendColors } from "./materials.js?v=20261106e";
 import { shadeGeometry } from "./geometry.js?v=20261106e";
 import isTouchDevice from "./isTouchDevice.js?v=20261106e";
-import { Input, controlSchemesByName } from "./Input.js?v=20261106e";
+import { Input, controlSchemesByName } from "./Input.js?v=20261106t";
 
 import Screen from "./Screen.js?v=20261106e";
 import Buttons from "./Buttons.js?v=20261106e";
