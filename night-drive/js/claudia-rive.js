@@ -4,6 +4,7 @@
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
 import { BRAIN } from "./claudia-rive-brain.js?v=rive1";
+import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=rive1";
 
 export const OPENER_MUSIC =
   "Good. Now we have music and nowhere we have to be. What’s on your mind?";
@@ -112,7 +113,7 @@ const PICKS = [
     "Believe Me Before Dawn. Good for the stretch where nobody's talking.",
   ] },
 ];
-const FOLLOW_RE = /^(why|why that one|why that|how come|what is it about|what is that about|what is that|tell me more|tell me more about it|more|go on|say more)$/;
+const FOLLOW_RE = /^(why|why that one|why that|how come|what is it about|what is that about|what is that|tell me more|tell me more about it|more|go on|say more|how so)$/;
 const NAMED_ASK_RE = /^(tell me about|what is|what about|why|have you seen|have you heard|do you like|what do you think of|what do you think about) /;
 function pickFor(text) {
   return PICKS.find((p) => p.re.test(text)) || null;
@@ -174,6 +175,33 @@ export async function reply(session, raw) {
   }
 
   let text = "";
+  // Culture topics: last_topic / last_variant kept in RAM; follow-ups explain the variant just said.
+  const say = (t, extra = {}) => {
+    remember(session, t);
+    session.lastNorm = norm;
+    session.lastPickText = "";
+    session.lastTopic = extra.topic || null;
+    session.lastVariant = extra.variant ?? null;
+    return { text: t, kind: "rive", distressMode: false };
+  };
+  const rot = (lines) => lines.find((l) => l !== session.recent[session.recent.length - 1]) || lines[0];
+  if (FOLLOW_RE.test(norm) && session.lastTopic) {
+    const tp = TOPICS.find((x) => x.id === session.lastTopic);
+    const f = tp && tp.follow.find((x) => x.v.includes(session.lastVariant));
+    if (f) return say(f.text, { topic: tp.id, variant: session.lastVariant });
+  }
+  if (CONTEST_LIVE_RE.test(norm)) return say(CONTEST_LIVE_LINE);
+  if (POLITICS_RE.test(norm)) return say(rot(POLITICS_LINES));
+  if (RELIGION_RE.test(norm)) return say(rot(RELIGION_LINES));
+  const tp = TOPICS.find((x) => x.re.test(norm));
+  if (tp) {
+    const fresh = tp.replies.map((t, i) => i).filter((i) => !session.recent.includes(tp.replies[i]));
+    const pool = fresh.length ? fresh : [0, 1, 2];
+    const v = pool[Math.floor((session.rng || Math.random)() * pool.length)];
+    return say(tp.replies[v], { topic: tp.id, variant: v });
+  }
+  session.lastTopic = null;
+  session.lastVariant = null;
   const pick = FOLLOW_RE.test(norm)
     ? pickFor(session.lastPickText || "")
     : NAMED_ASK_RE.test(norm) ? pickFor(norm) : null;
