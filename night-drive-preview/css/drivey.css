@@ -260,26 +260,36 @@ div#buttonsContainer.claudia-only #buttons button {
   background: rgba(0, 0, 0, 0.22);
   touch-action: pan-y;
 }
-/* Wide: history to the right of question + choices */
+/* Wide: history to the right of question + choices.
+   Cap the Earlier box ~4 lines so it never grows over Claudia's face. */
 @media (min-width: 720px) {
   #dialoguePanel .dialogue-card {
     flex-direction: row;
-    align-items: stretch;
+    align-items: flex-start;
     width: min(56rem, 96vw);
+    /* Keep the whole panel in the lower third on desktop side view */
+    max-height: min(38vh, 22rem);
+    overflow-y: auto;
   }
   #dialoguePanel .dialogue-main {
     flex: 1 1 58%;
+    min-height: 0;
   }
   #dialoguePanel .dialogue-history {
-    flex: 1 1 42%;
+    flex: 0 1 42%;
+    align-self: flex-start;
     max-width: 18rem;
     border-left: 1px solid rgba(255, 192, 138, 0.16);
     padding-left: 0.75rem;
   }
   #dialoguePanel .dialogue-log {
-    max-height: none;
-    height: 100%;
-    min-height: 8rem;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    box-sizing: border-box;
+    /* ~4 lines total incl. padding/border (~130px) */
+    max-height: 8.25rem; /* 132px */
+    overflow-y: auto;
   }
 }
 /* Narrow: history below choices */
