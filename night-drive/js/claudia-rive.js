@@ -3,9 +3,9 @@
   RiveScript is the vendored global from lib/rivescript (loaded by a classic <script>).
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
-import { BRAIN } from "./claudia-rive-brain.js?v=rive1";
-import { SOCIAL, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=rive1";
-import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=rive1";
+import { BRAIN } from "./claudia-rive-brain.js?v=social2";
+import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=social2";
+import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=social2";
 
 export const OPENER_MUSIC =
   "Good. Now we have music and nowhere we have to be. What’s on your mind?";
@@ -193,18 +193,6 @@ export async function reply(session, raw) {
     const sp = SOCIAL.find((x) => "social:" + x.id === session.lastTopic);
     if (sp) return say(/more|go on/.test(norm) ? sp.more : sp.why, { topic: session.lastTopic, variant: session.lastVariant });
   }
-  if (SOCIAL_BARE_X_RE.test(norm)) return say(SOCIAL_BARE_X_LINE);
-  if (SOCIAL_PUBLISH_RE.test(norm)) return say(SOCIAL_PUBLISH_LINE);
-  if (SOCIAL_THIS_GAME_RE.test(norm)) return say(SOCIAL_THIS_GAME_LINE);
-  {
-    const sp = SOCIAL.find((x) => x.re.test(norm));
-    if (sp) {
-      const fresh = sp.replies.map((t, i) => i).filter((i) => !session.recent.includes(sp.replies[i]));
-      const pool = fresh.length ? fresh : sp.replies.map((t, i) => i);
-      const v = pool[Math.floor((session.rng || Math.random)() * pool.length)];
-      return say(sp.replies[v], { topic: "social:" + sp.id, variant: v });
-    }
-  }
   if (FOLLOW_RE.test(norm) && session.lastTopic) {
     const tp = TOPICS.find((x) => x.id === session.lastTopic);
     const f = tp && tp.follow.find((x) => x.v.includes(session.lastVariant));
@@ -212,8 +200,22 @@ export async function reply(session, raw) {
   }
   if (VOTE_HOWTO_RE.test(norm)) return say(VOTE_HOWTO_LINE);
   if (CONTEST_LIVE_RE.test(norm)) return say(CONTEST_LIVE_LINE);
+  if (/\b(your|you have) political (views?|opinions?|position)\b/.test(norm)) return say(rot(POLITICS_LINES));
   if (POLITICS_RE.test(norm)) return say(rot(POLITICS_LINES));
   if (RELIGION_RE.test(norm)) return say(rot(RELIGION_LINES));
+  if (SOCIAL_BARE_X_RE.test(norm)) return say(SOCIAL_BARE_X_LINE);
+  if (SOCIAL_PUBLISH_RE.test(norm)) return say(SOCIAL_PUBLISH_LINE);
+  if (SOCIAL_THIS_GAME_RE.test(norm)) return say(SOCIAL_THIS_GAME_LINE);
+  {
+    const sid = SOCIAL.find((x) => x.re.test(norm))?.id || socialIdFor(norm);
+    const sp = sid && SOCIAL.find((x) => x.id === sid);
+    if (sp) {
+      const fresh = sp.replies.map((t, i) => i).filter((i) => !session.recent.includes(sp.replies[i]));
+      const pool = fresh.length ? fresh : sp.replies.map((t, i) => i);
+      const v = pool[Math.floor((session.rng || Math.random)() * pool.length)];
+      return say(sp.replies[v], { topic: "social:" + sp.id, variant: v });
+    }
+  }
   const tp = TOPICS.find((x) => x.re.test(norm));
   if (tp) {
     const fresh = tp.replies.map((t, i) => i).filter((i) => !session.recent.includes(tp.replies[i]));
