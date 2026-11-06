@@ -44,7 +44,7 @@ const cases = [
   ["what do you think about movies", /film|ending|trust/i],
   ["What do you think of art?", /summarise|Art/i],
   ["what do you think of memes", /internet|folk songs/i],
-  ["do you like tiktok", /scroll/i],
+  ["do you like tiktok", /scroll|TikTok|platform/i],
   ["what do you think of paris", /Paris/],
   ["do you like tokyo", /Tokyo/],
   ["where are you", /^Beside you, in this night-drive scene\./],
@@ -149,6 +149,29 @@ console.log(log.join("\n"));
   const allLines = SOCIAL.flatMap((x) => [...x.replies, x.why, x.more]);
   for (const q of ["post", "follow", "follow me", "on x", "x marks the spot", "i will post it later", "reels", "trending", "the next exit", "I want to kill myself after seeing that tweet"]) { const r = await fr(q); allLines.includes(r) || /Do you mean the platform|can't publish/.test(r) ? (fail++, log.push(`FAIL social overbroad ${q} → ${r}`)) : pass++; }
   const s9 = await createRiveSession(); await reply(s9, "what is tiktok"); await reply(s9, "who are you"); const r9 = (await reply(s9, "why")).text; allLines.includes(r9) ? (fail++, log.push("FAIL social stale")) : pass++;
+}
+// Social contains-routing (natural phrasings)
+{
+  const { SOCIAL } = await import("../js/claudia-rive-social.js");
+  const G = (id) => SOCIAL.find((x) => x.id === id).replies;
+  const cases = [
+    ["who do you follow on x","account"],["who do you follow","account"],["are you on social media","account"],["do you have social media","account"],
+    ["do you have an instagram","account"],["whats your twitter","account"],["do you use tiktok","account"],["are you on x","account"],
+    ["are you on twitter?","account"],["what's your x handle","account"],["do you have socials","account"],["can I follow you on instagram","account"],
+    ["where can I follow you on social media","account"],["do you have a youtube channel","account"],["what's your tiktok","account"],["do you post on x","account"],
+    ["do you tweet","account"],["what's your handle","account"],["what is twitter","x"],["have you heard of tiktok","tiktok"],
+    ["what do you think of youtube","youtube"],["is instagram still a thing","instagram"],["what's trending on twitter","trends"],
+    ["how many followers do you have on x","counts"],["can you read my tweet","seepost"],["what should I post on instagram","whatpost"],
+    ["Do you know what x.com is?","x"],["do you have a tiktok account","account"],
+  ];
+  for (const [q, id] of cases) { const r = (await reply(await createRiveSession(), q)).text; G(id).includes(r) ? pass++ : (fail++, log.push(`FAIL natural ${q} → ${r}`)); }
+  const s = await createRiveSession(); await reply(s, "who do you follow on x"); const w = (await reply(s, "why")).text;
+  w === SOCIAL.find((x) => x.id === "account").why ? pass++ : (fail++, log.push("FAIL natural why " + w));
+  const all = SOCIAL.flatMap((x) => [...x.replies, x.why, x.more]);
+  for (const q of ["post", "follow", "follow the road", "i will post it later", "on the x axis", "x marks the spot"]) { const r = (await reply(await createRiveSession(), q)).text; all.includes(r) ? (fail++, log.push(`FAIL natural overbroad ${q}`)) : pass++; }
+  const pv = (await reply(await createRiveSession(), "what are your political views on twitter")).text; /politics|political|sides/.test(pv) ? pass++ : (fail++, log.push("FAIL politics-before-social"));
+  const rg = (await reply(await createRiveSession(), "do you believe in god")).text; /religious|belief/.test(rg) ? pass++ : (fail++, log.push("FAIL religion"));
+  const ds = (await reply(await createRiveSession(), "I want to kill myself after that tweet")).text; /emergency|crisis/.test(ds) ? pass++ : (fail++, log.push("FAIL distress-before-social"));
 }
 console.log(`RIVE TESTS: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

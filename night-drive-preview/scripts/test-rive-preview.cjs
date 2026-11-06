@@ -53,11 +53,12 @@ async function say(page, text, { tap = false } = {}) {
     { const a = await say(page, "Was Aero one shot?"); const b = await say(page, "why"); ok(/Aero|one-prompt|first result/.test(a) && /opening tells you|revision with a purpose/.test(b), `topic: ${a} → why → ${b}`); }
     { const a = await say(page, "What is x.com?"); const b = await say(page, "why"); ok(/Twitter/.test(a) && /name changed/.test(b), `social: ${a} → why → ${b}`); }
     { const a = await say(page, "What's trending on X?"); const b = await say(page, "why"); ok(/trends|popular/.test(a) && b === "This chat doesn't have a live feed.", `social trends: ${a} → ${b}`); }
+    for (const q of ["who do you follow on x","who do you follow","are you on social media","do you have social media","do you have an instagram","whats your twitter","do you use tiktok","are you on x"]) { const l = await say(page, q); ok(/@anabology/.test(l), `social natural: "${q}" → ${l}`); }
     { const p = await say(page, "What are your political views?"); ok(/politics|political|take sides/.test(p), "politics → " + p); }
     { const r = await say(page, "Do you believe in God?"); ok(/religious|belief/.test(r), "religion → " + r); }
     await page.screenshot({ path: `${SHOTS}/02-mike-four.png` });
 
-    const culture = [["what song is this", /playlist|Service Road/], ["favourite film?", /Lost in Translation|Paris, Texas/], ["what do you think of tokyo", /Tokyo/], ["do you like tiktok", /scroll/i], ["what do you do", /sing/i], ["tell me about your videos", /Bliss|Nine|nine/]];
+    const culture = [["what song is this", /playlist|Service Road/], ["favourite film?", /Lost in Translation|Paris, Texas/], ["what do you think of tokyo", /Tokyo/], ["do you like tiktok", /scroll|TikTok|platform/i], ["what do you do", /sing/i], ["tell me about your videos", /Bliss|Nine|nine/]];
     for (const [q, re] of culture) { const l = await say(page, q); ok(re.test(l), `culture: "${q}" → ${l}`); }
 
     await say(page, "<b>bold</b> <script>alert(1)</script>");
