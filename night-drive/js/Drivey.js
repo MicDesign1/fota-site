@@ -29,6 +29,17 @@ import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "
 import DialoguePanel from "./DialoguePanel.js?v=20261106w";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 
+/** Chance that a Talk answer soft-toggles Claudia's eyes (0–1). Override with ?exprchance=0.5 */
+const EXPRESSION_CHANGE_CHANCE = 0.3;
+
+/** Story moods that force an eye variant; idle / unknown keep the current look unless chance fires. */
+const MOOD_TO_EYES = {
+  smile: "open",
+  listen: "open",
+  think: "closed",
+};
+
+
 const parser = new DOMParser();
 const readLevel = (htmlText) => {
   const levelDOM = parser.parseFromString(htmlText, "text/html").documentElement;
@@ -257,6 +268,7 @@ export default class Drivey {
 
     // Talk mode: side view stays open while the dialogue panel is up.
     this.talkMode = false;
+    this.expressionChangeChance = EXPRESSION_CHANGE_CHANCE;
 
     this.dialoguePanel = new DialoguePanel({
       onChoose: (index) => this.onDialogueChoose(index),
@@ -331,7 +343,7 @@ export default class Drivey {
     this.screen.scene.visible = true;
   }
 
-  /** URL debug: ?side | ?noclaudia | ?rawsky | ?upstreambackseat (combinable). */
+  /** URL debug: ?side | ?noclaudia | ?rawsky | ?upstreambackseat | ?exprchance=0–1 (combinable). */
   applyUrlDebugFlags() {
     let params;
     try {
@@ -339,13 +351,21 @@ export default class Drivey {
     } catch {
       params = new URLSearchParams();
     }
+    let exprChance = EXPRESSION_CHANGE_CHANCE;
+    const exprRaw = params.get("exprchance");
+    if (exprRaw != null && exprRaw !== "") {
+      const n = Number(exprRaw);
+      if (Number.isFinite(n)) exprChance = Math.min(1, Math.max(0, n));
+    }
     const flags = {
       side: params.has("side"),
       noclaudia: params.has("noclaudia"),
       rawsky: params.has("rawsky"),
       // Exact upstream drivey backseat pose (no passengerSign, no negative scale).
       upstreambackseat: params.has("upstreambackseat"),
+      exprchance: exprChance,
     };
+    this.expressionChangeChance = exprChance;
     this.screen.debugFlags = flags;
     if (flags.side || flags.upstreambackseat) {
       // Open Claudia/side view immediately and hold (no auto-return).
@@ -679,8 +699,27 @@ export default class Drivey {
     this.talkMode = true;
     this.checkPhase = "hold";
     this.screen.viewBlend = 1;
-    if (this.claudia?.toggleEyesSoft) this.claudia.toggleEyesSoft(0.3);
+    this._maybeChangeExpression(view);
     if (view) this.dialoguePanel.show(view);
+  }
+
+  /** Explicit story mood → eyes always; otherwise chance-based soft toggle. */
+  _maybeChangeExpression(view) {
+    if (!this.claudia) return;
+    const mood = view?.mood;
+    const forced = mood != null ? MOOD_TO_EYES[mood] : null;
+    if (forced != null) {
+      if (typeof this.claudia.crossfadeToVariant === "function") {
+        this.claudia.crossfadeToVariant(forced, 0.3);
+      }
+      return;
+    }
+    const chance = Number.isFinite(this.expressionChangeChance)
+      ? this.expressionChangeChance
+      : EXPRESSION_CHANGE_CHANCE;
+    if (Math.random() < chance && typeof this.claudia.toggleEyesSoft === "function") {
+      this.claudia.toggleEyesSoft(0.3);
+    }
   }
 
   closeTalkPanel({ returnToRoad = true } = {}) {
