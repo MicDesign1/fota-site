@@ -392,16 +392,19 @@ body.portrait-letterbox #viewStage canvas#renderer {
   height: 100% !important;
   display: block;
 }
+/* Chrome stack: view (above) → button bar → Talk panel in the free lower half */
 body.portrait-letterbox #buttonsContainer.claudia-only {
   position: relative;
   bottom: auto;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   opacity: 1;
   transition: none;
   align-items: flex-start;
-  padding: 0.85em 0.4em 1.1em;
+  justify-content: center;
+  padding: 0.65em 0.4em 0.45em;
   background: #050200;
   z-index: 15;
+  width: 100%;
 }
 body.portrait-letterbox #buttonsContainer.claudia-only #buttons {
   font-size: 0.7rem;
@@ -417,20 +420,36 @@ body.portrait-letterbox #musicTransport .music-title {
   max-width: 7.5em;
 }
 body.portrait-letterbox #dialoguePanel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100vw * 9 / 16 + 0.35rem);
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
   bottom: auto;
-  z-index: 25;
+  transform: none;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.35rem 0.5rem 1rem;
+  pointer-events: none;
+  z-index: 20;
+  overflow-y: auto;
+  min-height: 0;
+  background: #050200;
+}
+body.portrait-letterbox #dialoguePanel[hidden] {
+  display: none !important;
 }
 body.portrait-letterbox #dialoguePanel .dialogue-card {
+  pointer-events: auto;
   width: min(36rem, 94vw);
-  max-height: calc(100dvh - 100vw * 9 / 16 - 5.5rem);
-  overflow-y: auto;
+  max-height: none;
+  margin: 0 auto;
 }
 body.portrait-letterbox #controlsMenu,
 body.portrait-letterbox #musicMenu {
-  top: calc(100vw * 9 / 16 + 0.35rem);
+  /* Sit just under the button bar (view 16:9 + bar ~3.2rem) */
+  top: calc(100vw * 9 / 16 + 3.4rem);
   bottom: auto;
 }
