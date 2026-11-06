@@ -1,8 +1,8 @@
-import { Group, Vector2, ShapePath, Path } from "./../lib/three/three.module.js";
+import { Group, Vector2, ShapePath, Path } from "./../lib/three/three.module.js?v=20261106e";
 
-import { lerp, PI, TWO_PI, unitVector, origin } from "./math.js";
-import { makeSplinePath, getOffsetPoints, makeCirclePath, makePolygonPath } from "./paths.js";
-import { makeGeometry, makeMesh } from "./geometry.js";
+import { lerp, PI, TWO_PI, unitVector, origin } from "./math.js?v=20261106e";
+import { makeSplinePath, getOffsetPoints, makeCirclePath, makePolygonPath } from "./paths.js?v=20261106e";
+import { makeGeometry, makeMesh } from "./geometry.js?v=20261106e";
 
 const wheelScale = 5;
 const gaugeScale = 5;

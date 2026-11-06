@@ -1,7 +1,7 @@
-import { Group, BufferGeometry, BufferAttribute } from "./../lib/three/three.module.js";
-import { Road } from "./roads.js";
-import { getTriangleCount, makeMesh } from "./geometry.js";
-import modelLevel from "./modelLevel.js";
+import { Group, BufferGeometry, BufferAttribute } from "./../lib/three/three.module.js?v=20261106e";
+import { Road } from "./roads.js?v=20261106e";
+import { getTriangleCount, makeMesh } from "./geometry.js?v=20261106e";
+import modelLevel from "./modelLevel.js?v=20261106e";
 
 const rehydrate = (attributeData) => {
   const geometry = new BufferGeometry();
@@ -14,7 +14,7 @@ const rehydrate = (attributeData) => {
   return geometry;
 };
 
-// const worker = new Worker("./js/worker.js", {type: "module"});
+// const worker = new Worker("./js/worker.js?v=20261106e", {type: "module"});
 // worker.addEventListener("error", event => console.log(event));
 
 const modelLevelAsync = (levelData) =>

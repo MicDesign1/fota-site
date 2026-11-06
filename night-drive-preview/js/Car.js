@@ -1,5 +1,5 @@
-import { Vector2 } from "./../lib/three/three.module.js";
-import { getAngle, lerp, rotate, rotateY, sign } from "./math.js";
+import { Vector2 } from "./../lib/three/three.module.js?v=20261106e";
+import { getAngle, lerp, rotate, rotateY, sign } from "./math.js?v=20261106e";
 
 export default class Car {
   constructor() {

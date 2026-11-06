@@ -1,5 +1,5 @@
-import { getOffsetPoints, makeCirclePath, makePolygonPath } from "./paths.js";
-import { fract } from "./math.js";
+import { getOffsetPoints, makeCirclePath, makePolygonPath } from "./paths.js?v=20261106e";
+import { fract } from "./math.js?v=20261106e";
 
 const modelSolidLine = ({ spacing, curve, x, width, start, end }) => {
   if (start === end) return [];

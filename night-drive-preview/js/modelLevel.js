@@ -1,9 +1,9 @@
-import { Vector2, Vector3, Matrix4, ShapePath } from "./../lib/three/three.module.js";
-import { getOffsetPoints, makeCirclePath, makeSquarePath } from "./paths.js";
-import { distance, origin, sanitize, TWO_PI } from "./math.js";
-import { makeGeometry, mergeGeometries } from "./geometry.js";
-import { lineModelersByType, partModelersByType } from "./lineModelers.js";
-import { makeRoad } from "./roads.js";
+import { Vector2, Vector3, Matrix4, ShapePath } from "./../lib/three/three.module.js?v=20261106e";
+import { getOffsetPoints, makeCirclePath, makeSquarePath } from "./paths.js?v=20261106e";
+import { distance, origin, sanitize, TWO_PI } from "./math.js?v=20261106e";
+import { makeGeometry, mergeGeometries } from "./geometry.js?v=20261106e";
+import { lineModelersByType, partModelersByType } from "./lineModelers.js?v=20261106e";
+import { makeRoad } from "./roads.js?v=20261106e";
 
 const getChildrenOfTypes = (node, types) => node.children.filter((child) => types.includes(child.type));
 

@@ -9,25 +9,25 @@
   Upstream root LICENSE is GPL-3; this header previously conflicted and is corrected here.
 */
 
-import { Group, Color, CylinderBufferGeometry, Mesh, PerspectiveCamera } from "./../lib/three/three.module.js";
+import { Group, Color, CylinderBufferGeometry, Mesh, PerspectiveCamera } from "./../lib/three/three.module.js?v=20261106e";
 
-import buildLevel from "./buildLevel.js";
-import renderLevel from "./renderLevel.js";
-import { lerp, PI } from "./math.js";
-import { silhouetteMaterial, transparentMaterial, blendColors } from "./materials.js";
-import { shadeGeometry } from "./geometry.js";
-import isTouchDevice from "./isTouchDevice.js";
-import { Input, controlSchemesByName } from "./Input.js";
+import buildLevel from "./buildLevel.js?v=20261106e";
+import renderLevel from "./renderLevel.js?v=20261106e";
+import { lerp, PI } from "./math.js?v=20261106e";
+import { silhouetteMaterial, transparentMaterial, blendColors } from "./materials.js?v=20261106e";
+import { shadeGeometry } from "./geometry.js?v=20261106e";
+import isTouchDevice from "./isTouchDevice.js?v=20261106e";
+import { Input, controlSchemesByName } from "./Input.js?v=20261106e";
 
-import Screen from "./Screen.js";
-import Buttons from "./Buttons.js";
-import Car from "./Car.js";
-import buildCar from "./buildCar.js";
-import Dashboard from "./Dashboard.js";
-import ClaudiaPassenger from "./ClaudiaPassenger.js";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js";
-import DialoguePanel from "./DialoguePanel.js";
-import MusicPlayer from "./MusicPlayer.js";
+import Screen from "./Screen.js?v=20261106e";
+import Buttons from "./Buttons.js?v=20261106e";
+import Car from "./Car.js?v=20261106e";
+import buildCar from "./buildCar.js?v=20261106e";
+import Dashboard from "./Dashboard.js?v=20261106e";
+import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106e";
+import DialoguePanel from "./DialoguePanel.js?v=20261106e";
+import MusicPlayer from "./MusicPlayer.js?v=20261106e";
 
 const parser = new DOMParser();
 const readLevel = (htmlText) => {
@@ -331,7 +331,7 @@ export default class Drivey {
     this.screen.scene.visible = true;
   }
 
-  /** URL debug: ?side | ?noclaudia | ?rawsky (combinable). */
+  /** URL debug: ?side | ?noclaudia | ?rawsky | ?upstreambackseat (combinable). */
   applyUrlDebugFlags() {
     let params;
     try {
@@ -343,9 +343,11 @@ export default class Drivey {
       side: params.has("side"),
       noclaudia: params.has("noclaudia"),
       rawsky: params.has("rawsky"),
+      // Exact upstream drivey backseat pose (no passengerSign, no negative scale).
+      upstreambackseat: params.has("upstreambackseat"),
     };
     this.screen.debugFlags = flags;
-    if (flags.side) {
+    if (flags.side || flags.upstreambackseat) {
       // Open Claudia/side view immediately and hold (no auto-return).
       this.checkPhase = "hold";
       this.checkPhaseT = 0;
@@ -724,18 +726,25 @@ export default class Drivey {
       if (this.otherCarExteriors[i]) this.otherCarExteriors[i].visible = false;
     }
 
-    const passengerSign = -this.drivingSide; // RIGHT → +1
-    // Upstream backseat: position.z=1, rotation.x=π/2, rotation.y=+π·0.625.
-    // Ours: same near seat height, passenger-side yaw only.
-    this.claudiaCameraMount.position.set(0.20 * passengerSign, -0.45, 1);
-    this.claudiaCameraMount.rotation.order = "XYZ";
-    this.claudiaCameraMount.rotation.set(PI * 0.5, -PI * 0.38 * passengerSign, 0);
+    // Never mirror the camera mount / projection (negative scale flips face winding → stripes).
+    this.claudiaCameraMount.scale.set(1, 1, 1);
+    this.sideCamera.scale.set(1, 1, 1);
     this.sideCamera.position.set(0, 0, 0);
     this.sideCamera.rotation.set(0, 0, 0);
-    // Identical projection to the front/upstream camera.
-    this.sideCamera.fov = this.screen.camera.fov;
-    this.sideCamera.near = this.screen.camera.near;
-    this.sideCamera.far = this.screen.camera.far;
+    this.claudiaCameraMount.rotation.order = "XYZ";
+
+    if (this.screen.debugFlags?.upstreambackseat) {
+      // Exact upstream Rezmason/drivey backseat — even if it looks out the driver side.
+      // position.z=1, rotation.x=π/2, rotation.y=+π·0.625. No passengerSign flip.
+      this.claudiaCameraMount.position.set(0, 0, 1);
+      this.claudiaCameraMount.rotation.set(PI * 0.5, PI * 0.625, 0);
+    } else {
+      const passengerSign = -this.drivingSide; // RIGHT → +1
+      // Ours: same near seat height, passenger-side yaw only.
+      this.claudiaCameraMount.position.set(0.20 * passengerSign, -0.45, 1);
+      this.claudiaCameraMount.rotation.set(PI * 0.5, -PI * 0.38 * passengerSign, 0);
+    }
+    // Identical projection to the front/upstream camera (positive determinant).
     this.sideCamera.fov = this.screen.camera.fov;
     this.sideCamera.near = this.screen.camera.near;
     this.sideCamera.far = this.screen.camera.far;

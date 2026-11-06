@@ -15,7 +15,7 @@ import {
   sRGBEncoding,
   ClampToEdgeWrapping,
   LinearFilter,
-} from "./../lib/three/three.module.js";
+} from "./../lib/three/three.module.js?v=20261106e";
 
 const OPEN_URL = "./assets/claudia-art/claudia-eyes-open.png";
 const CLOSED_URL = "./assets/claudia-art/claudia-eyes-closed.png";

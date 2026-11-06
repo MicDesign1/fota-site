@@ -1,4 +1,4 @@
-import { Color, Vector2 } from "./../lib/three/three.module.js";
+import { Color, Vector2 } from "./../lib/three/three.module.js?v=20261106e";
 
 const verbatim = (_) => _;
 const safeParseFloat = (s) => {

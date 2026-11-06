@@ -31,11 +31,11 @@
 
 */
 
-import { BoxGeometry, BufferGeometry, Vector2, Group, Mesh, CylinderBufferGeometry } from "./../lib/three/three.module.js";
+import { BoxGeometry, BufferGeometry, Vector2, Group, Mesh, CylinderBufferGeometry } from "./../lib/three/three.module.js?v=20261106e";
 
-import { lerp } from "./math.js";
-import { mergeGeometries, shadeGeometry, idGeometry } from "./geometry.js";
-import { silhouetteMaterial, transparentMaterial } from "./materials.js";
+import { lerp } from "./math.js?v=20261106e";
+import { mergeGeometries, shadeGeometry, idGeometry } from "./geometry.js?v=20261106e";
+import { silhouetteMaterial, transparentMaterial } from "./materials.js?v=20261106e";
 
 const boxGeometry = new BoxGeometry();
 const createBoxes = (topFront, bottomFront, topRear, bottomRear, outerSlope, innerSlope, reflect = false) => {

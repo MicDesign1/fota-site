@@ -16,15 +16,15 @@ import {
   PlaneBufferGeometry,
   OrthographicCamera,
   Vector2,
-} from "./../lib/three/three.module.js";
-import { EffectComposer } from "./../lib/three/postprocessing/EffectComposer.js";
-import { RenderPass } from "./../lib/three/postprocessing/RenderPass.js";
-import { ShaderPass } from "./../lib/three/postprocessing/ShaderPass.js";
-import { SMAAPass } from "./../lib/three/postprocessing/SMAAPass.js";
-import { SobelOperatorShader } from "./../lib/three/shaders/SobelOperatorShader.js";
-import { CopyShader } from "./../lib/three/shaders/CopyShader.js";
+} from "./../lib/three/three.module.js?v=20261106e";
+import { EffectComposer } from "./../lib/three/postprocessing/EffectComposer.js?v=20261106e";
+import { RenderPass } from "./../lib/three/postprocessing/RenderPass.js?v=20261106e";
+import { ShaderPass } from "./../lib/three/postprocessing/ShaderPass.js?v=20261106e";
+import { SMAAPass } from "./../lib/three/postprocessing/SMAAPass.js?v=20261106e";
+import { SobelOperatorShader } from "./../lib/three/shaders/SobelOperatorShader.js?v=20261106e";
+import { CopyShader } from "./../lib/three/shaders/CopyShader.js?v=20261106e";
 
-import { silhouetteMaterial, transparentMaterial } from "./materials.js";
+import { silhouetteMaterial, transparentMaterial } from "./materials.js?v=20261106e";
 
 export default class Screen {
   constructor(animate = true) {

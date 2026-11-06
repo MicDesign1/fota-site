@@ -1,5 +1,5 @@
-import { Path, CatmullRomCurve3, Vector3, Vector2 } from "./../lib/three/three.module.js";
-import { fract, modDiffAngle, TWO_PI, origin, unitVector } from "./math.js";
+import { Path, CatmullRomCurve3, Vector3, Vector2 } from "./../lib/three/three.module.js?v=20261106e";
+import { fract, modDiffAngle, TWO_PI, origin, unitVector } from "./math.js?v=20261106e";
 
 const makeSplinePath = (pts, closed) => {
   const path = new Path();

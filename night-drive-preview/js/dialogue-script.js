@@ -4,7 +4,7 @@
   Only a TODO stub until then. Chained so Talk A/B/C can be tested.
 */
 
-/** @type {Record<string, import("./dialogue.js").DialogueNode>} */
+/** @type {Record<string, import("./dialogue.js?v=20261106e").DialogueNode>} */
 export const script = {
   todo_1: {
     id: "todo_1",

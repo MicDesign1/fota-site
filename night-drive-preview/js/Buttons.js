@@ -23,7 +23,7 @@ export default class Buttons {
       <button type="button" id="button_musicToggle" title="Play/Pause"><div class="label">▶</div></button>
       <button type="button" id="button_musicNext" title="Next"><div class="label">⏭</div></button>
       <label class="music-vol" title="Volume">
-        <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+        <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.25" aria-label="Volume" />
       </label>
       <div id="musicTitle" class="music-title"></div>
     `;

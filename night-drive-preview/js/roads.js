@@ -1,6 +1,6 @@
-import { Vector2 } from "./../lib/three/three.module.js";
-import { fract, lerp, closestPointIndex, lcg, intMax, TWO_PI } from "./math.js";
-import { makeSplinePath } from "./paths.js";
+import { Vector2 } from "./../lib/three/three.module.js?v=20261106e";
+import { fract, lerp, closestPointIndex, lcg, intMax, TWO_PI } from "./math.js?v=20261106e";
+import { makeSplinePath } from "./paths.js?v=20261106e";
 
 class Road {
   constructor(points) {

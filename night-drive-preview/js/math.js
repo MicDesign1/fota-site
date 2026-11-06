@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from "./../lib/three/three.module.js";
+import { Vector2, Vector3 } from "./../lib/three/three.module.js?v=20261106e";
 
 const [PI, TWO_PI] = [Math.PI, Math.PI * 2];
 

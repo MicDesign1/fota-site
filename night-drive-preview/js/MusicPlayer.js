@@ -3,13 +3,14 @@
   and loops the list. Prev / next / play-pause live in the button bar.
 */
 
-import { musicTracks } from "./music-tracks.js";
+import { musicTracks } from "./music-tracks.js?v=20261106e";
 
 export default class MusicPlayer {
   constructor({ tracks = musicTracks } = {}) {
     this.tracks = Array.isArray(tracks) ? tracks.slice() : [];
     this.audio = new Audio();
     this.audio.preload = "metadata";
+    // Soft default (half of the original 0.5).
     this.audio.volume = 0.25;
     this.index = 0;
     this.currentId = null;
@@ -19,6 +20,8 @@ export default class MusicPlayer {
     this.audio.addEventListener("ended", () => {
       if (this.userStarted && this.tracks.length > 0) this.next({ fromUser: false });
     });
+    this.audio.addEventListener("play", () => this._syncMediaSession());
+    this.audio.addEventListener("pause", () => this._syncMediaSession());
   }
 
   addListener(fn) {
@@ -42,6 +45,22 @@ export default class MusicPlayer {
     };
   }
 
+  _syncMediaSession() {
+    if (typeof navigator === "undefined" || !navigator.mediaSession) return;
+    const cur = this.tracks[this.index] || null;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: cur ? cur.title : "Claudia Night Drive",
+        artist: "Claudia Night Drive",
+        album: "Night Drive",
+      });
+      navigator.mediaSession.playbackState =
+        this.userStarted && !this.audio.paused ? "playing" : "paused";
+    } catch (_) {
+      /* MediaMetadata unsupported */
+    }
+  }
+
   _playIndex(index, { fromUser = false } = {}) {
     if (this.tracks.length === 0) return this.status();
     const i = ((index % this.tracks.length) + this.tracks.length) % this.tracks.length;
@@ -54,6 +73,7 @@ export default class MusicPlayer {
     if (fromUser) this.userStarted = true;
     const p = this.audio.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
+    this._syncMediaSession();
     this._emit();
     return this.status();
   }
@@ -71,6 +91,7 @@ export default class MusicPlayer {
     } else {
       this.audio.pause();
     }
+    this._syncMediaSession();
     this._emit();
     return this.status();
   }
@@ -89,6 +110,7 @@ export default class MusicPlayer {
         const p = this.audio.play();
         if (p && typeof p.catch === "function") p.catch(() => {});
       }
+      this._syncMediaSession();
       this._emit();
       return this.status();
     }
@@ -119,6 +141,7 @@ export default class MusicPlayer {
     this.audio.removeAttribute("src");
     this.audio.load();
     this.currentId = null;
+    this._syncMediaSession();
     this._emit();
   }
 }

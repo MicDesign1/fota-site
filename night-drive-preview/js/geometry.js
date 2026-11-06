@@ -1,6 +1,6 @@
-import { Float32BufferAttribute, Mesh, BufferGeometry, ExtrudeBufferGeometry } from "./../lib/three/three.module.js";
-import { BufferGeometryUtils } from "./../lib/three/utils/BufferGeometryUtils.js";
-import { silhouetteMaterial, transparentMaterial } from "./materials.js";
+import { Float32BufferAttribute, Mesh, BufferGeometry, ExtrudeBufferGeometry } from "./../lib/three/three.module.js?v=20261106e";
+import { BufferGeometryUtils } from "./../lib/three/utils/BufferGeometryUtils.js?v=20261106e";
+import { silhouetteMaterial, transparentMaterial } from "./materials.js?v=20261106e";
 
 const makeGeometry = (source, height, shade = 0, alpha = 1, fade = 0) => {
   const geom = new ExtrudeBufferGeometry(source.toShapes(false, false), {

@@ -1,4 +1,4 @@
-import { RawShaderMaterial, Vector2, Color } from "./../lib/three/three.module.js";
+import { RawShaderMaterial, Vector2, Color } from "./../lib/three/three.module.js?v=20261106e";
 
 const blendColors = ({ dark, full, light }, shade) => (shade < 0.5 ? dark.clone().lerp(full, shade * 2.0) : full.clone().lerp(light, shade * 2.0 - 1.0));
 

@@ -1,3 +1,27 @@
 /night-drive-preview/*
   X-Robots-Tag: noindex
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/*.html
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/*.js
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/js/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/css/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/assets/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive-preview/lib/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0

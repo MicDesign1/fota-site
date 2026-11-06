@@ -1,5 +1,5 @@
-import { Color, Vector2 } from "./../lib/three/three.module.js";
-import { verbatim, safeParseFloat, safeParseInt, parseNumberList, parseColor, parseVec2, parseBool } from "./parseFunctions.js";
+import { Color, Vector2 } from "./../lib/three/three.module.js?v=20261106e";
+import { verbatim, safeParseFloat, safeParseInt, parseNumberList, parseColor, parseVec2, parseBool } from "./parseFunctions.js?v=20261106e";
 
 const idAttribute = { id: {} };
 const shadeAttribute = {
