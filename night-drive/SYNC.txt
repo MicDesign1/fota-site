@@ -1,4 +1,3 @@
-synced_from=5b48b23
-short=5b48b23
+synced_from=324a60a
 branch=eliza-preview
-note=STAGING typed ELIZA preview — not production
+note=STAGING RiveScript typed preview, not production

@@ -26,14 +26,16 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=20261106eliza";
+import DialoguePanel from "./DialoguePanel.js?v=rive1";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 import {
-  createSession as createElizaSession,
-  opener as elizaOpener,
-  reply as elizaReply,
-  callback as elizaCallback,
-} from "./claudia-eliza.js?v=20261106eliza";
+  createRiveSession,
+  opener as riveOpener,
+  reply as riveReply,
+} from "./claudia-rive.js?v=rive1";
+
+/** Typed (RiveScript) replies change expression less often than A/B/C. */
+const TYPED_EXPRESSION_CHANCE = 0.2;
 
 /** Chance that a Talk answer soft-toggles Claudia's eyes (0–1). Override with ?exprchance=0.5 */
 const EXPRESSION_CHANGE_CHANCE = 0.3;
@@ -714,7 +716,7 @@ export default class Drivey {
   }
 
   /** Explicit story mood → eyes always; otherwise chance-based soft toggle. */
-  _maybeChangeExpression(view) {
+  _maybeChangeExpression(view, chanceOverride = null) {
     if (!this.claudia) return;
     const mood = view?.mood;
     const forced = mood != null ? MOOD_TO_EYES[mood] : null;
@@ -724,7 +726,9 @@ export default class Drivey {
       }
       return;
     }
-    const chance = Number.isFinite(this.expressionChangeChance)
+    const chance = Number.isFinite(chanceOverride)
+      ? chanceOverride
+      : Number.isFinite(this.expressionChangeChance)
       ? this.expressionChangeChance
       : EXPRESSION_CHANGE_CHANCE;
     if (Math.random() < chance && typeof this.claudia.toggleEyesSoft === "function") {
@@ -735,65 +739,41 @@ export default class Drivey {
 
   onTalkModeChange(mode) {
     if (mode === "typed") {
-      this._ensureElizaSession();
-      if (!this._elizaOpened) {
-        const line = elizaOpener(this._elizaSession);
-        this._elizaOpened = true;
-        this.dialoguePanel.setTypedState({
-          line,
-          log: [{ role: "claudia", text: line }],
-        });
-      }
+      this._ensureRive().then(() => {
+        if (!this._riveOpened) {
+          this._riveOpened = true;
+          const line = riveOpener(this._riveSession);
+          this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
+        }
+      });
     } else if (mode === "choices") {
       const view =
-        this.dialogue.currentId != null
-          ? this.dialogue.resume()
-          : this.dialogue.start(dialogueStartId);
+        this.dialogue.currentId != null ? this.dialogue.resume() : this.dialogue.start(dialogueStartId);
       if (view) this.dialoguePanel.show(view);
     }
   }
 
-  _ensureElizaSession() {
-    if (!this._elizaSession) {
-      this._elizaSession = createElizaSession();
-      this._elizaOpened = false;
-    }
-  }
-
-  onElizaSubmit(raw) {
-    this._ensureElizaSession();
-    if (!this._elizaOpened) {
-      const line = elizaOpener(this._elizaSession);
-      this._elizaOpened = true;
-      this.dialoguePanel.setTypedState({
-        line,
-        log: [{ role: "claudia", text: line }],
+  _ensureRive() {
+    if (!this._rivePromise) {
+      this._rivePromise = createRiveSession().then((s) => {
+        this._riveSession = s;
+        return s;
       });
     }
-    const result = elizaReply(this._elizaSession, raw);
-    this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
-    // Visit-only callbacks (music / bye_stayed) — spend once on a later turn.
-    if (result.groupId !== "safety_distress") {
-      const musicCb = elizaCallback(this._elizaSession, "music");
-      if (
-        musicCb &&
-        result.groupId !== "music" &&
-        !this._elizaSession.flags._musicCbSpent
-      ) {
-        this._elizaSession.flags._musicCbSpent = true;
-        this.dialoguePanel.appendTypedTurn(null, musicCb);
-      } else {
-        const byeCb = elizaCallback(this._elizaSession, "bye_stayed");
-        if (
-          byeCb &&
-          result.groupId !== "bye" &&
-          !this._elizaSession.flags._byeCbSpent
-        ) {
-          this._elizaSession.flags._byeCbSpent = true;
-          this.dialoguePanel.appendTypedTurn(null, byeCb);
-        }
-      }
+    return this._rivePromise;
+  }
+
+  async onElizaSubmit(raw) {
+    await this._ensureRive();
+    if (!this._riveOpened) {
+      this._riveOpened = true;
+      const line = riveOpener(this._riveSession);
+      this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
     }
+    const result = await riveReply(this._riveSession, raw);
+    this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
+    if (!result.distressMode) this._maybeChangeExpression(null, TYPED_EXPRESSION_CHANCE);
+    this._lastTypedKind = result.kind;
   }
 
   closeTalkPanel({ returnToRoad = true } = {}) {
