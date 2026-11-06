@@ -225,6 +225,17 @@ div#buttonsContainer.claudia-only #buttons button {
   min-width: 0;
   flex: 1 1 auto;
 }
+#dialoguePanel .dialogue-narration {
+  font-size: clamp(0.88rem, 2vw, 1.02rem);
+  line-height: 1.35;
+  font-style: italic;
+  color: rgba(255, 192, 138, 0.78);
+}
+#dialoguePanel .dialogue-narration[hidden] { display: none !important; }
+#dialoguePanel .dialogue-log-narration {
+  font-style: italic;
+  color: rgba(255, 192, 138, 0.72);
+}
 #dialoguePanel .dialogue-line {
   font-size: clamp(0.95rem, 2.2vw, 1.12rem);
   line-height: 1.35;

@@ -25,7 +25,7 @@ import Car from "./Car.js?v=20261106e";
 import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106t";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106u";
 import DialoguePanel from "./DialoguePanel.js?v=20261106w";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 

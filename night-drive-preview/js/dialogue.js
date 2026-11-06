@@ -25,7 +25,7 @@
   No AI calls. Advancement is start() / choose(index) only.
 */
 
-import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106t";
+import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106u";
 
 /** @typedef {{ label: string, next: string | null, setFlags?: Record<string, unknown>, requireFlags?: Record<string, unknown> }} DialogueChoice */
 /**
@@ -34,7 +34,7 @@ import { script as defaultScript, startId as defaultStartId } from "./dialogue-s
  *   line: string | Array<{ text: string, requireFlags?: Record<string, unknown> }>,
  *   mood?: string,
  *   requireFlags?: Record<string, unknown>,
- *   choices: [DialogueChoice, DialogueChoice, DialogueChoice]
+ *   choices: DialogueChoice[]
  * }} DialogueNode
  */
 
@@ -128,7 +128,11 @@ export default class Dialogue {
     }
     this.currentId = nodeId;
     this.active = true;
-    this._appendLog("claudia", this.resolveLine(node), nodeId);
+    if (typeof node.narration === "string" && node.narration.trim()) {
+      this._appendLog("narration", node.narration.trim(), nodeId);
+    }
+    const spoken = this.resolveLine(node);
+    if (spoken) this._appendLog("claudia", spoken, nodeId);
     const view = this._view(node);
     if (this.onEnter) this.onEnter(view);
     return view;
@@ -139,6 +143,7 @@ export default class Dialogue {
     return {
       id: node.id,
       mood: node.mood,
+      narration: typeof node.narration === "string" ? node.narration.trim() : "",
       line: this.resolveLine(node),
       choices,
       ended: choices.length === 0,
@@ -168,6 +173,16 @@ export default class Dialogue {
       for (const [k, v] of Object.entries(choice.setFlags)) {
         this.flags[k] = v;
       }
+    }
+    // Concrete "changed your answer twice": stance flips across marked work beats.
+    if (choice.stance != null) {
+      const prev = this.flags._workStance;
+      if (prev != null && prev !== choice.stance) {
+        const n = (Number(this.flags.stanceChanges) || 0) + 1;
+        this.flags.stanceChanges = n;
+        if (n >= 2) this.flags.changed_twice = true;
+      }
+      this.flags._workStance = choice.stance;
     }
     this.history.push({
       nodeId: node.id,
