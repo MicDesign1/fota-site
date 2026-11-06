@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Claudia Night Drive</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" type="text/css" title="main" href="./css/drivey.css" />
+  </head>
+  <body>
+    <script src="./lib/theme.js"></script>
+    <script type="module">
+      import Drivey from "./js/Drivey.js";
+      document.addEventListener("touchmove", (e) => e.preventDefault(), {
+        passive: false,
+      });
+      window.drivey = new Drivey();
+    </script>
+  </body>
+</html>
