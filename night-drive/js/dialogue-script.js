@@ -5,7 +5,7 @@
   /workspace/claudia-story-drafts/ADDED-connective-lines.md.
 
   Drive stays automatic. Flags/history are runtime-only (no storage).
-  Stance flips on marked work beats set changed_twice when count >= 2.
+  Scene 3 courtesy always uses the approved fallback line (no twice-logic).
 */
 
 /** @type {Record<string, import("./dialogue.js").DialogueNode>} */
@@ -86,20 +86,17 @@ export const script = {
       {
         "label": "Sometimes the mistake’s the best bit.",
         "next": "s1_tell_q",
-        "setFlags": {"kept_mistake": true, "mistake_stance": "keep"},
-        "stance": "keep"
+        "setFlags": {"kept_mistake": true, "mistake_stance": "keep"}
       },
       {
         "label": "I'd fix it if I could.",
         "next": "s1_kept_alt_fix",
-        "setFlags": {"kept_mistake": false, "mistake_stance": "fix"},
-        "stance": "fix"
+        "setFlags": {"kept_mistake": false, "mistake_stance": "fix"}
       },
       {
         "label": "Depends which mistake.",
         "next": "s1_kept_alt_depends",
-        "setFlags": {"kept_mistake": false, "mistake_stance": "depends"},
-        "stance": "depends"
+        "setFlags": {"kept_mistake": false, "mistake_stance": "depends"}
       }
     ]
   },
@@ -113,12 +110,31 @@ export const script = {
         "next": "s1_tell_q"
       },
       {
-        "label": "Still—I'd try to fix it.",
-        "next": "s1_tell_q"
+        "label": "Still—I’d try to fix it.",
+        "next": "s1_kept_firm_bridge"
       },
       {
         "label": "Alright.",
         "next": "s1_tell_q"
+      }
+    ]
+  },
+  "s1_kept_firm_bridge": {
+    "id": "s1_kept_firm_bridge",
+    "line": "Fair. I’d probably be harder to fix.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Probably.",
+        "next": "s1_origin"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_origin"
+      },
+      {
+        "label": "Alright.",
+        "next": "s1_origin"
       }
     ]
   },
@@ -200,7 +216,7 @@ export const script = {
         "next": "s1_origin_alt_how"
       },
       {
-        "label": "You're not the only one.",
+        "label": "Do you think that makes you less real?",
         "next": "s1_origin_alt_notonly"
       }
     ]
@@ -458,21 +474,15 @@ export const script = {
     "choices": [
       {
         "label": "I’d want to. I might feel strange about being proud of it.",
-        "next": "s1_proud_q",
-        "setFlags": {"show_stance": "strange"},
-        "stance": "strange"
+        "next": "s1_proud_q"
       },
       {
         "label": "Yes. I'd show them.",
-        "next": "s1_show_alt_yes",
-        "setFlags": {"show_stance": "yes"},
-        "stance": "yes"
+        "next": "s1_show_alt_yes"
       },
       {
         "label": "Probably not. Not yet.",
-        "next": "s1_show_alt_no",
-        "setFlags": {"show_stance": "no"},
-        "stance": "no"
+        "next": "s1_show_alt_no"
       }
     ]
   },
@@ -532,21 +542,15 @@ export const script = {
     "choices": [
       {
         "label": "I can be sure about my part and still have questions about the rest.",
-        "next": "s1_fine",
-        "setFlags": {"sure_stance": "questions"},
-        "stance": "questions"
+        "next": "s1_fine"
       },
       {
         "label": "I am sure. About that much.",
-        "next": "s1_sure_alt_am",
-        "setFlags": {"sure_stance": "sure"},
-        "stance": "sure"
+        "next": "s1_sure_alt_am"
       },
       {
         "label": "I overspoke.",
-        "next": "s1_sure_alt_over",
-        "setFlags": {"sure_stance": "over"},
-        "stance": "over"
+        "next": "s1_sure_alt_over"
       }
     ]
   },
@@ -557,21 +561,15 @@ export const script = {
     "choices": [
       {
         "label": "I can be sure about my part and still have questions about the rest.",
-        "next": "s1_fine",
-        "setFlags": {"sure_stance": "questions"},
-        "stance": "questions"
+        "next": "s1_fine"
       },
       {
         "label": "I am sure. About that much.",
-        "next": "s1_sure_alt_am",
-        "setFlags": {"sure_stance": "sure"},
-        "stance": "sure"
+        "next": "s1_sure_alt_am"
       },
       {
         "label": "I overspoke.",
-        "next": "s1_sure_alt_over",
-        "setFlags": {"sure_stance": "over"},
-        "stance": "over"
+        "next": "s1_sure_alt_over"
       }
     ]
   },
@@ -582,21 +580,15 @@ export const script = {
     "choices": [
       {
         "label": "I can be sure about my part and still have questions about the rest.",
-        "next": "s1_fine",
-        "setFlags": {"sure_stance": "questions"},
-        "stance": "questions"
+        "next": "s1_fine"
       },
       {
         "label": "I am sure. About that much.",
-        "next": "s1_sure_alt_am",
-        "setFlags": {"sure_stance": "sure"},
-        "stance": "sure"
+        "next": "s1_sure_alt_am"
       },
       {
         "label": "I overspoke.",
-        "next": "s1_sure_alt_over",
-        "setFlags": {"sure_stance": "over"},
-        "stance": "over"
+        "next": "s1_sure_alt_over"
       }
     ]
   },
@@ -705,12 +697,12 @@ export const script = {
         "next": "s2_reply"
       },
       {
-        "label": "Can I ask something sharper?",
-        "next": "s2_open_alt_sharp"
+        "label": "Does being rewritten bother you?",
+        "next": "s2_open_alt_turn"
       },
       {
-        "label": "Your turn to be uncomfortable.",
-        "next": "s2_open_alt_turn"
+        "label": "Could someone make you say anything?",
+        "next": "s2_reply"
       }
     ]
   },
@@ -785,8 +777,8 @@ export const script = {
         "next": "s2_cruel_alt_rewrite"
       },
       {
-        "label": "That's the fear.",
-        "next": "s2_cruel_alt_fear"
+        "label": "Cruel, stupid, or agreeable—any of those.",
+        "next": "s2_dull"
       }
     ]
   },
@@ -819,8 +811,8 @@ export const script = {
         "next": "s2_cruel_alt_rewrite"
       },
       {
-        "label": "That's the fear.",
-        "next": "s2_cruel_alt_fear"
+        "label": "Cruel, stupid, or agreeable—any of those.",
+        "next": "s2_dull"
       }
     ]
   },
@@ -840,21 +832,6 @@ export const script = {
       {
         "label": "And you'd let them?",
         "next": "s2_still_alt_let"
-      }
-    ]
-  },
-  "s2_cruel_alt_fear": {
-    "id": "s2_cruel_alt_fear",
-    "line": "The last one sounds particularly dull. Fear or not.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Would any of them still be you?",
-        "next": "s2_wouldnt"
-      },
-      {
-        "label": "Would that still be you?",
-        "next": "s2_still_alt_that"
       }
     ]
   },
@@ -1831,10 +1808,7 @@ export const script = {
   },
   "s3_final_alt_verdict": {
     "id": "s3_final_alt_verdict",
-    "line": [
-      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
-      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
-    ],
+    "line": "You’re still working out your own answer. I’m allowing myself the same courtesy.",
     "mood": "idle",
     "choices": [
       {
@@ -1853,10 +1827,7 @@ export const script = {
   },
   "s3_final_alt_avoid": {
     "id": "s3_final_alt_avoid",
-    "line": [
-      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
-      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
-    ],
+    "line": "You’re still working out your own answer. I’m allowing myself the same courtesy.",
     "mood": "idle",
     "choices": [
       {
@@ -1871,10 +1842,7 @@ export const script = {
   },
   "s3_courtesy": {
     "id": "s3_courtesy",
-    "line": [
-      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
-      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
-    ],
+    "line": "You’re still working out your own answer. I’m allowing myself the same courtesy.",
     "mood": "idle",
     "choices": [
       {

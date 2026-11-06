@@ -17,7 +17,7 @@ const allText = (node) =>
     .filter(Boolean)
     .join("\n");
 
-const readKeys = new Set(["_workStance", "stanceChanges", "changed_twice"]);
+const readKeys = new Set();
 for (const [key, node] of Object.entries(script)) {
   if (node.id !== key) error(`${key}: id is ${node.id}`);
   const hasLine =
@@ -100,21 +100,6 @@ while (pending.length) {
     }
     if (!script[choice.next]) continue;
     const nextFlags = { ...flags, ...(choice.setFlags ?? {}) };
-    if (choice.stance != null) {
-      const prev = nextFlags._workStance;
-      // Mirror engine: stance applied after setFlags in choose(); simulate:
-      const stanceFlags = { ...flags, ...(choice.setFlags ?? {}) };
-      if (stanceFlags._workStance != null && stanceFlags._workStance !== choice.stance) {
-        /* prev was before stance update — use flags before stance write */
-      }
-      const prevStance = flags._workStance;
-      if (prevStance != null && prevStance !== choice.stance) {
-        const n = (Number(nextFlags.stanceChanges) || 0) + 1;
-        nextFlags.stanceChanges = n;
-        if (n >= 2) nextFlags.changed_twice = true;
-      }
-      nextFlags._workStance = choice.stance;
-    }
     const nextNode = script[choice.next];
     if (!matches(nextNode.requireFlags, nextFlags)) {
       error(`${id}: choice ${choice.label} reaches blocked ${choice.next}`);
@@ -271,37 +256,37 @@ function scriptedUntil(stopId, overrides = {}) {
   assert.notEqual(v.line, "You said you sometimes keep the mistake.");
 }
 
-// Conditional: changed_twice true vs false
+// Courtesy fallback always (no twice-logic)
 {
-  // keep → yes show → overspeak = 2 flips (keep→yes→over)
-  const { d, view } = scriptedUntil("s1_lights");
-  let v = view;
-  v = d.choose(1); // Yes I'd show (stance yes) — flip from keep
-  // finish alt to proud_q
-  while (v && v.id !== "s1_proud_q" && !v.ended) v = d.choose(v.choices[0].index);
-  v = d.choose(0); // Knowing what I wanted → s1_sure
-  v = d.choose(2); // I overspoke (stance over) — second flip
-  assert.equal(d.flags.changed_twice, true);
-  while (v && v.id !== "s3_courtesy" && !v.ended) {
-    const pref = v.choices.find((c) => /You really don’t want|Is that all|I’d want to see|Which version|Even the cruel|Go on\.|You’re still thinking|Changed her how|Unrecognizable|Does that make|But thinking|Including this|Like disagreeing|What’s a real|Exactly|I have an idea|The version I know|I might\.|Would any|Someone could|I’m serious|Does it bother|I noticed|I can be sure|Knowing what/i.test(c.label));
-    v = d.choose((pref || v.choices[0]).index);
-  }
-  if (v?.id === "s3_courtesy") {
-    assert.match(v.line, /changed your answer about your own work twice/i);
-  }
-}
-
-{
-  const d = new Dialogue();
-  d.flags = { kept_mistake: true };
-  const lineFallback = Dialogue.prototype.resolveLine.call(d, script.s3_courtesy);
   assert.equal(
-    lineFallback,
+    script.s3_courtesy.line,
     "You’re still working out your own answer. I’m allowing myself the same courtesy."
   );
-  d.flags.changed_twice = true;
-  const lineTwice = Dialogue.prototype.resolveLine.call(d, script.s3_courtesy);
-  assert.match(lineTwice, /changed your answer about your own work twice/);
+  assert.equal(script.s3_final_alt_verdict.line, script.s3_courtesy.line);
+  assert.equal(script.s3_final_alt_avoid.line, script.s3_courtesy.line);
+}
+
+// Integrity: dull line only after explicit cruel/stupid/agreeable list
+{
+  for (const id of ["s2_iknow", "s2_serious_alt_mean"]) {
+    for (const c of script[id].choices) {
+      if (c.next === "s2_dull") {
+        assert.match(
+          c.label,
+          /cruel/i,
+          `${id} → s2_dull must mention cruel/stupid/agreeable`
+        );
+        assert.match(c.label, /stupid/i);
+        assert.match(c.label, /agree/i);
+      }
+    }
+  }
+  assert.equal(script.s1_annoying.choices[1].label, "Does being rewritten bother you?");
+  assert.equal(script.s1_annoying.choices[2].label, "Could someone make you say anything?");
+  assert.equal(script.s1_origin.choices[2].label, "Do you think that makes you less real?");
+  assert.equal(script.s1_kept_firm_bridge.line, "Fair. I’d probably be harder to fix.");
+  const firm = script.s1_kept_alt_fix.choices.find((c) => /Still/.test(c.label));
+  assert.equal(firm.next, "s1_kept_firm_bridge");
 }
 
 // Resume / fresh engine
