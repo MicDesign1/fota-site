@@ -10,7 +10,7 @@ export default class MusicPlayer {
     this.tracks = Array.isArray(tracks) ? tracks.slice() : [];
     this.audio = new Audio();
     this.audio.preload = "metadata";
-    this.audio.volume = 0.5;
+    this.audio.volume = 0.25;
     this.index = 0;
     this.currentId = null;
     this.listeners = [];
