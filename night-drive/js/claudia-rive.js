@@ -4,7 +4,7 @@
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
 import { BRAIN } from "./claudia-rive-brain.js?v=rive1";
-import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=rive1";
+import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=rive1";
 
 export const OPENER_MUSIC =
   "Good. Now we have music and nowhere we have to be. What’s on your mind?";
@@ -98,9 +98,11 @@ const PICKS = [
   ] },
   { re: /paris,? texas/i, lines: [
     "Paris, Texas. Long roads and people struggling to say what they mean. I think it would stay with you.",
+    "People struggle to explain themselves without making things worse. I like the patience it gives them.",
   ] },
   { re: /invisible cities|calvino/i, lines: [
     "Invisible Cities, by Italo Calvino. Cities made out of memory and desire. I'd like to argue with a few of them.",
+    "The cities can feel like different ways of wanting something. I like a book that leaves me wondering what I brought into it.",
   ] },
   { re: /\brobyn\b/i, lines: [
     "Robyn. She lets a song be sad without making it small.",
@@ -108,6 +110,7 @@ const PICKS = [
   ] },
   { re: /portal 2|\bportal\b/i, lines: [
     "Portal 2. I have complicated feelings about being cast as the ceiling.",
+    "The room is part of the joke, and part of the problem. You have to pay attention to the place, not just whoever is talking.",
   ] },
   { re: /believe me before dawn/i, lines: [
     "Believe Me Before Dawn. Good for the stretch where nobody's talking.",
@@ -190,6 +193,7 @@ export async function reply(session, raw) {
     const f = tp && tp.follow.find((x) => x.v.includes(session.lastVariant));
     if (f) return say(f.text, { topic: tp.id, variant: session.lastVariant });
   }
+  if (VOTE_HOWTO_RE.test(norm)) return say(VOTE_HOWTO_LINE);
   if (CONTEST_LIVE_RE.test(norm)) return say(CONTEST_LIVE_LINE);
   if (POLITICS_RE.test(norm)) return say(rot(POLITICS_LINES));
   if (RELIGION_RE.test(norm)) return say(rot(RELIGION_LINES));

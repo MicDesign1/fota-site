@@ -110,3 +110,6 @@ export const RELIGION_LINES = [
   "I don't have a religious position to give you. I don't mind you having yours.",
   "I'd rather not weigh in on belief in this conversation. Is there another subject you'd like?",
 ];
+
+export const VOTE_HOWTO_RE = /^(how (do|can) i vote (in|for) (the )?(claudia contest|claudia video contest|community vote)|how do i vote in the community vote( for the claudia contest)?|how does the (claudia contest )?community vote work|where (do|can) i vote (in|for) the claudia (video )?contest)$/;
+export const VOTE_HOWTO_LINE = "I don’t check voting rules live. Look for anabology’s current Claudia contest announcement; I don’t want to send you to an old ballot.";
