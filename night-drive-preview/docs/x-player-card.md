@@ -63,6 +63,6 @@ Rules consistently stated across the sample + Brightcove guide
 
 ## Would-be production URLs (not deployed by this task)
 
-- Share / tweet URL: `https://flowersoftheaftermath.com/night-drive-preview/share.html`
-- Player iframe: `https://flowersoftheaftermath.com/night-drive-preview/player.html`
-- Poster: `https://flowersoftheaftermath.com/night-drive-preview/assets/xcard/amber-current-poster.jpg`
+- Share / tweet URL: `https://flowersoftheaftermath.com/night-drive/share.html`
+- Player iframe: `https://flowersoftheaftermath.com/night-drive/player.html`
+- Poster: `https://flowersoftheaftermath.com/night-drive/assets/xcard/amber-current-poster.jpg`
