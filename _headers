@@ -1,2 +1,3 @@
 /night-drive-preview/*
   X-Robots-Tag: noindex
+  Cache-Control: no-cache, must-revalidate
