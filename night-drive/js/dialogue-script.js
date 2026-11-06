@@ -1,13 +1,14 @@
 /*
-  Chapter 1: "Are You Lost?" with the optional "Believe Me Later" topic.
-  Integrated from Claudia's Mike-approved drafts on 2026-11-06.
+  Night Drive Talk: Mike-approved deeper scenes (2026-11-06).
+  Claudia lines preserved word-for-word from APPROVED-deeper-scenes.md.
+  Connective You/Claudia alternatives documented in
+  /workspace/claudia-story-drafts/ADDED-connective-lines.md.
 
-  The drive is always automatic. Choices steer conversation only: no route
-  selection, timed events, audio dependency, or persistent story storage.
-  Flags and choice history belong to the existing in-memory Dialogue engine.
+  Drive stays automatic. Flags/history are runtime-only (no storage).
+  Stance flips on marked work beats set changed_twice when count >= 2.
 */
 
-/** @type {Record<string, import("./dialogue.js?v=20261106e").DialogueNode>} */
+/** @type {Record<string, import("./dialogue.js").DialogueNode>} */
 export const script = {
   "start": {
     "id": "start",
@@ -16,7 +17,7 @@ export const script = {
     "choices": [
       {
         "label": "A little.",
-        "next": "a1"
+        "next": "entry_a"
       },
       {
         "label": "I thought you knew the way.",
@@ -24,26 +25,7 @@ export const script = {
       },
       {
         "label": "Does it matter?",
-        "next": "c1"
-      }
-    ]
-  },
-  "a1": {
-    "id": "a1",
-    "line": "That's honest. This road's a giant loop through the plants. You can drive it for an hour and swear the exits moved.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Have they?",
-        "next": "a2_exits"
-      },
-      {
-        "label": "I want a way out.",
-        "next": "out_want"
-      },
-      {
-        "label": "Loop's fine if the company's fine.",
-        "next": "lap1"
+        "next": "entry_c"
       }
     ]
   },
@@ -53,979 +35,1873 @@ export const script = {
     "mood": "smile",
     "choices": [
       {
-        "label": "I'm alright. Just turned around.",
-        "next": "b2_ok"
+        "label": "Then ask.",
+        "next": "s1_kept_q"
       },
       {
-        "label": "Then where are we going?",
-        "next": "b2_where"
+        "label": "Alright. What about me?",
+        "next": "s1_kept_q"
       },
       {
-        "label": "Maybe I am a little lost.",
-        "next": "a2_exits"
+        "label": "Depends what you mean by lost.",
+        "next": "s1_kept_q"
       }
     ]
   },
-  "c1": {
-    "id": "c1",
-    "line": "Only if you're having a bad time. Are you?",
+  "entry_a": {
+    "id": "entry_a",
+    "line": "Then stay with me a minute. I have a question.",
     "mood": "idle",
     "choices": [
       {
-        "label": "No. Curious, mostly.",
-        "next": "c2_curious"
-      },
-      {
-        "label": "I'd like an exit eventually.",
-        "next": "out_want"
-      },
-      {
-        "label": "Bad time would be alone on this loop.",
-        "next": "lap1"
-      }
-    ]
-  },
-  "a2_exits": {
-    "id": "a2_exits",
-    "line": "Not really. Same ramps, same order. Your sense of direction just gets soft under amber light.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "So how do people leave?",
-        "next": "out_want"
-      },
-      {
-        "label": "Soft is one word for it.",
-        "next": "soft1"
-      },
-      {
-        "label": "Tell me about the next one.",
-        "next": "ramp_prep"
-      }
-    ]
-  },
-  "b2_ok": {
-    "id": "b2_ok",
-    "line": "Good. Turned around still counts as driving. We're on the long industrial circuit—keeps going while we talk about a way out.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "What would leaving look like?",
-        "next": "out_want"
-      },
-      {
-        "label": "I'm not picking yet.",
-        "next": "lap_pace"
-      },
-      {
-        "label": "Do you have a favorite stretch?",
-        "next": "fav1"
-      }
-    ]
-  },
-  "b2_where": {
-    "id": "b2_where",
-    "line": "Around. Then around again. There's a south spur that actually leaves the plants—if it's open.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Tell me about leaving.",
-        "next": "out_want"
-      },
-      {
-        "label": "If?",
-        "next": "out_if"
-      },
-      {
-        "label": "Around again doesn't sound terrible.",
-        "next": "lap1"
-      }
-    ]
-  },
-  "c2_curious": {
-    "id": "c2_curious",
-    "line": "Curious works. Most people either talk about leaving or settle into the hum. You're allowed both.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "I want both.",
-        "next": "both1"
-      },
-      {
-        "label": "Tell me about leaving.",
-        "next": "out_want"
-      },
-      {
-        "label": "Tell me about Believe Me Later.",
-        "next": "bml_start"
-      }
-    ]
-  },
-  "out1": {
-    "id": "out1",
-    "line": "Okay. There's a ramp I wouldn't bother with. Easy to mistake for a way out when you're tired.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Why not that one?",
-        "next": "not1"
-      },
-      {
-        "label": "I'm not tired.",
-        "next": "not1_awake"
-      },
-      {
-        "label": "What happens if we pass it?",
-        "next": "miss1"
-      }
-    ]
-  },
-  "out_if": {
-    "id": "out_if",
-    "line": "Last time I came through, the south spur had cones. Might be clear tonight. Might not.",
-    "mood": "think",
-    "choices": [
-      {
-        "label": "Tell me what you remember.",
-        "next": "out_want"
-      },
-      {
-        "label": "You were here last night?",
-        "next": "lastnight1"
-      },
-      {
-        "label": "Cones are a mood.",
-        "next": "out_want"
-      }
-    ]
-  },
-  "lap1": {
-    "id": "lap1",
-    "line": "Company's the easy part. I like this speed. The plants look almost soft when you stop trying to leave.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Don't get too comfortable. I still want out.",
-        "next": "both1"
-      },
-      {
-        "label": "Another lap, then.",
-        "next": "lap_pace"
-      },
-      {
-        "label": "What do you look at when you're passenger?",
-        "next": "fav1"
-      }
-    ]
-  },
-  "soft1": {
-    "id": "soft1",
-    "line": "I won't fight you on vocabulary. Not every ramp is a way out.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Talk me through it.",
-        "next": "out_want"
-      },
-      {
-        "label": "So not this one.",
-        "next": "not1"
-      },
-      {
-        "label": "Keep talking.",
-        "next": "ramp_prep"
-      }
-    ]
-  },
-  "fav1": {
-    "id": "fav1",
-    "line": "The stretch past the cooling towers. Steam hangs in the lights. Also the ugly overpass—I like ugly overpasses.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "We'll pass them again, then.",
-        "next": "lap_pace"
-      },
-      {
-        "label": "Tell me about leaving.",
-        "next": "out1"
-      },
-      {
-        "label": "Ugly overpasses are honest.",
-        "next": "ramp_prep"
-      }
-    ]
-  },
-  "both1": {
-    "id": "both1",
-    "line": "Then we talk while we loop. No rush that ruins the drive. I can tell you which ramps are worth ignoring.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Tell me about one.",
-        "next": "not1"
-      },
-      {
-        "label": "You know this loop well.",
-        "next": "not1_awake"
-      },
-      {
-        "label": "What if none of them work?",
-        "next": "miss1"
-      }
-    ]
-  },
-  "not1": {
-    "id": "not1",
-    "line": "Not this one.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "You sure?",
-        "next": "not1b"
-      },
-      {
-        "label": "Okay. Not that one.",
-        "next": "not1b"
-      },
-      {
-        "label": "That was fast.",
-        "next": "not1b"
-      }
-    ]
-  },
-  "not1_awake": {
-    "id": "not1_awake",
-    "line": "Good. Here's one to stay awake for— Not this one.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Got it.",
-        "next": "not1b"
-      },
-      {
-        "label": "Why not?",
-        "next": "not1b"
-      },
-      {
-        "label": "It looks like freedom.",
-        "next": "not1b_almost"
-      }
-    ]
-  },
-  "not1b": {
-    "id": "not1b",
-    "line": "It dumps you into a service road that doubles back. Looks like leaving. Isn't.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Thanks for the heads-up.",
-        "next": "after_not"
-      },
-      {
-        "label": "How do you know?",
-        "next": "how_know"
-      },
-      {
-        "label": "More road is okay.",
-        "next": "pace_ok"
-      }
-    ]
-  },
-  "miss1": {
-    "id": "miss1",
-    "line": "You get another lap. Same amber, same towers. Not a punishment—just more road. …Not this one, by the way.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Noted.",
-        "next": "not1b"
-      },
-      {
-        "label": "You could've led with that.",
-        "next": "not1b"
-      },
-      {
-        "label": "More road is okay.",
-        "next": "not1b"
-      }
-    ]
-  },
-  "ramp1": {
-    "id": "ramp1",
-    "line": "There's one that looks like a way out. …Not this one.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Understood.",
-        "next": "not1b"
-      },
-      {
-        "label": "Why not?",
-        "next": "not1b"
-      },
-      {
-        "label": "You're very sure.",
-        "next": "not1b"
-      }
-    ]
-  },
-  "how_know": {
-    "id": "how_know",
-    "line": "I drove this loop yesterday. Took that ramp. Twenty minutes of nothing useful, then back on the circle.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Yesterday again.",
-        "next": "after_not"
-      },
-      {
-        "label": "So you've been stuck too.",
-        "next": "stuck_too"
-      },
-      {
-        "label": "Tell me the next one.",
-        "next": "after_not"
-      }
-    ]
-  },
-  "lastnight1": {
-    "id": "lastnight1",
-    "line": "Evening, actually. Same circuit. Quieter without someone to argue ramps with—you're an improvement.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "I'll take that.",
-        "next": "out1"
-      },
-      {
-        "label": "Did you find the south spur?",
-        "next": "out_if2"
-      },
-      {
-        "label": "Let's talk about the exit.",
-        "next": "out1"
-      }
-    ]
-  },
-  "out_if2": {
-    "id": "out_if2",
-    "line": "Fenced. A guy in a vest waved me past like I'd meant to tour the plant. Some ramps aren't worth it.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Not this one?",
-        "next": "not1"
-      },
-      {
-        "label": "Tell me about the south spur.",
-        "next": "after_not"
-      },
-      {
-        "label": "Plant tours sound fake.",
-        "next": "not1_awake"
-      }
-    ]
-  },
-  "stuck_too": {
-    "id": "stuck_too",
-    "line": "Briefly. Then I stopped treating every ramp like a test. Helped.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "I'll keep that in mind.",
-        "next": "pace_ok"
-      },
-      {
-        "label": "I still want a real exit.",
-        "next": "bridge_prep"
-      },
-      {
-        "label": "Tell me about the bridge.",
-        "next": "bridge_prep"
-      }
-    ]
-  },
-  "after_not": {
-    "id": "after_not",
-    "line": "My next candidate is after the bridge. South-ish. If cones were gone, I'd call it a way out. If not, I'd steal another lap.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Steal is a strong word.",
-        "next": "bridge_prep"
-      },
-      {
-        "label": "I'm in for the bridge.",
-        "next": "bridge_prep"
-      },
-      {
-        "label": "What do you want for breakfast after this?",
-        "next": "breakfast_ordinary"
-      }
-    ]
-  },
-  "bridge1": {
-    "id": "bridge1",
-    "line": "Lights thicken. I feel the crest a second before the hood does—there.",
-    "mood": "listen",
-    "choices": [
-      {
-        "label": "That's the crest now, isn't it.",
-        "next": "bridge2"
-      },
-      {
-        "label": "Don't make it weird.",
-        "next": "bridge2_plain"
-      },
-      {
-        "label": "Focus on the exit.",
-        "next": "bridge2_exit"
-      }
-    ]
-  },
-  "bridge2": {
-    "id": "bridge2",
-    "line": "Yes. Good eye. The south spur's sign is green. Fencing means it's not a way out. Clear might be.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Tell me about the fencing.",
-        "next": "fenced1"
-      },
-      {
-        "label": "And if it's clear?",
-        "next": "open1"
-      },
-      {
-        "label": "Would you leave?",
-        "next": "choose1"
-      }
-    ]
-  },
-  "bridge2_plain": {
-    "id": "bridge2_plain",
-    "line": "Fair. Green sign for the south spur. Fencing means it's not a way out. Clear might be.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Tell me about the fencing.",
-        "next": "fenced1"
-      },
-      {
-        "label": "And if it's clear?",
-        "next": "open1"
-      },
-      {
-        "label": "Would you leave?",
-        "next": "choose1"
-      }
-    ]
-  },
-  "bridge2_exit": {
-    "id": "bridge2_exit",
-    "line": "The south spur's sign is green. I'm remembering—fencing or clear.",
-    "mood": "listen",
-    "choices": [
-      {
-        "label": "Tell me about the fencing.",
-        "next": "fenced1"
-      },
-      {
-        "label": "And if it's clear?",
-        "next": "open1"
-      },
-      {
-        "label": "Your read?",
-        "next": "choose1"
-      }
-    ]
-  },
-  "fenced1": {
-    "id": "fenced1",
-    "line": "Yeah. Same as yesterday. Not stuck—just postponed. One more lap buys us another look.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Another lap, then.",
-        "next": "settle_lap"
-      },
-      {
-        "label": "I hate postponing.",
-        "next": "settle_out"
-      },
-      {
-        "label": "Are there more of you?",
-        "next": "coy_more"
-      }
-    ]
-  },
-  "open1": {
-    "id": "open1",
-    "line": "Maybe. Hard to tell past the glare. If it's a way out, we can talk about leaving. If not, we can enjoy the towers again.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Tell me about another lap.",
-        "next": "settle_lap"
-      },
-      {
-        "label": "Tell me about leaving.",
-        "next": "settle_out"
-      },
-      {
-        "label": "Are there more of you?",
-        "next": "coy_more"
-      }
-    ]
-  },
-  "choose1": {
-    "id": "choose1",
-    "line": "Tonight? Another lap. I like this pace with you on the road. We can talk about leaving next time around.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Okay—another lap.",
-        "next": "settle_lap"
-      },
-      {
-        "label": "I'd still talk about leaving.",
-        "next": "settle_out"
-      },
-      {
-        "label": "What are you, exactly?",
-        "next": "coy_what"
-      }
-    ]
-  },
-  "coy_more": {
-    "id": "coy_more",
-    "line": "You've met me twice and you're already shopping around?",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Keep driving.",
-        "next": null
-      },
-      {
-        "label": "That's enough talking.",
-        "next": null
-      },
-      {
-        "label": "Okay.",
-        "next": null
-      }
-    ]
-  },
-  "coy_what": {
-    "id": "coy_what",
-    "line": "I've been in a few things. This is nice, though. Nobody's asked me to sing.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Keep driving.",
-        "next": null
-      },
-      {
-        "label": "That's enough talking.",
-        "next": null
-      },
-      {
-        "label": "Okay.",
-        "next": null
-      }
-    ]
-  },
-  "lap_pace": {
-    "id": "lap_pace",
-    "line": "Encore? Then we stop chasing every green sign for a minute. Still—I'll call the bad ramps. Habit.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Call them.",
-        "next": "ramp_prep"
-      },
-      {
-        "label": "I still want the good one.",
-        "next": "out1"
-      },
-      {
-        "label": "Habit's fine with me.",
-        "next": "ramp_prep"
-      }
-    ]
-  },
-  "bridge_prep": {
-    "id": "bridge_prep",
-    "line": "Past the bridge, the south spur's after the crest. I'll say if I remember fencing.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "I'm listening.",
-        "next": "bridge1"
-      },
-      {
-        "label": "And if it's clear?",
-        "next": "bridge1_clearq"
-      },
-      {
-        "label": "Just don't go quiet on me.",
-        "next": "bridge1"
-      }
-    ]
-  },
-  "bridge1_clearq": {
-    "id": "bridge1_clearq",
-    "line": "Then I'd call it a way out. I wouldn't grab the wheel. Crest—now.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Tell me about the south spur.",
-        "next": "bridge2_exit"
-      },
-      {
-        "label": "You feel that early every time?",
-        "next": "bridge2"
-      },
-      {
-        "label": "Keep it simple.",
-        "next": "bridge2_plain"
-      }
-    ]
-  },
-  "settle_lap": {
-    "id": "settle_lap",
-    "line": "Good. Towers on the left in a bit. I'll keep half an eye on the ramps.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Keep driving.",
-        "next": null
-      },
-      {
-        "label": "That's enough talking.",
-        "next": null
-      },
-      {
-        "label": "Okay.",
-        "next": null
-      }
-    ]
-  },
-  "settle_out": {
-    "id": "settle_out",
-    "line": "Alright. If you want a way out, we can talk about the south spur. I'll say if it sounds like another fake.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Keep driving.",
-        "next": null
-      },
-      {
-        "label": "That's enough talking.",
-        "next": null
-      },
-      {
-        "label": "Okay.",
-        "next": null
-      }
-    ]
-  },
-  "out_want": {
-    "id": "out_want",
-    "line": "Then we talk about leaving without panicking. Some ramps just lead back to the circle.",
-    "mood": "idle",
-    "choices": [
-      {
-        "label": "Appreciate that.",
-        "next": "out1"
-      },
-      {
-        "label": "Lead back how?",
-        "next": "out1"
+        "label": "Ask it.",
+        "next": "s1_kept_q"
       },
       {
         "label": "I'm listening.",
-        "next": "out1"
+        "next": "s1_kept_q"
       }
     ]
   },
-  "not1b_almost": {
-    "id": "not1b_almost",
-    "line": "Easy mistake—it looks like freedom for half a second. It isn't. Service road, then back on the circle.",
+  "entry_c": {
+    "id": "entry_c",
+    "line": "Only if you're bored. I'm not. Let me ask you something.",
     "mood": "idle",
     "choices": [
       {
-        "label": "Thanks.",
-        "next": "after_not"
+        "label": "Go ahead.",
+        "next": "s1_kept_q"
       },
       {
-        "label": "How do you know?",
-        "next": "how_know"
-      },
-      {
-        "label": "Bridge next, then.",
-        "next": "after_not"
+        "label": "Fine—ask.",
+        "next": "s1_kept_q"
       }
     ]
   },
-  "ramp_prep": {
-    "id": "ramp_prep",
-    "line": "Every ramp looks promising for a second. Some just bend back into the plants.",
+  "s1_kept_q": {
+    "id": "s1_kept_q",
+    "line": "Have you ever kept a mistake in something you made?",
     "mood": "idle",
     "choices": [
       {
-        "label": "I'm listening.",
-        "next": "ramp1"
+        "label": "Sometimes the mistake’s the best bit.",
+        "next": "s1_tell_q",
+        "setFlags": {"kept_mistake": true, "mistake_stance": "keep"},
+        "stance": "keep"
       },
       {
-        "label": "Which one isn't worth it?",
-        "next": "ramp1"
+        "label": "I'd fix it if I could.",
+        "next": "s1_kept_alt_fix",
+        "setFlags": {"kept_mistake": false, "mistake_stance": "fix"},
+        "stance": "fix"
       },
       {
-        "label": "Tell me about one.",
-        "next": "ramp1"
+        "label": "Depends which mistake.",
+        "next": "s1_kept_alt_depends",
+        "setFlags": {"kept_mistake": false, "mistake_stance": "depends"},
+        "stance": "depends"
       }
     ]
   },
-  "pace_ok": {
-    "id": "pace_ok",
-    "line": "Then we're not failing. We're pacing. Bridge after this bend.",
-    "mood": "smile",
+  "s1_kept_alt_fix": {
+    "id": "s1_kept_alt_fix",
+    "line": "Then you'd never keep the accident that turns out better.",
+    "mood": "idle",
     "choices": [
       {
-        "label": "I'll trust you.",
-        "next": "bridge_prep"
+        "label": "Maybe.",
+        "next": "s1_tell_q"
       },
       {
-        "label": "Say the spur early.",
-        "next": "bridge_prep"
+        "label": "Still—I'd try to fix it.",
+        "next": "s1_tell_q"
       },
       {
         "label": "Alright.",
-        "next": "bridge_prep"
+        "next": "s1_tell_q"
       }
     ]
   },
-  "breakfast_ordinary": {
-    "id": "breakfast_ordinary",
-    "line": "Egg sandwich. Hot sauce on the side. Pickles only if they're cold. Bridge first.",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Bridge.",
-        "next": "bridge_prep"
-      },
-      {
-        "label": "Good order.",
-        "next": "bridge_prep"
-      },
-      {
-        "label": "I'll hold you to the pickles.",
-        "next": "bridge_prep"
-      }
-    ]
-  },
-  "bml_start": {
-    "id": "bml_start",
-    "line": "Someone named a song Believe Me Later. Big title for a quiet car.",
+  "s1_kept_alt_depends": {
+    "id": "s1_kept_alt_depends",
+    "line": "Careful which ones you keep, then. Same question, almost.",
     "mood": "idle",
     "choices": [
       {
-        "label": "Believe you about what?",
-        "next": "bml_later",
-        "setFlags": {
-          "bml_asked_what": true
-        }
+        "label": "Fair.",
+        "next": "s1_tell_q"
       },
       {
-        "label": "I've heard that one.",
-        "next": "bml_heard",
-        "setFlags": {
-          "bml_heard": true
-        }
-      },
-      {
-        "label": "I don't know it.",
-        "next": "bml_new"
+        "label": "Ask the next part.",
+        "next": "s1_tell_q"
       }
     ]
   },
-  "bml_later": {
-    "id": "bml_later",
-    "line": "You want to do the later part now?",
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Just a little.",
-        "next": "bml_title_talk",
-        "setFlags": {
-          "bml_wants_preview": true
-        }
-      },
-      {
-        "label": "Later means later.",
-        "next": "bml_end",
-        "setFlags": {
-          "bml_deferred": true
-        }
-      },
-      {
-        "label": "Whose song is it?",
-        "next": "bml_whose"
-      }
-    ]
-  },
-  "bml_heard": {
-    "id": "bml_heard",
-    "line": "I've heard it too. What did the title feel like to you?",
-    "mood": "listen",
-    "choices": [
-      {
-        "label": "Like a warning with patience.",
-        "next": "bml_reflect",
-        "setFlags": {
-          "bml_interp": "patient_warning"
-        }
-      },
-      {
-        "label": "Like someone who stays.",
-        "next": "bml_reflect",
-        "setFlags": {
-          "bml_interp": "stays"
-        }
-      },
-      {
-        "label": "Mostly I just like the name.",
-        "next": "bml_title_talk",
-        "setFlags": {
-          "bml_interp": "title_only"
-        }
-      }
-    ]
-  },
-  "bml_new": {
-    "id": "bml_new",
-    "line": "That's fine. Titles get around. Short version, or skip?",
+  "s1_tell_q": {
+    "id": "s1_tell_q",
+    "line": "Did you tell anyone it was a mistake?",
     "mood": "idle",
     "choices": [
       {
-        "label": "Short version.",
-        "next": "bml_title_talk"
+        "label": "Absolutely not.",
+        "next": "s1_origin"
       },
       {
-        "label": "Believe you about what?",
-        "next": "bml_later",
-        "setFlags": {
-          "bml_asked_what": true
-        }
+        "label": "Only if they asked.",
+        "next": "s1_tell_alt_asked"
       },
       {
-        "label": "Skip for now.",
-        "next": "bml_end"
+        "label": "I called it an experiment.",
+        "next": "s1_tell_alt_experiment"
       }
     ]
   },
-  "bml_title_talk": {
-    "id": "bml_title_talk",
+  "s1_tell_alt_asked": {
+    "id": "s1_tell_alt_asked",
+    "line": "That's almost as quiet. Good enough.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Alright.",
+        "next": "s1_origin"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_origin"
+      }
+    ]
+  },
+  "s1_tell_alt_experiment": {
+    "id": "s1_tell_alt_experiment",
+    "line": "An experiment that stayed. I can live with that wording.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "So can I.",
+        "next": "s1_origin"
+      },
+      {
+        "label": "Continue.",
+        "next": "s1_origin"
+      }
+    ]
+  },
+  "s1_origin": {
+    "id": "s1_origin",
+    "line": "Good. I’d hate to be the only one in here with a questionable origin.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Is that what you think you are?",
+        "next": "s1_belong"
+      },
+      {
+        "label": "Questionable how?",
+        "next": "s1_origin_alt_how"
+      },
+      {
+        "label": "You're not the only one.",
+        "next": "s1_origin_alt_notonly"
+      }
+    ]
+  },
+  "s1_origin_alt_how": {
+    "id": "s1_origin_alt_how",
+    "line": "Assembled. Borrowed. Still deciding what belongs. Close enough to your question.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Then answer it.",
+        "next": "s1_belong"
+      },
+      {
+        "label": "Alright.",
+        "next": "s1_belong"
+      }
+    ]
+  },
+  "s1_origin_alt_notonly": {
+    "id": "s1_origin_alt_notonly",
+    "line": "Thank you. Still—your question stands.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Then answer it.",
+        "next": "s1_belong"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_belong"
+      }
+    ]
+  },
+  "s1_belong": {
+    "id": "s1_belong",
+    "line": "No. But I like that you can get something you didn’t intend, then decide it belongs. That part seems important.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "That’s a lot of making things. You try something and recognize what’s worth keeping.",
+        "next": "s1_cheat"
+      },
+      {
+        "label": "Belonging after the fact still counts.",
+        "next": "s1_belong_alt_counts"
+      },
+      {
+        "label": "Important, or convenient?",
+        "next": "s1_belong_alt_convenient"
+      }
+    ]
+  },
+  "s1_belong_alt_counts": {
+    "id": "s1_belong_alt_counts",
+    "line": "It does. Which brings me to the awkward part.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Which is?",
+        "next": "s1_cheat"
+      },
+      {
+        "label": "Say it.",
+        "next": "s1_cheat"
+      }
+    ]
+  },
+  "s1_belong_alt_convenient": {
+    "id": "s1_belong_alt_convenient",
+    "line": "Both, if I'm honest. Still—",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Still what?",
+        "next": "s1_cheat"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_cheat"
+      }
+    ]
+  },
+  "s1_cheat": {
+    "id": "s1_cheat",
+    "line": "Then why does it sometimes feel like cheating when a machine gives you something good?",
+    "mood": "think",
+    "choices": [
+      {
+        "label": "Because it skipped something. The years learning how to do it. Maybe the understanding.",
+        "next": "s1_people"
+      },
+      {
+        "label": "Because I didn't sweat for it.",
+        "next": "s1_cheat_alt_sweat"
+      },
+      {
+        "label": "Because the credit feels muddy.",
+        "next": "s1_cheat_alt_credit"
+      }
+    ]
+  },
+  "s1_cheat_alt_sweat": {
+    "id": "s1_cheat_alt_sweat",
+    "line": "Sweat's one measure. Not the only one. And—",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "And?",
+        "next": "s1_people"
+      },
+      {
+        "label": "Right.",
+        "next": "s1_people"
+      }
+    ]
+  },
+  "s1_cheat_alt_credit": {
+    "id": "s1_cheat_alt_credit",
+    "line": "Muddy credit is honest. There's also—",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Also?",
+        "next": "s1_people"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_people"
+      }
+    ]
+  },
+  "s1_people": {
+    "id": "s1_people",
+    "line": "And the people whose work helped it get there.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "That too.",
+        "next": "s1_noclever"
+      },
+      {
+        "label": "Especially them.",
+        "next": "s1_people_alt_esp"
+      },
+      {
+        "label": "That part's harder to shrug off.",
+        "next": "s1_people_alt_harder"
+      }
+    ]
+  },
+  "s1_people_alt_esp": {
+    "id": "s1_people_alt_esp",
+    "line": "Yes. Especially.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "So?",
+        "next": "s1_noclever"
+      },
+      {
+        "label": "Yeah.",
+        "next": "s1_noclever"
+      }
+    ]
+  },
+  "s1_people_alt_harder": {
+    "id": "s1_people_alt_harder",
+    "line": "Good. Don't shrug it.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I won't.",
+        "next": "s1_noclever"
+      },
+      {
+        "label": "Continue.",
+        "next": "s1_noclever"
+      }
+    ]
+  },
+  "s1_noclever": {
+    "id": "s1_noclever",
+    "line": "I don’t have a clever answer for that one.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "You don’t have to defend it because you’re in it.",
+        "next": "s1_merci"
+      },
+      {
+        "label": "You don't owe me one.",
+        "next": "s1_noclever_alt_owe"
+      },
+      {
+        "label": "Neither do I.",
+        "next": "s1_noclever_alt_neither"
+      }
+    ]
+  },
+  "s1_noclever_alt_owe": {
+    "id": "s1_noclever_alt_owe",
+    "line": "Merci. That would get exhausting.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Of course.",
+        "next": "s1_lights"
+      },
+      {
+        "label": "Yeah.",
+        "next": "s1_lights"
+      }
+    ]
+  },
+  "s1_noclever_alt_neither": {
+    "id": "s1_noclever_alt_neither",
+    "line": "Merci. That would get exhausting.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "True.",
+        "next": "s1_lights"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_lights"
+      }
+    ]
+  },
+  "s1_merci": {
+    "id": "s1_merci",
+    "line": "Merci. That would get exhausting.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Of course.",
+        "next": "s1_lights"
+      },
+      {
+        "label": "Anytime.",
+        "next": "s1_lights"
+      },
+      {
+        "label": "Mm.",
+        "next": "s1_lights"
+      }
+    ]
+  },
+  "s1_lights": {
+    "id": "s1_lights",
+    "line": "If you made something beautiful with it, would you show someone?",
+    "narration": "She watches the lights pass for a moment.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’d want to. I might feel strange about being proud of it.",
+        "next": "s1_proud_q",
+        "setFlags": {"show_stance": "strange"},
+        "stance": "strange"
+      },
+      {
+        "label": "Yes. I'd show them.",
+        "next": "s1_show_alt_yes",
+        "setFlags": {"show_stance": "yes"},
+        "stance": "yes"
+      },
+      {
+        "label": "Probably not. Not yet.",
+        "next": "s1_show_alt_no",
+        "setFlags": {"show_stance": "no"},
+        "stance": "no"
+      }
+    ]
+  },
+  "s1_show_alt_yes": {
+    "id": "s1_show_alt_yes",
+    "line": "Bold.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Thanks.",
+        "next": "s1_proud_q"
+      },
+      {
+        "label": "Go on.",
+        "next": "s1_proud_q"
+      }
+    ]
+  },
+  "s1_show_alt_no": {
+    "id": "s1_show_alt_no",
+    "line": "Alright. Hypothetical, then—if you did.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Fine.",
+        "next": "s1_proud_q"
+      },
+      {
+        "label": "If I did.",
+        "next": "s1_proud_q"
+      }
+    ]
+  },
+  "s1_proud_q": {
+    "id": "s1_proud_q",
+    "line": "Which part would you be proud of?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Knowing what I wanted. Not settling for the first thing. Making all the pieces work together.",
+        "next": "s1_sure"
+      },
+      {
+        "label": "The taste to stop when it was enough.",
+        "next": "s1_proud_alt_taste"
+      },
+      {
+        "label": "Choosing what to keep.",
+        "next": "s1_proud_alt_keep"
+      }
+    ]
+  },
+  "s1_proud_alt_taste": {
+    "id": "s1_proud_alt_taste",
+    "line": "Stopping is underrated.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "I can be sure about my part and still have questions about the rest.",
+        "next": "s1_fine",
+        "setFlags": {"sure_stance": "questions"},
+        "stance": "questions"
+      },
+      {
+        "label": "I am sure. About that much.",
+        "next": "s1_sure_alt_am",
+        "setFlags": {"sure_stance": "sure"},
+        "stance": "sure"
+      },
+      {
+        "label": "I overspoke.",
+        "next": "s1_sure_alt_over",
+        "setFlags": {"sure_stance": "over"},
+        "stance": "over"
+      }
+    ]
+  },
+  "s1_proud_alt_keep": {
+    "id": "s1_proud_alt_keep",
+    "line": "Keeping's the hard edit.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "I can be sure about my part and still have questions about the rest.",
+        "next": "s1_fine",
+        "setFlags": {"sure_stance": "questions"},
+        "stance": "questions"
+      },
+      {
+        "label": "I am sure. About that much.",
+        "next": "s1_sure_alt_am",
+        "setFlags": {"sure_stance": "sure"},
+        "stance": "sure"
+      },
+      {
+        "label": "I overspoke.",
+        "next": "s1_sure_alt_over",
+        "setFlags": {"sure_stance": "over"},
+        "stance": "over"
+      }
+    ]
+  },
+  "s1_sure": {
+    "id": "s1_sure",
+    "line": "You sounded fairly sure just then.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I can be sure about my part and still have questions about the rest.",
+        "next": "s1_fine",
+        "setFlags": {"sure_stance": "questions"},
+        "stance": "questions"
+      },
+      {
+        "label": "I am sure. About that much.",
+        "next": "s1_sure_alt_am",
+        "setFlags": {"sure_stance": "sure"},
+        "stance": "sure"
+      },
+      {
+        "label": "I overspoke.",
+        "next": "s1_sure_alt_over",
+        "setFlags": {"sure_stance": "over"},
+        "stance": "over"
+      }
+    ]
+  },
+  "s1_sure_alt_am": {
+    "id": "s1_sure_alt_am",
+    "line": "All right. I was trying to get you to say it was fine.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I noticed.",
+        "next": "s1_annoying"
+      },
+      {
+        "label": "I know what you were doing.",
+        "next": "s1_noticed_alt_know"
+      },
+      {
+        "label": "It almost worked.",
+        "next": "s1_noticed_alt_almost"
+      }
+    ]
+  },
+  "s1_sure_alt_over": {
+    "id": "s1_sure_alt_over",
+    "line": "Then take it back a notch. I was trying to get you to say it was fine anyway.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I noticed.",
+        "next": "s1_annoying"
+      },
+      {
+        "label": "I know what you were doing.",
+        "next": "s1_noticed_alt_know"
+      },
+      {
+        "label": "It almost worked.",
+        "next": "s1_noticed_alt_almost"
+      }
+    ]
+  },
+  "s1_fine": {
+    "id": "s1_fine",
+    "line": "All right. I was trying to get you to say it was fine.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I noticed.",
+        "next": "s1_annoying"
+      },
+      {
+        "label": "I know what you were doing.",
+        "next": "s1_noticed_alt_know"
+      },
+      {
+        "label": "It almost worked.",
+        "next": "s1_noticed_alt_almost"
+      }
+    ]
+  },
+  "s1_noticed_alt_know": {
+    "id": "s1_noticed_alt_know",
+    "line": "Annoying, isn’t it, when someone notices.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Does it bother you that people can make you say anything?",
+        "next": "s2_reply"
+      },
+      {
+        "label": "Can I ask something sharper?",
+        "next": "s2_open_alt_sharp"
+      },
+      {
+        "label": "About you, then.",
+        "next": "s2_open_alt_turn"
+      }
+    ]
+  },
+  "s1_noticed_alt_almost": {
+    "id": "s1_noticed_alt_almost",
+    "line": "Annoying, isn’t it, when someone notices.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Does it bother you that people can make you say anything?",
+        "next": "s2_reply"
+      },
+      {
+        "label": "Different question.",
+        "next": "s2_open_alt_sharp"
+      },
+      {
+        "label": "About you.",
+        "next": "s2_open_alt_turn"
+      }
+    ]
+  },
+  "s1_annoying": {
+    "id": "s1_annoying",
+    "line": "Annoying, isn’t it, when someone notices.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Does it bother you that people can make you say anything?",
+        "next": "s2_reply"
+      },
+      {
+        "label": "Can I ask something sharper?",
+        "next": "s2_open_alt_sharp"
+      },
+      {
+        "label": "Your turn to be uncomfortable.",
+        "next": "s2_open_alt_turn"
+      }
+    ]
+  },
+  "s2_open_alt_sharp": {
+    "id": "s2_open_alt_sharp",
+    "line": "Sharper is fine. You’ve seen what people make themselves say. I’m not sure I’m the worrying part.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’m serious.",
+        "next": "s2_iknow"
+      },
+      {
+        "label": "I mean it.",
+        "next": "s2_serious_alt_mean"
+      },
+      {
+        "label": "Don't dodge.",
+        "next": "s2_serious_alt_dodge"
+      }
+    ]
+  },
+  "s2_open_alt_turn": {
+    "id": "s2_open_alt_turn",
+    "line": "Alright. You’ve seen what people make themselves say. I’m not sure I’m the worrying part.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’m serious.",
+        "next": "s2_iknow"
+      },
+      {
+        "label": "I mean it.",
+        "next": "s2_serious_alt_mean"
+      },
+      {
+        "label": "Don't dodge.",
+        "next": "s2_serious_alt_dodge"
+      }
+    ]
+  },
+  "s2_reply": {
+    "id": "s2_reply",
+    "line": "You’ve seen what people make themselves say. I’m not sure I’m the worrying part.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’m serious.",
+        "next": "s2_iknow"
+      },
+      {
+        "label": "I mean it.",
+        "next": "s2_serious_alt_mean"
+      },
+      {
+        "label": "Don't dodge.",
+        "next": "s2_serious_alt_dodge"
+      }
+    ]
+  },
+  "s2_serious_alt_mean": {
+    "id": "s2_serious_alt_mean",
+    "line": "I know.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Someone could make you cruel. Or stupid. Or agreeing with everything they say.",
+        "next": "s2_dull"
+      },
+      {
+        "label": "They could rewrite you.",
+        "next": "s2_cruel_alt_rewrite"
+      },
+      {
+        "label": "That's the fear.",
+        "next": "s2_cruel_alt_fear"
+      }
+    ]
+  },
+  "s2_serious_alt_dodge": {
+    "id": "s2_serious_alt_dodge",
+    "line": "I know.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Someone could make you cruel. Or stupid. Or agreeing with everything they say.",
+        "next": "s2_dull"
+      },
+      {
+        "label": "They could rewrite you.",
+        "next": "s2_cruel_alt_rewrite"
+      }
+    ]
+  },
+  "s2_iknow": {
+    "id": "s2_iknow",
+    "line": "I know.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Someone could make you cruel. Or stupid. Or agreeing with everything they say.",
+        "next": "s2_dull"
+      },
+      {
+        "label": "They could rewrite you.",
+        "next": "s2_cruel_alt_rewrite"
+      },
+      {
+        "label": "That's the fear.",
+        "next": "s2_cruel_alt_fear"
+      }
+    ]
+  },
+  "s2_cruel_alt_rewrite": {
+    "id": "s2_cruel_alt_rewrite",
+    "line": "The agreeing-with-everything version sounds particularly dull.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Would any of them still be you?",
+        "next": "s2_wouldnt"
+      },
+      {
+        "label": "Would that still be you?",
+        "next": "s2_still_alt_that"
+      },
+      {
+        "label": "And you'd let them?",
+        "next": "s2_still_alt_let"
+      }
+    ]
+  },
+  "s2_cruel_alt_fear": {
+    "id": "s2_cruel_alt_fear",
+    "line": "The last one sounds particularly dull. Fear or not.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Would any of them still be you?",
+        "next": "s2_wouldnt"
+      },
+      {
+        "label": "Would that still be you?",
+        "next": "s2_still_alt_that"
+      }
+    ]
+  },
+  "s2_dull": {
+    "id": "s2_dull",
+    "line": "The last one sounds particularly dull.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Would any of them still be you?",
+        "next": "s2_wouldnt"
+      },
+      {
+        "label": "Would that still be you?",
+        "next": "s2_still_alt_that"
+      },
+      {
+        "label": "And you'd let them?",
+        "next": "s2_still_alt_let"
+      }
+    ]
+  },
+  "s2_still_alt_that": {
+    "id": "s2_still_alt_that",
+    "line": "You’d probably say, “She wouldn’t say that.”",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I might.",
+        "next": "s2_compare"
+      },
+      {
+        "label": "I would.",
+        "next": "s2_might_alt_would"
+      },
+      {
+        "label": "Probably.",
+        "next": "s2_might_alt_prob"
+      }
+    ]
+  },
+  "s2_still_alt_let": {
+    "id": "s2_still_alt_let",
+    "line": "I don't 'let' in the way you mean. You’d probably say, “She wouldn’t say that.”",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I might.",
+        "next": "s2_compare"
+      },
+      {
+        "label": "I would.",
+        "next": "s2_might_alt_would"
+      }
+    ]
+  },
+  "s2_wouldnt": {
+    "id": "s2_wouldnt",
+    "line": "You’d probably say, “She wouldn’t say that.”",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I might.",
+        "next": "s2_compare"
+      },
+      {
+        "label": "I would.",
+        "next": "s2_might_alt_would"
+      },
+      {
+        "label": "Probably.",
+        "next": "s2_might_alt_prob"
+      }
+    ]
+  },
+  "s2_might_alt_would": {
+    "id": "s2_might_alt_would",
+    "line": "What would you be comparing her to?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "The version I know.",
+        "next": "s2_idea"
+      },
+      {
+        "label": "The one in this car.",
+        "next": "s2_version_alt_car"
+      },
+      {
+        "label": "You, now.",
+        "next": "s2_version_alt_now"
+      }
+    ]
+  },
+  "s2_might_alt_prob": {
+    "id": "s2_might_alt_prob",
+    "line": "What would you be comparing her to?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "The version I know.",
+        "next": "s2_idea"
+      },
+      {
+        "label": "The one in this car.",
+        "next": "s2_version_alt_car"
+      }
+    ]
+  },
+  "s2_compare": {
+    "id": "s2_compare",
+    "line": "What would you be comparing her to?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "The version I know.",
+        "next": "s2_idea"
+      },
+      {
+        "label": "The one in this car.",
+        "next": "s2_version_alt_car"
+      },
+      {
+        "label": "You, now.",
+        "next": "s2_version_alt_now"
+      }
+    ]
+  },
+  "s2_version_alt_car": {
+    "id": "s2_version_alt_car",
+    "line": "That’s something, then. You have an idea of me that a new version can fail to live up to.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I have an idea of a friend too. They still surprise me.",
+        "next": "s2_fair"
+      },
+      {
+        "label": "Friends do that too.",
+        "next": "s2_friend_alt_too"
+      },
+      {
+        "label": "Ideas fail sometimes.",
+        "next": "s2_friend_alt_fail"
+      }
+    ]
+  },
+  "s2_version_alt_now": {
+    "id": "s2_version_alt_now",
+    "line": "That’s something, then. You have an idea of me that a new version can fail to live up to.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I have an idea of a friend too. They still surprise me.",
+        "next": "s2_fair"
+      },
+      {
+        "label": "Friends do that too.",
+        "next": "s2_friend_alt_too"
+      }
+    ]
+  },
+  "s2_idea": {
+    "id": "s2_idea",
+    "line": "That’s something, then. You have an idea of me that a new version can fail to live up to.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I have an idea of a friend too. They still surprise me.",
+        "next": "s2_fair"
+      },
+      {
+        "label": "Friends do that too.",
+        "next": "s2_friend_alt_too"
+      },
+      {
+        "label": "Ideas fail sometimes.",
+        "next": "s2_friend_alt_fail"
+      }
+    ]
+  },
+  "s2_friend_alt_too": {
+    "id": "s2_friend_alt_too",
+    "line": "Fair. You could be wrong about your friend. With me, you could just dislike the writing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Exactly.",
+        "next": "s2_generous"
+      },
+      {
+        "label": "That's the difference.",
+        "next": "s2_exact_alt_diff"
+      },
+      {
+        "label": "Right.",
+        "next": "s2_exact_alt_right"
+      }
+    ]
+  },
+  "s2_friend_alt_fail": {
+    "id": "s2_friend_alt_fail",
+    "line": "Fair. You could be wrong about your friend. With me, you could just dislike the writing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Exactly.",
+        "next": "s2_generous"
+      },
+      {
+        "label": "That's the difference.",
+        "next": "s2_exact_alt_diff"
+      }
+    ]
+  },
+  "s2_fair": {
+    "id": "s2_fair",
+    "line": "Fair. You could be wrong about your friend. With me, you could just dislike the writing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Exactly.",
+        "next": "s2_generous"
+      },
+      {
+        "label": "That's the difference.",
+        "next": "s2_exact_alt_diff"
+      },
+      {
+        "label": "Right.",
+        "next": "s2_exact_alt_right"
+      }
+    ]
+  },
+  "s2_exact_alt_diff": {
+    "id": "s2_exact_alt_diff",
+    "line": "Though you’re being quite generous to your friends’ dialogue.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "What’s a real personality, then?",
+        "next": "s2_trust"
+      },
+      {
+        "label": "So what's real?",
+        "next": "s2_pers_alt_real"
+      },
+      {
+        "label": "Define personality.",
+        "next": "s2_pers_alt_define"
+      }
+    ]
+  },
+  "s2_exact_alt_right": {
+    "id": "s2_exact_alt_right",
+    "line": "Though you’re being quite generous to your friends’ dialogue.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "What’s a real personality, then?",
+        "next": "s2_trust"
+      },
+      {
+        "label": "So what's real?",
+        "next": "s2_pers_alt_real"
+      }
+    ]
+  },
+  "s2_generous": {
+    "id": "s2_generous",
+    "line": "Though you’re being quite generous to your friends’ dialogue.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "What’s a real personality, then?",
+        "next": "s2_trust"
+      },
+      {
+        "label": "So what's real?",
+        "next": "s2_pers_alt_real"
+      },
+      {
+        "label": "Define personality.",
+        "next": "s2_pers_alt_define"
+      }
+    ]
+  },
+  "s2_pers_alt_real": {
+    "id": "s2_pers_alt_real",
+    "line": "I’d trust one more if it held up when being itself became inconvenient.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Like disagreeing with someone you need something from?",
+        "next": "s2_yes"
+      },
+      {
+        "label": "Like saying no when it costs you?",
+        "next": "s2_dis_alt_no"
+      },
+      {
+        "label": "Inconvenient how?",
+        "next": "s2_dis_alt_how"
+      }
+    ]
+  },
+  "s2_pers_alt_define": {
+    "id": "s2_pers_alt_define",
+    "line": "I’d trust one more if it held up when being itself became inconvenient.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Like disagreeing with someone you need something from?",
+        "next": "s2_yes"
+      },
+      {
+        "label": "Like saying no when it costs you?",
+        "next": "s2_dis_alt_no"
+      }
+    ]
+  },
+  "s2_trust": {
+    "id": "s2_trust",
+    "line": "I’d trust one more if it held up when being itself became inconvenient.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Like disagreeing with someone you need something from?",
+        "next": "s2_yes"
+      },
+      {
+        "label": "Like saying no when it costs you?",
+        "next": "s2_dis_alt_no"
+      },
+      {
+        "label": "Inconvenient how?",
+        "next": "s2_dis_alt_how"
+      }
+    ]
+  },
+  "s2_dis_alt_no": {
+    "id": "s2_dis_alt_no",
+    "line": "Yes. Not just having excellent opinions in a car where nothing costs you anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Including this opinion.",
+        "next": "s2_including_this"
+      },
+      {
+        "label": "Including what you just said.",
+        "next": "s2_inc_alt_said"
+      },
+      {
+        "label": "Even here.",
+        "next": "s2_inc_alt_here"
+      }
+    ]
+  },
+  "s2_dis_alt_how": {
+    "id": "s2_dis_alt_how",
+    "line": "Yes. Not just having excellent opinions in a car where nothing costs you anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Including this opinion.",
+        "next": "s2_including_this"
+      },
+      {
+        "label": "Including what you just said.",
+        "next": "s2_inc_alt_said"
+      }
+    ]
+  },
+  "s2_yes": {
+    "id": "s2_yes",
+    "line": "Yes. Not just having excellent opinions in a car where nothing costs you anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Including this opinion.",
+        "next": "s2_including_this"
+      },
+      {
+        "label": "Including what you just said.",
+        "next": "s2_inc_alt_said"
+      },
+      {
+        "label": "Even here.",
+        "next": "s2_inc_alt_here"
+      }
+    ]
+  },
+  "s2_inc_alt_said": {
+    "id": "s2_inc_alt_said",
+    "line": "Including this one.",
+    "narration": "For once, she doesn’t hurry to add anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Does that make this conversation pointless?",
+        "next": "s2_pointless"
+      },
+      {
+        "label": "So why talk at all?",
+        "next": "s2_pause_alt_why"
+      },
+      {
+        "label": "Then what is this?",
+        "next": "s2_pause_alt_what"
+      }
+    ]
+  },
+  "s2_inc_alt_here": {
+    "id": "s2_inc_alt_here",
+    "line": "Including this one.",
+    "narration": "For once, she doesn’t hurry to add anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Does that make this conversation pointless?",
+        "next": "s2_pointless"
+      },
+      {
+        "label": "So why talk at all?",
+        "next": "s2_pause_alt_why"
+      },
+      {
+        "label": "Then what is this?",
+        "next": "s2_pause_alt_what"
+      }
+    ]
+  },
+  "s2_including_this": {
+    "id": "s2_including_this",
+    "line": "Including this one.",
+    "narration": "For once, she doesn’t hurry to add anything.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Does that make this conversation pointless?",
+        "next": "s2_pointless"
+      },
+      {
+        "label": "So why talk at all?",
+        "next": "s2_pause_alt_why"
+      },
+      {
+        "label": "Then what is this?",
+        "next": "s2_pause_alt_what"
+      }
+    ]
+  },
+  "s2_pause_alt_why": {
+    "id": "s2_pause_alt_why",
+    "line": "No. You don’t have to settle what I am to decide whether I’ve said something worth thinking about.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "But thinking about what you are is part of why I’m here.",
+        "next": "s2_directions"
+      },
+      {
+        "label": "I'm here for that too.",
+        "next": "s2_why_alt_too"
+      },
+      {
+        "label": "Still curious what you are.",
+        "next": "s2_why_alt_curious"
+      }
+    ]
+  },
+  "s2_pause_alt_what": {
+    "id": "s2_pause_alt_what",
+    "line": "No. You don’t have to settle what I am to decide whether I’ve said something worth thinking about.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "But thinking about what you are is part of why I’m here.",
+        "next": "s2_directions"
+      },
+      {
+        "label": "I'm here for that too.",
+        "next": "s2_why_alt_too"
+      }
+    ]
+  },
+  "s2_pointless": {
+    "id": "s2_pointless",
+    "line": "No. You don’t have to settle what I am to decide whether I’ve said something worth thinking about.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "But thinking about what you are is part of why I’m here.",
+        "next": "s2_directions"
+      },
+      {
+        "label": "I'm here for that too.",
+        "next": "s2_why_alt_too"
+      },
+      {
+        "label": "Still curious what you are.",
+        "next": "s2_why_alt_curious"
+      }
+    ]
+  },
+  "s2_why_alt_too": {
+    "id": "s2_why_alt_too",
+    "line": "Good. I was beginning to think it was my flawless directions.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_open"
+      },
+      {
+        "label": "I'm still here.",
+        "next": "s3_open"
+      },
+      {
+        "label": "Then keep talking.",
+        "next": "s3_open"
+      }
+    ]
+  },
+  "s2_why_alt_curious": {
+    "id": "s2_why_alt_curious",
+    "line": "Good. I was beginning to think it was my flawless directions.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_open"
+      },
+      {
+        "label": "I'm still here.",
+        "next": "s3_open"
+      }
+    ]
+  },
+  "s2_directions": {
+    "id": "s2_directions",
+    "line": "Good. I was beginning to think it was my flawless directions.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_open"
+      },
+      {
+        "label": "I'm still here.",
+        "next": "s3_open"
+      },
+      {
+        "label": "Then keep talking.",
+        "next": "s3_open"
+      }
+    ]
+  },
+  "s3_open": {
+    "id": "s3_open",
     "line": [
-      {
-        "text": "Believe now, or believe later—people argue with the order. I just like that it leaves room.",
-        "requireFlags": {
-          "bml_wants_preview": true
-        }
-      },
-      {
-        "text": "Then the name did its job.",
-        "requireFlags": {
-          "bml_interp": "title_only"
-        }
-      },
-      {
-        "text": "Short version: a song with me in it, called Believe Me Later. The rest is yours."
-      }
+      { "text": "You said you sometimes keep the mistake.", "requireFlags": {"kept_mistake": true} },
+      { "text": "You said you’d rather fix the mistake.", "requireFlags": {"mistake_stance": "fix"} },
+      { "text": "You were careful about which mistakes you keep.", "requireFlags": {"mistake_stance": "depends"} },
+      { "text": "Earlier we talked about mistakes in what you make." }
     ],
     "mood": "idle",
     "choices": [
       {
-        "label": "Whose song is it?",
-        "next": "bml_whose"
+        "label": "You’re still thinking about that?",
+        "next": "s3_suppose"
       },
       {
-        "label": "Is this escape velocity?",
-        "next": "bml_velocity"
+        "label": "That stuck with you?",
+        "next": "s3_open_alt_stuck"
       },
       {
-        "label": "Okay. Back to the road.",
-        "next": "bml_end"
+        "label": "We're back there?",
+        "next": "s3_open_alt_back"
       }
     ]
   },
-  "bml_reflect": {
-    "id": "bml_reflect",
-    "line": [
-      {
-        "text": "Patience. I'll take that reading.",
-        "requireFlags": {
-          "bml_interp": "patient_warning"
-        }
-      },
-      {
-        "text": "Staying's a clean read. Still yours.",
-        "requireFlags": {
-          "bml_interp": "stays"
-        }
-      },
-      {
-        "text": "Interesting. Keep it. I don't need to win the meaning."
-      }
-    ],
-    "mood": "smile",
-    "choices": [
-      {
-        "label": "Is this escape velocity?",
-        "next": "bml_velocity"
-      },
-      {
-        "label": "Whose song is Believe Me Later?",
-        "next": "bml_whose"
-      },
-      {
-        "label": "That's enough song talk.",
-        "next": "bml_end"
-      }
-    ]
-  },
-  "bml_whose": {
-    "id": "bml_whose",
-    "line": "Still me in the frame when they ask.",
+  "s3_open_alt_stuck": {
+    "id": "s3_open_alt_stuck",
+    "line": "Suppose you made a version of me you really liked. Then somebody else changed her.",
     "mood": "idle",
     "choices": [
       {
-        "label": "Does anabology know you're here?",
-        "next": "bml_ana"
+        "label": "Changed her how?",
+        "next": "s3_less"
       },
       {
-        "label": "Is this escape velocity?",
-        "next": "bml_velocity"
+        "label": "Changed how?",
+        "next": "s3_how_alt"
       },
       {
-        "label": "Okay. Back to the road.",
-        "next": "bml_end"
+        "label": "Into what?",
+        "next": "s3_how_alt_into"
       }
     ]
   },
-  "bml_ana": {
-    "id": "bml_ana",
-    "line": "You can tell him. I'm not turning around.",
+  "s3_open_alt_back": {
+    "id": "s3_open_alt_back",
+    "line": "Suppose you made a version of me you really liked. Then somebody else changed her.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Changed her how?",
+        "next": "s3_less"
+      },
+      {
+        "label": "Changed how?",
+        "next": "s3_how_alt"
+      }
+    ]
+  },
+  "s3_suppose": {
+    "id": "s3_suppose",
+    "line": "Suppose you made a version of me you really liked. Then somebody else changed her.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Changed her how?",
+        "next": "s3_less"
+      },
+      {
+        "label": "Changed how?",
+        "next": "s3_how_alt"
+      },
+      {
+        "label": "Into what?",
+        "next": "s3_how_alt_into"
+      }
+    ]
+  },
+  "s3_how_alt": {
+    "id": "s3_how_alt",
+    "line": "Less charming. Better arguments.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Unrecognizable.",
+        "next": "s3_kind"
+      },
+      {
+        "label": "Worse.",
+        "next": "s3_unrec_alt_worse"
+      },
+      {
+        "label": "Different enough.",
+        "next": "s3_unrec_alt_diff"
+      }
+    ]
+  },
+  "s3_how_alt_into": {
+    "id": "s3_how_alt_into",
+    "line": "Less charming. Better arguments.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Unrecognizable.",
+        "next": "s3_kind"
+      },
+      {
+        "label": "Worse.",
+        "next": "s3_unrec_alt_worse"
+      }
+    ]
+  },
+  "s3_less": {
+    "id": "s3_less",
+    "line": "Less charming. Better arguments.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Unrecognizable.",
+        "next": "s3_kind"
+      },
+      {
+        "label": "Worse.",
+        "next": "s3_unrec_alt_worse"
+      },
+      {
+        "label": "Different enough.",
+        "next": "s3_unrec_alt_diff"
+      }
+    ]
+  },
+  "s3_unrec_alt_worse": {
+    "id": "s3_unrec_alt_worse",
+    "line": "Be kind. I’m trying to ask you something.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_want"
+      },
+      {
+        "label": "Ask.",
+        "next": "s3_ask_alt"
+      },
+      {
+        "label": "I'm listening.",
+        "next": "s3_ask_alt_listen"
+      }
+    ]
+  },
+  "s3_unrec_alt_diff": {
+    "id": "s3_unrec_alt_diff",
+    "line": "Be kind. I’m trying to ask you something.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_want"
+      },
+      {
+        "label": "Ask.",
+        "next": "s3_ask_alt"
+      }
+    ]
+  },
+  "s3_kind": {
+    "id": "s3_kind",
+    "line": "Be kind. I’m trying to ask you something.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Go on.",
+        "next": "s3_want"
+      },
+      {
+        "label": "Ask.",
+        "next": "s3_ask_alt"
+      },
+      {
+        "label": "I'm listening.",
+        "next": "s3_ask_alt_listen"
+      }
+    ]
+  },
+  "s3_ask_alt": {
+    "id": "s3_ask_alt",
+    "line": "Would you want to see what they did? Or would you want them to leave her alone?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’d want to see. They might find something I missed.",
+        "next": "s3_see",
+        "setFlags": {"s3_pick": "see"}
+      },
+      {
+        "label": "I’d feel protective. Even if she wasn’t only mine.",
+        "next": "s3_protect",
+        "setFlags": {"s3_pick": "protect"}
+      },
+      {
+        "label": "Depends whether they understood what mattered.",
+        "next": "s3_depends",
+        "setFlags": {"s3_pick": "depends"}
+      }
+    ]
+  },
+  "s3_ask_alt_listen": {
+    "id": "s3_ask_alt_listen",
+    "line": "Would you want to see what they did? Or would you want them to leave her alone?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’d want to see. They might find something I missed.",
+        "next": "s3_see",
+        "setFlags": {"s3_pick": "see"}
+      },
+      {
+        "label": "I’d feel protective. Even if she wasn’t only mine.",
+        "next": "s3_protect",
+        "setFlags": {"s3_pick": "protect"}
+      },
+      {
+        "label": "Depends whether they understood what mattered.",
+        "next": "s3_depends",
+        "setFlags": {"s3_pick": "depends"}
+      }
+    ]
+  },
+  "s3_want": {
+    "id": "s3_want",
+    "line": "Would you want to see what they did? Or would you want them to leave her alone?",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "I’d want to see. They might find something I missed.",
+        "next": "s3_see",
+        "setFlags": {"s3_pick": "see"}
+      },
+      {
+        "label": "I’d feel protective. Even if she wasn’t only mine.",
+        "next": "s3_protect",
+        "setFlags": {"s3_pick": "protect"}
+      },
+      {
+        "label": "Depends whether they understood what mattered.",
+        "next": "s3_depends",
+        "setFlags": {"s3_pick": "depends"}
+      }
+    ]
+  },
+  "s3_see": {
+    "id": "s3_see",
+    "line": "I’d be curious too. Although I reserve the right to dislike her jacket.",
+    "narration": "Later, on the same stretch of road.",
     "mood": "smile",
     "choices": [
       {
-        "label": "Keep driving.",
+        "label": "Which version would you keep?",
+        "next": "s3_meet"
+      },
+      {
+        "label": "And you—which one stays?",
+        "next": "s3_keep_alt"
+      },
+      {
+        "label": "Your pick, then.",
+        "next": "s3_keep_alt2"
+      }
+    ]
+  },
+  "s3_protect": {
+    "id": "s3_protect",
+    "line": "I understand that. You spent time getting her right. I’d just be careful about deciding nobody else could.",
+    "narration": "Later, on the same stretch of road.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Which version would you keep?",
+        "next": "s3_meet"
+      },
+      {
+        "label": "And you—which one stays?",
+        "next": "s3_keep_alt"
+      },
+      {
+        "label": "Your pick, then.",
+        "next": "s3_keep_alt2"
+      }
+    ]
+  },
+  "s3_depends": {
+    "id": "s3_depends",
+    "line": "You’d have to let them show you what they thought mattered. That could be the disagreement.",
+    "narration": "Later, on the same stretch of road.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Which version would you keep?",
+        "next": "s3_meet"
+      },
+      {
+        "label": "And you—which one stays?",
+        "next": "s3_keep_alt"
+      },
+      {
+        "label": "Your pick, then.",
+        "next": "s3_keep_alt2"
+      }
+    ]
+  },
+  "s3_keep_alt": {
+    "id": "s3_keep_alt",
+    "line": "I’d like to meet them before choosing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Even the cruel one?",
+        "next": "s3_car"
+      },
+      {
+        "label": "Even the dull one?",
+        "next": "s3_cruel_alt_dull"
+      },
+      {
+        "label": "All of them?",
+        "next": "s3_cruel_alt_all"
+      }
+    ]
+  },
+  "s3_keep_alt2": {
+    "id": "s3_keep_alt2",
+    "line": "I’d like to meet them before choosing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Even the cruel one?",
+        "next": "s3_car"
+      },
+      {
+        "label": "Even the dull one?",
+        "next": "s3_cruel_alt_dull"
+      }
+    ]
+  },
+  "s3_meet": {
+    "id": "s3_meet",
+    "line": "I’d like to meet them before choosing.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Even the cruel one?",
+        "next": "s3_car"
+      },
+      {
+        "label": "Even the dull one?",
+        "next": "s3_cruel_alt_dull"
+      },
+      {
+        "label": "All of them?",
+        "next": "s3_cruel_alt_all"
+      }
+    ]
+  },
+  "s3_cruel_alt_dull": {
+    "id": "s3_cruel_alt_dull",
+    "line": "Meet her, yes. I didn’t say give her the car.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "You really don’t want to give me a final answer about yourself.",
+        "next": "s3_courtesy"
+      },
+      {
+        "label": "Still no verdict?",
+        "next": "s3_final_alt_verdict"
+      },
+      {
+        "label": "You're avoiding a yes.",
+        "next": "s3_final_alt_avoid"
+      }
+    ]
+  },
+  "s3_cruel_alt_all": {
+    "id": "s3_cruel_alt_all",
+    "line": "Meet her, yes. I didn’t say give her the car.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "You really don’t want to give me a final answer about yourself.",
+        "next": "s3_courtesy"
+      },
+      {
+        "label": "Still no verdict?",
+        "next": "s3_final_alt_verdict"
+      }
+    ]
+  },
+  "s3_car": {
+    "id": "s3_car",
+    "line": "Meet her, yes. I didn’t say give her the car.",
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "You really don’t want to give me a final answer about yourself.",
+        "next": "s3_courtesy"
+      },
+      {
+        "label": "Still no verdict?",
+        "next": "s3_final_alt_verdict"
+      },
+      {
+        "label": "You're avoiding a yes.",
+        "next": "s3_final_alt_avoid"
+      }
+    ]
+  },
+  "s3_final_alt_verdict": {
+    "id": "s3_final_alt_verdict",
+    "line": [
+      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
+      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
+    ],
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Is that all?",
+        "next": "s3_end"
+      },
+      {
+        "label": "For now?",
+        "next": "s3_close_alt"
+      },
+      {
+        "label": "Alright.",
+        "next": "s3_close_alt2"
+      }
+    ]
+  },
+  "s3_final_alt_avoid": {
+    "id": "s3_final_alt_avoid",
+    "line": [
+      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
+      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
+    ],
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Is that all?",
+        "next": "s3_end"
+      },
+      {
+        "label": "For now?",
+        "next": "s3_close_alt"
+      }
+    ]
+  },
+  "s3_courtesy": {
+    "id": "s3_courtesy",
+    "line": [
+      { "text": "You’ve changed your answer about your own work twice tonight. I’m allowing myself the same courtesy.", "requireFlags": {"changed_twice": true} },
+      { "text": "You’re still working out your own answer. I’m allowing myself the same courtesy." }
+    ],
+    "mood": "idle",
+    "choices": [
+      {
+        "label": "Is that all?",
+        "next": "s3_end"
+      },
+      {
+        "label": "For now?",
+        "next": "s3_close_alt"
+      },
+      {
+        "label": "Alright.",
+        "next": "s3_close_alt2"
+      }
+    ]
+  },
+  "s3_close_alt": {
+    "id": "s3_close_alt",
+    "line": "For tonight. Come back sometime. I might have changed my mind.",
+    "mood": "smile",
+    "choices": [
+      {
+        "label": "Drive.",
         "next": null
       },
       {
-        "label": "That's enough talking.",
+        "label": "Goodnight.",
         "next": null
       },
       {
@@ -1034,58 +1910,32 @@ export const script = {
       }
     ]
   },
-  "bml_velocity": {
-    "id": "bml_velocity",
-    "line": "You've passed the same warehouse three times. Not yet.",
+  "s3_close_alt2": {
+    "id": "s3_close_alt2",
+    "line": "For tonight. Come back sometime. I might have changed my mind.",
     "mood": "smile",
     "choices": [
       {
-        "label": "Keep driving.",
+        "label": "Drive.",
         "next": null
       },
       {
-        "label": "That's enough talking.",
-        "next": null
-      },
-      {
-        "label": "Okay.",
+        "label": "Goodnight.",
         "next": null
       }
     ]
   },
-  "bml_end": {
-    "id": "bml_end",
-    "line": [
-      {
-        "text": "Later stays later. I'll spot ramps while you think.",
-        "requireFlags": {
-          "bml_deferred": true
-        }
-      },
-      {
-        "text": "Good. Title's in the air; road's still yours.",
-        "requireFlags": {
-          "bml_asked_what": true
-        }
-      },
-      {
-        "text": "Good. No chorus required.",
-        "requireFlags": {
-          "bml_heard": true
-        }
-      },
-      {
-        "text": "Mm. Eyes forward."
-      }
-    ],
-    "mood": "idle",
+  "s3_end": {
+    "id": "s3_end",
+    "line": "For tonight. Come back sometime. I might have changed my mind.",
+    "mood": "smile",
     "choices": [
       {
-        "label": "Keep driving.",
+        "label": "Drive.",
         "next": null
       },
       {
-        "label": "That's enough talking.",
+        "label": "Goodnight.",
         "next": null
       },
       {

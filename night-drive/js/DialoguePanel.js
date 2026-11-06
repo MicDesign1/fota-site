@@ -15,6 +15,7 @@ export default class DialoguePanel {
     this.root.innerHTML = `
       <div class="dialogue-card">
         <div class="dialogue-main">
+          <div class="dialogue-narration" id="dialogueNarration" hidden></div>
           <div class="dialogue-line" id="dialogueLine" aria-live="polite"></div>
           <div class="dialogue-choices" id="dialogueChoices" role="group" aria-label="Replies"></div>
           <button type="button" class="dialogue-close" id="dialogueClose">Close</button>
@@ -26,6 +27,7 @@ export default class DialoguePanel {
       </div>
     `;
     document.body.appendChild(this.root);
+    this.narrationEl = this.root.querySelector("#dialogueNarration");
     this.lineEl = this.root.querySelector("#dialogueLine");
     this.logEl = this.root.querySelector("#dialogueLog");
     this.historyWrap = this.root.querySelector(".dialogue-history");
@@ -66,10 +68,15 @@ export default class DialoguePanel {
   _historyEntries(view) {
     const entries = Array.isArray(view?.log) ? view.log.slice() : [];
     const current = (view?.line || "").trim();
-    // Keep the open question in .dialogue-line; history shows earlier turns only.
+    const narration = (view?.narration || "").trim();
+    // Keep the open question / narration in the main column; history is earlier only.
     if (current && entries.length) {
       const last = entries[entries.length - 1];
       if (last?.role === "claudia" && last.text === current) entries.pop();
+    }
+    if (narration && entries.length) {
+      const last = entries[entries.length - 1];
+      if (last?.role === "narration" && last.text === narration) entries.pop();
     }
     return entries;
   }
@@ -81,7 +88,8 @@ export default class DialoguePanel {
     for (const entry of entries) {
       const row = document.createElement("div");
       const isYou = entry.role === "you";
-      row.className = `dialogue-log-row ${isYou ? "dialogue-log-you" : "dialogue-log-claudia"}`;
+      const isNarr = entry.role === "narration";
+      row.className = `dialogue-log-row ${isYou ? "dialogue-log-you" : isNarr ? "dialogue-log-narration" : "dialogue-log-claudia"}`;
       row.textContent = isYou ? `You: ${entry.text}` : entry.text;
       this.logEl.appendChild(row);
     }
@@ -94,6 +102,16 @@ export default class DialoguePanel {
     if (view == null) {
       this.hide();
       return;
+    }
+    const narration = (view.narration || "").trim();
+    if (this.narrationEl) {
+      if (narration) {
+        this.narrationEl.hidden = false;
+        this.narrationEl.textContent = narration;
+      } else {
+        this.narrationEl.hidden = true;
+        this.narrationEl.textContent = "";
+      }
     }
     this.lineEl.textContent = view.line || "";
     this._renderLog(view);
