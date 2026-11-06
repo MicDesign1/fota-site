@@ -3,7 +3,7 @@
   and loops the list. Prev / next / play-pause live in the button bar.
 */
 
-import { musicTracks } from "./music-tracks.js?v=20261106e";
+import { musicTracks } from "./music-tracks.js?v=20261106v";
 
 export default class MusicPlayer {
   constructor({ tracks = musicTracks } = {}) {
@@ -12,7 +12,11 @@ export default class MusicPlayer {
     this.audio.preload = "metadata";
     // Soft default (half of the original 0.5).
     this.audio.volume = 0.25;
-    this.index = 0;
+    // Start on Encore; playlist order stays 01→06 and wraps with next/prev.
+    const encoreIndex = this.tracks.findIndex(
+      (t) => t.id === "track-05" || /05-night-drive-with-claudia\.mp3/.test(t.src || "")
+    );
+    this.index = encoreIndex >= 0 ? encoreIndex : 0;
     this.currentId = null;
     this.listeners = [];
     this.userStarted = false;
@@ -78,7 +82,7 @@ export default class MusicPlayer {
     return this.status();
   }
 
-  /** Play/pause. First tap starts track 0 (or current). */
+  /** Play/pause. First tap starts current index (Encore by default). */
   toggleFromUser() {
     if (this.tracks.length === 0) return this.status();
     if (!this.userStarted || !this.audio.src) {

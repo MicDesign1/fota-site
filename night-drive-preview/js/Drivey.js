@@ -27,7 +27,7 @@ import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106t";
 import DialoguePanel from "./DialoguePanel.js?v=20261106u";
-import MusicPlayer from "./MusicPlayer.js?v=20261106e";
+import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 
 const parser = new DOMParser();
 const readLevel = (htmlText) => {
