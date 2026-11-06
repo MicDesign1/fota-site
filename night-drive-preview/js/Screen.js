@@ -302,8 +302,12 @@ export default class Screen {
     if (!this.active) return;
 
     this.time += 0.05;
-    silhouetteMaterial.uniforms.scramble.value = this.time;
-    transparentMaterial.uniforms.scramble.value = this.time;
+    // Side-only: freeze dither scramble so a smooth sky gradient cannot crawl.
+    // Front / dissolve keep the usual animated ombré grain.
+    const sideOnly = this.altCamera != null && this.viewBlend >= 0.999;
+    const scramble = sideOnly ? 0 : this.time;
+    silhouetteMaterial.uniforms.scramble.value = scramble;
+    transparentMaterial.uniforms.scramble.value = scramble;
     this.colorCyclePass.uniforms.time.value = this.time * 0.02;
 
     if (this.camera == null) return;

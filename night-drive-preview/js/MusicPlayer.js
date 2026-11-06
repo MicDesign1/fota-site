@@ -10,6 +10,7 @@ export default class MusicPlayer {
     this.tracks = Array.isArray(tracks) ? tracks.slice() : [];
     this.audio = new Audio();
     this.audio.preload = "metadata";
+    this.audio.volume = 0.5;
     this.index = 0;
     this.currentId = null;
     this.listeners = [];
@@ -37,6 +38,7 @@ export default class MusicPlayer {
       index: this.index,
       paused: this.audio.paused,
       userStarted: this.userStarted,
+      volume: this.audio.volume,
     };
   }
 
@@ -101,6 +103,17 @@ export default class MusicPlayer {
   }
   skip() { return this.next({ fromUser: false }); }
   skipFromUser() { return this.next({ fromUser: true }); }
+  setVolume(v) {
+    const x = Math.min(1, Math.max(0, Number(v)));
+    this.audio.volume = x;
+    this._emit();
+    return x;
+  }
+
+  getVolume() {
+    return this.audio.volume;
+  }
+
   stop() {
     this.audio.pause();
     this.audio.removeAttribute("src");

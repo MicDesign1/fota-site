@@ -84,7 +84,8 @@ export default class Dialogue {
   /** Choices visible under current flags (still length ≤ 3; pad not applied). */
   visibleChoices(node = this.current) {
     if (node == null) return [];
-    return node.choices
+    const list = Array.isArray(node.choices) ? node.choices : [];
+    return list
       .map((c, index) => ({ ...c, index }))
       .filter((c) => flagsMatch(c.requireFlags, this.flags));
   }
@@ -113,11 +114,13 @@ export default class Dialogue {
   }
 
   _view(node) {
+    const choices = this.visibleChoices(node);
     return {
       id: node.id,
       mood: node.mood,
       line: this.resolveLine(node),
-      choices: this.visibleChoices(node),
+      choices,
+      ended: choices.length === 0,
       flags: { ...this.flags },
       history: this.history.slice(),
     };
@@ -151,13 +154,36 @@ export default class Dialogue {
       next: choice.next,
     });
     if (choice.next == null) {
-      this.exitToRoad();
-      return null;
+      // End of branch: stay in Talk; UI shows a Drive button. Do not auto-return.
+      this.currentId = null;
+      this.active = true;
+      const ended = {
+        id: null,
+        mood: node.mood,
+        line: this.resolveLine(node),
+        choices: [],
+        ended: true,
+        flags: { ...this.flags },
+        history: this.history.slice(),
+      };
+      if (this.onEnter) this.onEnter(ended);
+      return ended;
     }
     if (!this.nodeAllowed(choice.next)) {
       console.warn("Dialogue.choose: next node blocked by flags", choice.next);
-      this.exitToRoad();
-      return null;
+      this.currentId = null;
+      this.active = true;
+      const ended = {
+        id: null,
+        mood: null,
+        line: "",
+        choices: [],
+        ended: true,
+        flags: { ...this.flags },
+        history: this.history.slice(),
+      };
+      if (this.onEnter) this.onEnter(ended);
+      return ended;
     }
     return this.start(choice.next);
   }

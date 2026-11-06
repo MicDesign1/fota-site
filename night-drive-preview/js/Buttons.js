@@ -22,12 +22,21 @@ export default class Buttons {
       <button type="button" id="button_musicPrev" title="Previous"><div class="label">⏮</div></button>
       <button type="button" id="button_musicToggle" title="Play/Pause"><div class="label">▶</div></button>
       <button type="button" id="button_musicNext" title="Next"><div class="label">⏭</div></button>
+      <label class="music-vol" title="Volume">
+        <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+      </label>
       <div id="musicTitle" class="music-title"></div>
     `;
     this.element.appendChild(this.musicGroup);
     this.musicGroup.querySelector("#button_musicPrev").addEventListener("click", () => this.dispatch("musicPrev", "trigger"));
     this.musicGroup.querySelector("#button_musicToggle").addEventListener("click", () => this.dispatch("musicToggle", "trigger"));
     this.musicGroup.querySelector("#button_musicNext").addEventListener("click", () => this.dispatch("musicNext", "trigger"));
+    this.musicVolEl = this.musicGroup.querySelector("#musicVolume");
+    this.musicVolEl.addEventListener("input", (e) => this.dispatch("musicVolume", e.target.value));
+    this.musicVolEl.addEventListener("change", (e) => this.dispatch("musicVolume", e.target.value));
+    // Prevent touch drag on the slider from scrolling the page / stealing drive gestures oddly
+    this.musicVolEl.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+    this.musicVolEl.addEventListener("touchmove", (e) => e.stopPropagation(), { passive: true });
     this.musicTitleEl = this.musicGroup.querySelector("#musicTitle");
     this.musicToggleBtn = this.musicGroup.querySelector("#button_musicToggle .label");
 
@@ -90,6 +99,10 @@ export default class Buttons {
     this.musicTitleEl.title = st.title || "";
     if (this.musicToggleBtn) {
       this.musicToggleBtn.textContent = !st.userStarted || st.paused ? "▶" : "❚❚";
+    }
+    if (this.musicVolEl && typeof st.volume === "number") {
+      const v = String(Math.round(st.volume * 100) / 100);
+      if (this.musicVolEl.value !== v) this.musicVolEl.value = v;
     }
   }
 

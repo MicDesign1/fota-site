@@ -263,6 +263,7 @@ export default class Drivey {
     this.dialoguePanel = new DialoguePanel({
       onChoose: (index) => this.onDialogueChoose(index),
       onClose: () => this.closeTalkPanel({ returnToRoad: true }),
+      onDrive: () => this.goDrive(),
     });
 
     this.dialogue = new Dialogue({
@@ -350,7 +351,10 @@ export default class Drivey {
 
     // Retint forward sky + full side sky (gradient from level skyLow/skyHigh)
     this.retintSkyMesh(this.sky, level);
-    if (this.sideSky) this.retintSkyMesh(this.sideSky, level);
+    if (this.sideSky) {
+      this._retintSideSkyCapped(this.sideSky, level);
+      this._sideSkyCappedFor = level;
+    }
 
     // Retint the background, UI and materials
     this.updateTints();
@@ -387,8 +391,10 @@ export default class Drivey {
     const amber = this.level.tint.clone().lerp(new Color(1, 0.75, 0.35), 0.35);
     silhouetteMaterial.uniforms.lightTint.value.copy(amber);
     transparentMaterial.uniforms.lightTint.value.copy(amber);
-    silhouetteMaterial.uniforms.ditherMagnitude.value = 0.008;
-    transparentMaterial.uniforms.ditherMagnitude.value = 0.008;
+    // Zero temporal dither on the big smooth sky gradient (stripes).
+    // Upstream backseat barely shows bare sky, so animated dither is invisible there.
+    silhouetteMaterial.uniforms.ditherMagnitude.value = 0;
+    transparentMaterial.uniforms.ditherMagnitude.value = 0;
   }
 
   _restoreFrontTints() {
@@ -503,14 +509,18 @@ export default class Drivey {
   makeFullSky() {
     // 360° shell so passenger-side camera still sees the amber gradient.
     // Negative X scale flips normals inward (camera sits inside the shell).
-    const geometry = new CylinderBufferGeometry(1, 1, -100, 100, 1, true, 0, PI * 2);
+    // Shared silhouetteMaterial (cloning RawShaderMaterial broke side draws).
+    // Stability comes from: side-view scramble freeze, dither→0 in side tint,
+    // sky radius well inside far=1e6 (avoids far-plane z-fight stripes).
+    const geometry = new CylinderBufferGeometry(1, 1, -100, 64, 1, true, 0, PI * 2);
     shadeGeometry(geometry, 0);
     const mesh = new Mesh(geometry, silhouetteMaterial);
-    mesh.scale.set(-100000, 100000, 100000);
+    mesh.scale.set(-50000, 50000, 50000);
     mesh.rotation.x = PI * 0.5;
     mesh.rotation.z = PI * 0.5;
     mesh.name = "sideSky";
     mesh.frustumCulled = false;
+    mesh.renderOrder = -10;
     return mesh;
   }
 
@@ -568,6 +578,10 @@ export default class Drivey {
         this.music.next({ fromUser: true });
         this._refreshMusicMenu();
         this.buttons.wakeUp();
+        break;
+      case "musicVolume":
+        this.music.setVolume(value);
+        this._refreshMusicMenu();
         break;
       case "drive":
         this.goDrive();
@@ -641,8 +655,12 @@ export default class Drivey {
 
   onDialogueChoose(index) {
     const view = this.dialogue.choose(index);
+    // Stay on Claudia view for every answer; only Drive / end-Drive returns.
+    this.talkMode = true;
+    this.checkPhase = "hold";
+    this.screen.viewBlend = 1;
+    if (this.claudia?.toggleEyesSoft) this.claudia.toggleEyesSoft(0.3);
     if (view) this.dialoguePanel.show(view);
-    // null view → onExit already closing talk / returning
   }
 
   closeTalkPanel({ returnToRoad = true } = {}) {
@@ -691,9 +709,10 @@ export default class Drivey {
     if (this.sideSky) {
       this.sky.visible = false;
       this.sideSky.visible = true;
-      // Cap horizon shade so dither never reaches lightTint white.
-      if (this.level != null) {
+      // Cap horizon shade once per level (not every frame — avoids GPU churn).
+      if (this.level != null && this._sideSkyCappedFor !== this.level) {
         this._retintSideSkyCapped(this.sideSky, this.level);
+        this._sideSkyCappedFor = this.level;
       }
     } else {
       this.sky.visible = true;
@@ -715,8 +734,8 @@ export default class Drivey {
     this.sideCamera.position.set(0, 0, 0);
     this.sideCamera.rotation.set(0, 0, 0);
     this.sideCamera.fov = 85;
-    this.sideCamera.near = 0.05;
-    this.sideCamera.far = 100000;
+    this.sideCamera.near = 0.1;
+    this.sideCamera.far = 1000000; // sky shell ~8e4 — stay clear of the far clip
     this.sideCamera.aspect = this.screen.camera.aspect;
     this.sideCamera.updateProjectionMatrix();
 
@@ -867,6 +886,7 @@ export default class Drivey {
     if (this.cruiseSpeed < 0.5) this.cruiseSpeed = 0.5;
 
     this.updateCheckClaudia(delta);
+    if (this.claudia?.update) this.claudia.update(delta);
   }
 
   setNumOtherCars(num) {

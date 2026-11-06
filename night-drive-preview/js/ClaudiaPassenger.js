@@ -14,6 +14,7 @@ import {
   DoubleSide,
   sRGBEncoding,
   ClampToEdgeWrapping,
+  LinearFilter,
 } from "./../lib/three/three.module.js";
 
 const OPEN_URL = "./assets/claudia-art/claudia-eyes-open.png";
@@ -44,6 +45,16 @@ export default class ClaudiaPassenger {
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 1000;
     this.object.add(this.mesh);
+    // Crossfade twin for soft open/closed eye swaps.
+    this.fadeMaterial = this.material.clone();
+    this.fadeMaterial.opacity = 0;
+    this.fadeMaterial.transparent = true;
+    this.fadeMesh = new Mesh(this.mesh.geometry, this.fadeMaterial);
+    this.fadeMesh.frustumCulled = false;
+    this.fadeMesh.renderOrder = 1001;
+    this.fadeMesh.visible = false;
+    this.object.add(this.fadeMesh);
+    this._eyeFade = null; // { from, to, t, dur }
     // No fake backdrop — live world from the claudia camera shows through α cutouts.
     this.backdrop = null;
 
@@ -62,25 +73,56 @@ export default class ClaudiaPassenger {
 
   _prepTex(tex) {
     tex.encoding = sRGBEncoding;
-    tex.anisotropy = 8;
+    tex.anisotropy = 4;
     tex.flipY = true;
     tex.premultiplyAlpha = false;
+    tex.generateMipmaps = false;
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
     tex.wrapS = tex.wrapT = ClampToEdgeWrapping;
     if (tex.image && tex.image.width && tex.image.height) {
       this.artAspect = tex.image.width / tex.image.height;
     }
   }
 
+  _texFor(which) {
+    return which === "closed" ? this.texClosed || this.texOpen : this.texOpen || this.texClosed;
+  }
+
   _applyVariant(which) {
-    const tex = which === "closed" ? this.texClosed || this.texOpen : this.texOpen || this.texClosed;
+    const tex = this._texFor(which);
     if (!tex) return;
     this.currentVariant = which;
     this.material.map = tex;
+    this.material.opacity = 1;
     this.material.needsUpdate = true;
+    if (this.fadeMesh) {
+      this.fadeMesh.visible = false;
+      this.fadeMaterial.opacity = 0;
+    }
+    this._eyeFade = null;
   }
 
-  /** Alternate eyes-closed / eyes-open each visit; never repeat immediately. */
-  pickNextVariant() {
+  /** Soft crossfade to open or closed eyes. */
+  crossfadeToVariant(which, dur = 0.28) {
+    if (which === this.currentVariant && !this._eyeFade) return which;
+    const toTex = this._texFor(which);
+    if (!toTex || !this.fadeMesh) {
+      this._applyVariant(which);
+      return which;
+    }
+    this.fadeMesh.geometry = this.mesh.geometry;
+    this.fadeMaterial.map = toTex;
+    this.fadeMaterial.opacity = 0;
+    this.fadeMaterial.needsUpdate = true;
+    this.fadeMesh.visible = true;
+    this.material.opacity = 1;
+    this._eyeFade = { to: which, t: 0, dur: Math.max(0.05, dur) };
+    return which;
+  }
+
+  /** Alternate eyes-closed / eyes-open; soft crossfade. */
+  pickNextVariant({ fade = false } = {}) {
     let next;
     if (this._lastVariant == null) {
       next = Math.random() < 0.5 ? "open" : "closed";
@@ -88,8 +130,30 @@ export default class ClaudiaPassenger {
       next = this._lastVariant === "open" ? "closed" : "open";
     }
     this._lastVariant = next;
-    this._applyVariant(next);
+    if (fade) this.crossfadeToVariant(next);
+    else this._applyVariant(next);
     return next;
+  }
+
+  /** Toggle open ↔ closed with a soft crossfade (Talk answers). */
+  toggleEyesSoft(dur = 0.28) {
+    const next = this.currentVariant === "open" ? "closed" : "open";
+    this._lastVariant = next;
+    return this.crossfadeToVariant(next, dur);
+  }
+
+  update(dt) {
+    if (!this._eyeFade) return;
+    this._eyeFade.t += dt;
+    const u = Math.min(1, this._eyeFade.t / this._eyeFade.dur);
+    const s = u * u * (3 - 2 * u);
+    this.fadeMaterial.opacity = s;
+    this.material.opacity = 1 - s;
+    if (u >= 1) {
+      const to = this._eyeFade.to;
+      this._eyeFade = null;
+      this._applyVariant(to);
+    }
   }
 
   setEyesOpen(amount) {
@@ -110,6 +174,11 @@ export default class ClaudiaPassenger {
       camera.add(this.object);
     }
     const aspect = Math.max(0.05, camera.aspect);
+    const cacheKey = `${aspect.toFixed(4)}|${camera.fov}|${dist}|${focusU}|${focusV}|${this.artAspect.toFixed(4)}`;
+    if (this._attachCacheKey === cacheKey && this.mesh.geometry) {
+      return;
+    }
+    this._attachCacheKey = cacheKey;
     const vFov = (camera.fov * Math.PI) / 180;
     const visibleH = 2 * dist * Math.tan(vFov * 0.5);
     const visibleW = visibleH * aspect;
@@ -167,6 +236,7 @@ export default class ClaudiaPassenger {
 
     this.mesh.geometry.dispose();
     this.mesh.geometry = new PlaneBufferGeometry(planeW, planeH);
+    if (this.fadeMesh) this.fadeMesh.geometry = this.mesh.geometry;
 
     // Unmirrored as supplied: yaw π to face camera, scale.x -1 cancels the facing flip.
     this.object.position.set(0, yOff, -dist);
