@@ -25,7 +25,7 @@
   No AI calls. Advancement is start() / choose(index) only.
 */
 
-import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106u";
+import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261106v";
 
 /** @typedef {{ label: string, next: string | null, setFlags?: Record<string, unknown>, requireFlags?: Record<string, unknown> }} DialogueChoice */
 /**
@@ -173,16 +173,6 @@ export default class Dialogue {
       for (const [k, v] of Object.entries(choice.setFlags)) {
         this.flags[k] = v;
       }
-    }
-    // Concrete "changed your answer twice": stance flips across marked work beats.
-    if (choice.stance != null) {
-      const prev = this.flags._workStance;
-      if (prev != null && prev !== choice.stance) {
-        const n = (Number(this.flags.stanceChanges) || 0) + 1;
-        this.flags.stanceChanges = n;
-        if (n >= 2) this.flags.changed_twice = true;
-      }
-      this.flags._workStance = choice.stance;
     }
     this.history.push({
       nodeId: node.id,

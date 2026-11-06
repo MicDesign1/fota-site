@@ -1,4 +1,4 @@
-PASS start=start; nodes=106/106 reachable; edges=7275; choice sets are 2–3; all targets exist
-PASS 8 flag keys referenced; 2674 flag-state combinations across 106 nodes; no dead ends
-PASS termination: 243 end nodes; sample Scene3 A/B/C walks ok; conditionals ok
+PASS start=start; nodes=106/106 reachable; edges=1002; choice sets are 2–3; all targets exist
+PASS 3 flag keys referenced; 374 flag-state combinations across 106 nodes; no dead ends
+PASS termination: 27 end nodes; sample Scene3 A/B/C walks ok; conditionals ok
 PASS runtime state: Close/reopen resumes; fresh engine has no flags/history; no storage/timers in script
