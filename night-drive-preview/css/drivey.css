@@ -507,3 +507,21 @@ body.portrait-letterbox #musicTransport .music-vol input[type="range"] {
 body.portrait-letterbox #musicTransport {
   max-width: min(92vw, 22rem);
 }
+
+
+/* GPL source download — discreet, non-interactive with the drive HUD */
+a.gpl-source {
+  position: fixed;
+  left: 0.75em;
+  bottom: 0.75em;
+  z-index: 30;
+  font: 11px/1.2 system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  pointer-events: auto;
+}
+a.gpl-source:hover,
+a.gpl-source:focus-visible {
+  color: rgba(255, 255, 255, 0.85);
+}
