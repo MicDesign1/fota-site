@@ -652,6 +652,11 @@ export default class Drivey {
     }
 
     this.talkMode = !!talk;
+    if (talk && this.checkPhase === "out") {
+      // Reopen during the return transition; otherwise its queued Talk request
+      // would remain armed after updateCheckClaudia reaches idle.
+      this.checkPhase = "in";
+    }
     if (talk) {
       const openNow = this.checkPhase === "hold" || this.screen.viewBlend >= 0.999;
       if (openNow) {
