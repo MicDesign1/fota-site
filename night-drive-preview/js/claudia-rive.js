@@ -3,9 +3,9 @@
   RiveScript is the vendored global from lib/rivescript (loaded by a classic <script>).
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
-import { BRAIN } from "./claudia-rive-brain.js?v=social2";
-import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=social2";
-import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=social2";
+import { BRAIN } from "./claudia-rive-brain.js?v=social3";
+import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=social3";
+import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=social3";
 
 export const OPENER_MUSIC =
   "Good. Now we have music and nowhere we have to be. What’s on your mind?";

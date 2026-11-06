@@ -43,9 +43,9 @@ export const SOCIAL = [
     more: "I mean the thing someone publishes, not a private message." },
   // Variant "Paste the wording and I can talk about it." omitted: no claim she understands pasted text.
   { id: "seepost", re: /^(can you see my (post|tweet)|did you (read|see) my (post|tweet)|can you open my (x|twitter|instagram|tiktok) profile|look at (this|my) (x|twitter) (link|post)|can you see my (x|twitter) (post|profile))$/,
-    replies: ["I can't open your feed here. You can show me the text.", "I haven't seen it. Tell me what you posted."],
+    replies: ["I can’t open the post here. Tell me what it’s about; I may have something to say.", "I haven't seen it. Tell me what you posted."],
     why: "This game chat isn't connected to your account or a live browser.",
-    more: "I can respond to the words you type here. A link alone won't let me read the post." },
+    more: "I can’t open the post here. Tell me what it’s about; I may have something to say. A link alone won't let me read the post." },
   { id: "counts", re: /^how many (followers|likes|views|reposts|retweets) (do i have|do you have|does anabology have|did my (post|tweet) get)( on (x|twitter))?$/,
     replies: ["I can't check account numbers from here.", "I don't have a live count to give you.", "You'd need the profile or post itself for that number. I won't guess."],
     why: "Those numbers change, and I can't fetch them in this chat.",
