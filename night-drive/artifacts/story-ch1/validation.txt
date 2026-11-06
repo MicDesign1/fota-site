@@ -1,7 +1,0 @@
-PASS start=start; nodes=53/53 reachable; edges=231; all choice nodes expose 3 usable choices; all targets exist
-PASS 5 referenced flags are set before read on every visited state (77 flag-state combinations across 53 nodes)
-PASS termination: 23 end nodes; every route ends with three honest Drive choices; loop present=false
-PASS real-engine exhaustive walks=3,866,247; length=6..17 choices; no unexpected cycles; no blank lines
-PASS runtime state: Close/reopen resumes; fresh engine has no flags/history; script contains no browser storage or timers
-Shortest route: [{"id":"start","choice":"C"},{"id":"c1","choice":"A"},{"id":"c2_curious","choice":"C"},{"id":"bml_start","choice":"A"},{"id":"bml_later","choice":"B"},{"id":"bml_end","choice":"A"}]
-Longest route: [{"id":"start","choice":"B"},{"id":"b1","choice":"B"},{"id":"b2_where","choice":"C"},{"id":"lap1","choice":"C"},{"id":"fav1","choice":"A"},{"id":"lap_pace","choice":"A"},{"id":"ramp_prep","choice":"A"},{"id":"ramp1","choice":"A"},{"id":"not1b","choice":"B"},{"id":"how_know","choice":"A"},{"id":"after_not","choice":"C"},{"id":"breakfast_ordinary","choice":"A"},{"id":"bridge_prep","choice":"A"},{"id":"bridge1","choice":"A"},{"id":"bridge2","choice":"A"},{"id":"fenced1","choice":"A"},{"id":"settle_lap","choice":"A"}]
