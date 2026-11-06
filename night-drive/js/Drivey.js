@@ -26,8 +26,14 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=20261106w";
+import DialoguePanel from "./DialoguePanel.js?v=20261106eliza";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
+import {
+  createSession as createElizaSession,
+  opener as elizaOpener,
+  reply as elizaReply,
+  callback as elizaCallback,
+} from "./claudia-eliza.js?v=20261106eliza";
 
 /** Chance that a Talk answer soft-toggles Claudia's eyes (0–1). Override with ?exprchance=0.5 */
 const EXPRESSION_CHANGE_CHANCE = 0.3;
@@ -270,10 +276,14 @@ export default class Drivey {
     this.talkMode = false;
     this.expressionChangeChance = EXPRESSION_CHANGE_CHANCE;
 
+    this._elizaSession = null;
+    this._elizaOpened = false;
     this.dialoguePanel = new DialoguePanel({
       onChoose: (index) => this.onDialogueChoose(index),
       onClose: () => this.closeTalkPanel({ returnToRoad: true }),
       onDrive: () => this.goDrive(),
+      onTypedSubmit: (text) => this.onElizaSubmit(text),
+      onModeChange: (mode) => this.onTalkModeChange(mode),
     });
 
     this.dialogue = new Dialogue({
@@ -719,6 +729,70 @@ export default class Drivey {
       : EXPRESSION_CHANGE_CHANCE;
     if (Math.random() < chance && typeof this.claudia.toggleEyesSoft === "function") {
       this.claudia.toggleEyesSoft(0.3);
+    }
+  }
+
+
+  onTalkModeChange(mode) {
+    if (mode === "typed") {
+      this._ensureElizaSession();
+      if (!this._elizaOpened) {
+        const line = elizaOpener(this._elizaSession);
+        this._elizaOpened = true;
+        this.dialoguePanel.setTypedState({
+          line,
+          log: [{ role: "claudia", text: line }],
+        });
+      }
+    } else if (mode === "choices") {
+      const view =
+        this.dialogue.currentId != null
+          ? this.dialogue.resume()
+          : this.dialogue.start(dialogueStartId);
+      if (view) this.dialoguePanel.show(view);
+    }
+  }
+
+  _ensureElizaSession() {
+    if (!this._elizaSession) {
+      this._elizaSession = createElizaSession();
+      this._elizaOpened = false;
+    }
+  }
+
+  onElizaSubmit(raw) {
+    this._ensureElizaSession();
+    if (!this._elizaOpened) {
+      const line = elizaOpener(this._elizaSession);
+      this._elizaOpened = true;
+      this.dialoguePanel.setTypedState({
+        line,
+        log: [{ role: "claudia", text: line }],
+      });
+    }
+    const result = elizaReply(this._elizaSession, raw);
+    this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
+    // Visit-only callbacks (music / bye_stayed) — spend once on a later turn.
+    if (result.groupId !== "safety_distress") {
+      const musicCb = elizaCallback(this._elizaSession, "music");
+      if (
+        musicCb &&
+        result.groupId !== "music" &&
+        !this._elizaSession.flags._musicCbSpent
+      ) {
+        this._elizaSession.flags._musicCbSpent = true;
+        this.dialoguePanel.appendTypedTurn(null, musicCb);
+      } else {
+        const byeCb = elizaCallback(this._elizaSession, "bye_stayed");
+        if (
+          byeCb &&
+          result.groupId !== "bye" &&
+          !this._elizaSession.flags._byeCbSpent
+        ) {
+          this._elizaSession.flags._byeCbSpent = true;
+          this.dialoguePanel.appendTypedTurn(null, byeCb);
+        }
+      }
     }
   }
 
