@@ -701,6 +701,8 @@ export default class Drivey {
     this.dashboard.object.visible = true;
     this.myCarMesh.visible = false;
     this.sky.visible = true;
+    // The sky is only a half-shell: aim it at whichever camera is rendering.
+    this.sky.rotation.y = this.cameraMount.rotation.y;
     if (this.sideSky) this.sideSky.visible = false;
     if (this.level != null) {
       this.level.sky.visible = true;
@@ -744,6 +746,9 @@ export default class Drivey {
       this.claudiaCameraMount.position.set(0.20 * passengerSign, -0.45, 1);
       this.claudiaCameraMount.rotation.set(PI * 0.5, -PI * 0.38 * passengerSign, 0);
     }
+    // The sky is only a half-shell and must face the rendering camera (upstream does this
+    // in updateCamera via cameraMount; the side camera bypasses that path).
+    this.sky.rotation.y = this.claudiaCameraMount.rotation.y;
     // Identical projection to the front/upstream camera (positive determinant).
     this.sideCamera.fov = this.screen.camera.fov;
     this.sideCamera.near = this.screen.camera.near;
