@@ -13,13 +13,21 @@ export default class DialoguePanel {
     this.root.hidden = true;
     this.root.innerHTML = `
       <div class="dialogue-card">
-        <div class="dialogue-log" id="dialogueLog" aria-live="polite"></div>
-        <div class="dialogue-choices" id="dialogueChoices" role="group" aria-label="Replies"></div>
-        <button type="button" class="dialogue-close" id="dialogueClose">Close</button>
+        <div class="dialogue-main">
+          <div class="dialogue-line" id="dialogueLine" aria-live="polite"></div>
+          <div class="dialogue-choices" id="dialogueChoices" role="group" aria-label="Replies"></div>
+          <button type="button" class="dialogue-close" id="dialogueClose">Close</button>
+        </div>
+        <div class="dialogue-history">
+          <div class="dialogue-history-label">Earlier</div>
+          <div class="dialogue-log" id="dialogueLog"></div>
+        </div>
       </div>
     `;
     document.body.appendChild(this.root);
+    this.lineEl = this.root.querySelector("#dialogueLine");
     this.logEl = this.root.querySelector("#dialogueLog");
+    this.historyWrap = this.root.querySelector(".dialogue-history");
     this.choicesEl = this.root.querySelector("#dialogueChoices");
     this.closeBtn = this.root.querySelector("#dialogueClose");
     this.closeBtn.addEventListener("click", (event) => {
@@ -56,24 +64,28 @@ export default class DialoguePanel {
     el.addEventListener("click", run);
   }
 
-  _renderLog(view) {
-    const entries = Array.isArray(view?.log) ? view.log : [];
-    this.logEl.innerHTML = "";
-    if (entries.length === 0 && view?.line) {
-      const row = document.createElement("div");
-      row.className = "dialogue-log-row dialogue-log-claudia";
-      row.textContent = view.line;
-      this.logEl.appendChild(row);
-    } else {
-      for (const entry of entries) {
-        const row = document.createElement("div");
-        const isYou = entry.role === "you";
-        row.className = `dialogue-log-row ${isYou ? "dialogue-log-you" : "dialogue-log-claudia"}`;
-        row.textContent = isYou ? `You: ${entry.text}` : entry.text;
-        this.logEl.appendChild(row);
-      }
+  _historyEntries(view) {
+    const entries = Array.isArray(view?.log) ? view.log.slice() : [];
+    const current = (view?.line || "").trim();
+    // Keep the open question in .dialogue-line; history shows earlier turns only.
+    if (current && entries.length) {
+      const last = entries[entries.length - 1];
+      if (last?.role === "claudia" && last.text === current) entries.pop();
     }
-    // Auto-scroll to newest while still allowing scrollback.
+    return entries;
+  }
+
+  _renderLog(view) {
+    const entries = this._historyEntries(view);
+    this.logEl.innerHTML = "";
+    if (this.historyWrap) this.historyWrap.hidden = entries.length === 0;
+    for (const entry of entries) {
+      const row = document.createElement("div");
+      const isYou = entry.role === "you";
+      row.className = `dialogue-log-row ${isYou ? "dialogue-log-you" : "dialogue-log-claudia"}`;
+      row.textContent = isYou ? `You: ${entry.text}` : entry.text;
+      this.logEl.appendChild(row);
+    }
     requestAnimationFrame(() => {
       this.logEl.scrollTop = this.logEl.scrollHeight;
     });
@@ -84,6 +96,7 @@ export default class DialoguePanel {
       this.hide();
       return;
     }
+    this.lineEl.textContent = view.line || "";
     this._renderLog(view);
     this.choicesEl.innerHTML = "";
     const choices = view.choices || [];
