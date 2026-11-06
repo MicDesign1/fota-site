@@ -115,6 +115,7 @@ export default class Screen {
 
     // Dual-view dissolve (0 = front/driver, 1 = Claudia side view)
     this.viewBlend = 0;
+    this.debugFlags = { side: false, noclaudia: false, rawsky: false };
     this.altCamera = null;
     this.beforeFrontRender = null; // optional () => void
     this.beforeSideRender = null;
@@ -200,9 +201,16 @@ export default class Screen {
   }
 
   _ensureDissolveRTs(width, height) {
+    // Match EffectComposer targets: same size as drawing buffer, depth attached.
     const w = Math.max(1, width);
     const h = Math.max(1, height);
-    const params = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, stencilBuffer: false };
+    const params = {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      stencilBuffer: false,
+      depthBuffer: true,
+    };
     if (this.frontRT == null || this.frontRT.width !== w || this.frontRT.height !== h) {
       if (this.frontRT) this.frontRT.dispose();
       if (this.sideRT) this.sideRT.dispose();
@@ -276,7 +284,10 @@ export default class Screen {
 
     this.composer.setSize(width, height);
     silhouetteMaterial.uniforms.resolution.value.set(width, height);
-    this._ensureDissolveRTs(width, height);
+    // Dissolve RTs must match the composer's internal buffer pixel size.
+    const db = new Vector2();
+    this.renderer.getDrawingBufferSize(db);
+    this._ensureDissolveRTs(Math.max(1, Math.ceil(db.x)), Math.max(1, Math.ceil(db.y)));
   }
 
   setWireframe(enabled) {
@@ -302,12 +313,9 @@ export default class Screen {
     if (!this.active) return;
 
     this.time += 0.05;
-    // Side-only: freeze dither scramble so a smooth sky gradient cannot crawl.
-    // Front / dissolve keep the usual animated ombré grain.
-    const sideOnly = this.altCamera != null && this.viewBlend >= 0.999;
-    const scramble = sideOnly ? 0 : this.time;
-    silhouetteMaterial.uniforms.scramble.value = scramble;
-    transparentMaterial.uniforms.scramble.value = scramble;
+    // Match upstream: always animate ombré dither (no side-only freeze).
+    silhouetteMaterial.uniforms.scramble.value = this.time;
+    transparentMaterial.uniforms.scramble.value = this.time;
     this.colorCyclePass.uniforms.time.value = this.time * 0.02;
 
     if (this.camera == null) return;
@@ -324,14 +332,21 @@ export default class Screen {
       this.composer.render();
     } else if (useSideOnly) {
       if (this.beforeSideRender) this.beforeSideRender();
-      this.renderPass.camera = this.altCamera;
-      this.composer.renderToScreen = true;
-      this.composer.render();
+      // ?rawsky — bypass composer/SMAA entirely (debug). Else same single composer as front.
+      if (this.debugFlags?.rawsky) {
+        this.renderer.setRenderTarget(null);
+        this.renderer.clear();
+        this.renderer.render(this.scene, this.altCamera);
+      } else {
+        this.renderPass.camera = this.altCamera;
+        this.composer.renderToScreen = true;
+        this.composer.render();
+      }
     } else {
-      // Cross-dissolve: render each view through composer (ombré intact) into RTs, then mix.
-      const pr = this.renderer.getPixelRatio();
-      const size = this.renderer.getSize(new Vector2());
-      this._ensureDissolveRTs(Math.max(1, Math.ceil(size.x * pr)), Math.max(1, Math.ceil(size.y * pr)));
+      // Cross-dissolve: each eye through the SAME composer into depth-bearing RTs.
+      const db = new Vector2();
+      this.renderer.getDrawingBufferSize(db);
+      this._ensureDissolveRTs(Math.max(1, Math.ceil(db.x)), Math.max(1, Math.ceil(db.y)));
 
       const prevRTS = this.composer.renderToScreen;
       this.composer.renderToScreen = false;

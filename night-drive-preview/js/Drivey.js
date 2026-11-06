@@ -179,10 +179,8 @@ export default class Drivey {
 
     this.sky = this.makeSky();
     this.myCarExterior.add(this.sky);
-    // Full cylinder sky for Check Claudia (side look); hidden unless side view.
-    this.sideSky = this.makeFullSky();
-    this.sideSky.visible = false;
-    this.myCarExterior.add(this.sideSky);
+    // No separate side sky — match upstream backseat (same half-shell + pipeline).
+    this.sideSky = null;
 
     this.chaseCameraMount = new Group();
     this.chaseCameraMount.rotation.x = PI * 0.5;
@@ -216,7 +214,7 @@ export default class Drivey {
     this.claudiaCameraMount.rotation.order = "XYZ";
     // Back seat, passenger-side aim. Pitch level (π/2), yaw −0.38π toward passenger+forward,
     // raised (z=1.45) + FOV 85 so α windows show amber sky, poles, wires, lamps.
-    this.claudiaCameraMount.position.set(0.20, -0.45, 1.45);
+    this.claudiaCameraMount.position.set(0.20, -0.45, 1);
     this.claudiaCameraMount.rotation.set(PI * 0.5, -PI * 0.38, 0);
     this.driver.add(this.claudiaCameraMount);
 
@@ -305,6 +303,9 @@ export default class Drivey {
     // Locked: driver camera + ombré effect for Claudia Night Drive.
     this.currentEffect = "ombré";
     this.setCameraMount("driver");
+    this.sideCamera.fov = this.screen.camera.fov;
+    this.sideCamera.near = this.screen.camera.near;
+    this.sideCamera.far = this.screen.camera.far;
     this.sideCamera.aspect = this.screen.camera.aspect;
     this.sideCamera.updateProjectionMatrix();
 
@@ -324,9 +325,34 @@ export default class Drivey {
       this.theme.start();
     }
 
+    this.applyUrlDebugFlags();
     this.screen.addUpdateListener(this.update.bind(this));
     this.update();
     this.screen.scene.visible = true;
+  }
+
+  /** URL debug: ?side | ?noclaudia | ?rawsky (combinable). */
+  applyUrlDebugFlags() {
+    let params;
+    try {
+      params = new URLSearchParams(window.location.search || "");
+    } catch {
+      params = new URLSearchParams();
+    }
+    const flags = {
+      side: params.has("side"),
+      noclaudia: params.has("noclaudia"),
+      rawsky: params.has("rawsky"),
+    };
+    this.screen.debugFlags = flags;
+    if (flags.side) {
+      // Open Claudia/side view immediately and hold (no auto-return).
+      this.checkPhase = "hold";
+      this.checkPhaseT = 0;
+      this.screen.viewBlend = 1;
+      this.talkMode = false;
+      this.prepareSideView();
+    }
   }
 
   async setLevelByName(levelName) {
@@ -351,10 +377,6 @@ export default class Drivey {
 
     // Retint forward sky + full side sky (gradient from level skyLow/skyHigh)
     this.retintSkyMesh(this.sky, level);
-    if (this.sideSky) {
-      this._retintSideSkyCapped(this.sideSky, level);
-      this._sideSkyCappedFor = level;
-    }
 
     // Retint the background, UI and materials
     this.updateTints();
@@ -385,17 +407,8 @@ export default class Drivey {
     this.screen.backgroundColor = blendColors(this.themeColors, this.drawBrighterGround ? 0.25 : this.level.ground);
   }
 
-  /** Side view: keep silhouette highlights amber — never pure white (stops sky flicker). */
-  _applySideAmberTints() {
-    if (this.level == null || this.themeColors == null) return;
-    const amber = this.level.tint.clone().lerp(new Color(1, 0.75, 0.35), 0.35);
-    silhouetteMaterial.uniforms.lightTint.value.copy(amber);
-    transparentMaterial.uniforms.lightTint.value.copy(amber);
-    // Zero temporal dither on the big smooth sky gradient (stripes).
-    // Upstream backseat barely shows bare sky, so animated dither is invisible there.
-    silhouetteMaterial.uniforms.ditherMagnitude.value = 0;
-    transparentMaterial.uniforms.ditherMagnitude.value = 0;
-  }
+  /** No-op: side view uses the same tints/dither as upstream backseat / front ombré. */
+  _applySideAmberTints() {}
 
   _restoreFrontTints() {
     if (this.themeColors == null) return;
@@ -681,10 +694,7 @@ export default class Drivey {
     // Front driver view: Claudia must not exist in this render at all.
     this.claudia.object.visible = false;
     if (this.claudia.hideBackdrop) this.claudia.hideBackdrop();
-    if (this._sideSavedBrighter != null) {
-      this.drawBrighterGround = this._sideSavedBrighter;
-      this._sideSavedBrighter = null;
-    }
+    this.drawBrighterGround = false;
     this._restoreFrontTints();
     this.dashboard.object.visible = true;
     this.myCarMesh.visible = false;
@@ -700,23 +710,12 @@ export default class Drivey {
   }
 
   prepareSideView() {
-    // Side view: live 3D from the "claudia" back-seat mount (passenger-side aim).
-    // Full-bleed cover plane (PNG as supplied, unmirrored) composites via alphaTest;
-    // α=0 window reveals the real industrial road/poles/sky — no fake canvas backdrop.
+    // Match upstream backseat render path: same sky, dither, near/far, composer.
+    // Only divergence: passenger-side mount yaw (and Claudia cover plane).
     this.dashboard.object.visible = false;
     this.myCarMesh.visible = false;
-    // Full 360° sky shell so sideways look still hits amber gradient (half-shell only covers forward).
-    if (this.sideSky) {
-      this.sky.visible = false;
-      this.sideSky.visible = true;
-      // Cap horizon shade once per level (not every frame — avoids GPU churn).
-      if (this.level != null && this._sideSkyCappedFor !== this.level) {
-        this._retintSideSkyCapped(this.sideSky, this.level);
-        this._sideSkyCappedFor = this.level;
-      }
-    } else {
-      this.sky.visible = true;
-    }
+    this.sky.visible = true;
+    if (this.sideSky) this.sideSky.visible = false;
     if (this.level != null) {
       this.level.sky.visible = true;
       this.level.world.visible = true;
@@ -726,34 +725,36 @@ export default class Drivey {
     }
 
     const passengerSign = -this.drivingSide; // RIGHT → +1
-    // Back seat, passenger-side aim (NOT stock +π·0.625). Raised + level pitch + FOV 85
-    // so windows read amber sky / poles / wires / lamps like the old backdrop.
-    this.claudiaCameraMount.position.set(0.20 * passengerSign, -0.45, 1.45);
+    // Upstream backseat: position.z=1, rotation.x=π/2, rotation.y=+π·0.625.
+    // Ours: same near seat height, passenger-side yaw only.
+    this.claudiaCameraMount.position.set(0.20 * passengerSign, -0.45, 1);
     this.claudiaCameraMount.rotation.order = "XYZ";
     this.claudiaCameraMount.rotation.set(PI * 0.5, -PI * 0.38 * passengerSign, 0);
     this.sideCamera.position.set(0, 0, 0);
     this.sideCamera.rotation.set(0, 0, 0);
-    this.sideCamera.fov = 85;
-    this.sideCamera.near = 0.1;
-    this.sideCamera.far = 1000000; // sky shell ~8e4 — stay clear of the far clip
+    // Identical projection to the front/upstream camera.
+    this.sideCamera.fov = this.screen.camera.fov;
+    this.sideCamera.near = this.screen.camera.near;
+    this.sideCamera.far = this.screen.camera.far;
+    this.sideCamera.fov = this.screen.camera.fov;
+    this.sideCamera.near = this.screen.camera.near;
+    this.sideCamera.far = this.screen.camera.far;
     this.sideCamera.aspect = this.screen.camera.aspect;
     this.sideCamera.updateProjectionMatrix();
 
-    // Keep clear color at night ground — brighter clear + white lightTint was
-    // blowing lamps/sky through dither into flashing white. Cap lightTint to amber.
-    this._sideSavedBrighter = this.drawBrighterGround;
+    // Same clear as upstream backseat (drawBrighterGround: false) — no amber/dither overrides.
     this.drawBrighterGround = false;
     this.updateBackgroundColor();
-    this._applySideAmberTints();
+    this._restoreFrontTints();
 
-    // Face-anchored cover-fit overlay; real world shows through α cutouts.
     this.claudia.attachToSideCamera(this.sideCamera, {
       dist: 0.85,
-      focusU: 0.68, // face-centered; phone cover crops sides around her
+      focusU: 0.68,
       focusV: 0.36,
     });
     if (this.claudia.hideBackdrop) this.claudia.hideBackdrop();
-    this.claudia.object.visible = true;
+    // ?noclaudia — show raw upstream-like backdrop through the side camera.
+    this.claudia.object.visible = !this.screen.debugFlags?.noclaudia;
   }
 
   updateCheckClaudia(dt) {
