@@ -1,3 +1,36 @@
+/night-drive/player.html
+  Content-Security-Policy: frame-ancestors 'self' https://twitter.com https://*.twitter.com https://x.com https://*.x.com
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/*.html
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/*.js
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/js/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/css/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/assets/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/night-drive/lib/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
 /night-drive-preview/player.html
   Content-Security-Policy: frame-ancestors 'self' https://twitter.com https://*.twitter.com https://x.com https://*.x.com
   X-Robots-Tag: noindex

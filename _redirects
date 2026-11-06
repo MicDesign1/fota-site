@@ -1,0 +1,3 @@
+# Canonical game URL is /night-drive/. Keep deep links working.
+/night-drive-preview/*  /night-drive/:splat  301
+/night-drive-preview    /night-drive/         301

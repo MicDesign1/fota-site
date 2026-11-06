@@ -1,0 +1,5 @@
+# Omitted from `git archive` / GPL source zip (still in the repo)
+shots/ export-ignore
+artifacts/ export-ignore
+.github/ export-ignore
+source/ export-ignore
