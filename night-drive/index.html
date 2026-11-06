@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Claudia Night Drive</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <link rel="stylesheet" type="text/css" title="main" href="./css/drivey.css?v=489cc2f" />
+  </head>
+  <body>
+    <script src="./lib/theme.js?v=489cc2f"></script>
+    <script type="module">
+      import Drivey from "./js/Drivey.js?v=489cc2f";
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          if (e.target && typeof e.target.closest === "function" && e.target.closest("#dialoguePanel")) {
+            return;
+          }
+          e.preventDefault();
+        },
+        { passive: false }
+      );
+      window.drivey = new Drivey();
+    </script>
+    <a class="gpl-source" href="./source/claudia-night-drive-0000000.zip" rel="license">Source code (GPL-3)</a>
+  </body>
+</html>

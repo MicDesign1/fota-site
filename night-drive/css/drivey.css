@@ -1,0 +1,657 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  text-decoration: none;
+  font-weight: inherit;
+  font-style: inherit;
+  color: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  list-style: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: black;
+  color: white;
+  overflow: hidden;
+  margin: 0;
+}
+
+body, colors {
+  --dashboard-background-color: black;
+  --dashboard-border-color: #888;
+  --dashboard-light-color: #fff;
+}
+
+canvas#renderer {
+  display: block;
+  image-rendering: optimizeSpeed;
+}
+
+div#buttonsContainer {
+  position: absolute;
+  bottom: 1em;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 4000ms;
+}
+
+div#buttonsContainer.awake {
+  opacity: 1;
+  transition: opacity 250ms;
+}
+
+div#buttons {
+  display: inline-flex;
+  align-items: center;
+  color: white;
+  font-weight: bolder;
+  font-size: 1vw;
+  font-family: sans-serif;
+  text-align: center;
+  border: 0.4em solid var(--dashboard-border-color);
+  border-radius: 3em;
+  overflow: hidden;
+  background: var(--dashboard-background-color);
+}
+
+div#buttons button {
+  text-transform: uppercase;
+  background-color: var(--dashboard-background-color);
+  padding:0 1.5em;
+  height: 5em;
+  border-left: 0.2em solid var(--dashboard-border-color);
+  border-right: 0.2em solid var(--dashboard-border-color);
+}
+
+#buttons button:first-of-type {
+  border-left: unset;
+}
+
+#buttons button:last-of-type {
+  border-right: unset;
+}
+
+div#buttons button#button_music {
+  display: none;
+}
+
+div#buttons #embedded-playlist {
+  border-left: 0.2em solid var(--dashboard-border-color);
+  border-right: 0.2em solid var(--dashboard-border-color);
+
+  position: relative;
+
+  --scale: 1.5;
+  --width: 300;
+  --height: 80;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: calc(var(--width) * 1px * var(--scale));
+  height: 5vw;
+  overflow: hidden;
+}
+
+@media (max-width: 2000px) { div#buttons #embedded-playlist { --scale: 1.25; } }
+@media (max-width: 1675px) { div#buttons #embedded-playlist { --scale: 1; } }
+@media (max-width: 1350px) {
+  div#buttons button#button_music {
+    display: block;
+  }
+
+  div#buttons #embedded-playlist {
+    display: none;
+  }
+}
+
+div#buttons #embedded-playlist #backdrop {
+  position: absolute;
+  width: calc(var(--width) * 1px * var(--scale));
+  height: calc(var(--height) * 1px * var(--scale));
+}
+
+div#buttons #embedded-playlist iframe {
+
+  overflow: hidden;
+  width: 300px;
+  height: 80px;
+  scale: var(--scale);
+  transform-origin: center;
+
+  background: #282828;
+  filter: contrast(150%) brightness(150%);
+  mix-blend-mode: luminosity;
+}
+
+div#buttons:not(.wireframe) #embedded-playlist #backdrop {
+  background: var(--dashboard-light-color);
+}
+
+div#buttons.wireframe #embedded-playlist iframe {
+  filter: contrast(200%) brightness(200%) saturate(0%);
+  mix-blend-mode: screen;
+}
+
+div#buttons button div.label {
+  display:block;
+  line-height: 2em;
+}
+
+div#buttons button div.option {
+  display:block;
+  line-height: 2em;
+}
+
+span.indicator {
+  color: var(--dashboard-light-color);
+  text-shadow: 0 0 0.5em var(--dashboard-light-color);
+}
+
+span.light {
+  display: inline-block;
+  width: 1.25em;
+  height: 1em;
+  background-color: var(--dashboard-light-color);
+  box-shadow: 0 0 1em var(--dashboard-light-color);
+}
+
+span.light.off {
+  background-color: var(--dashboard-border-color);
+  box-shadow: unset;
+}
+
+
+/* Claudia Night Drive — single small Claudia pill */
+div#buttonsContainer.claudia-only {
+  bottom: 1.2em;
+  pointer-events: none;
+}
+div#buttonsContainer.claudia-only #buttons {
+  pointer-events: auto;
+  font-size: 0.75rem;
+  border-width: 0.25em;
+  border-radius: 2em;
+}
+div#buttonsContainer.claudia-only #buttons button {
+  padding: 0 1.2em;
+  height: 2.6em;
+  border: none;
+  letter-spacing: 0.06em;
+}
+
+/* --- Claudia Night Drive: Talk panel + music menu --- */
+#dialoguePanel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6.5em;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+#dialoguePanel[hidden] { display: none !important; }
+#dialoguePanel .dialogue-card {
+  pointer-events: auto;
+  width: min(52rem, 94vw);
+  max-height: min(52vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: rgba(10, 4, 0, 0.92);
+  border: 0.2em solid var(--dashboard-border-color);
+  border-radius: 1em;
+  padding: 0.85rem 1rem 0.75rem;
+  color: var(--dashboard-light-color);
+  font-family: sans-serif;
+  box-shadow: 0 0.4em 1.2em rgba(0,0,0,0.55);
+}
+#dialoguePanel .dialogue-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+#dialoguePanel .dialogue-line {
+  font-size: clamp(0.95rem, 2.2vw, 1.12rem);
+  line-height: 1.35;
+  color: #ffc08a;
+}
+#dialoguePanel .dialogue-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  min-height: 0;
+}
+#dialoguePanel .dialogue-history[hidden] { display: none !important; }
+#dialoguePanel .dialogue-history-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+#dialoguePanel .dialogue-log {
+  flex: 1 1 auto;
+  min-height: 3.5rem;
+  max-height: 8.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid rgba(255, 192, 138, 0.16);
+  border-radius: 0.45em;
+  background: rgba(0, 0, 0, 0.22);
+  touch-action: pan-y;
+}
+/* Wide: history to the right of question + choices */
+@media (min-width: 720px) {
+  #dialoguePanel .dialogue-card {
+    flex-direction: row;
+    align-items: stretch;
+    width: min(56rem, 96vw);
+  }
+  #dialoguePanel .dialogue-main {
+    flex: 1 1 58%;
+  }
+  #dialoguePanel .dialogue-history {
+    flex: 1 1 42%;
+    max-width: 18rem;
+    border-left: 1px solid rgba(255, 192, 138, 0.16);
+    padding-left: 0.75rem;
+  }
+  #dialoguePanel .dialogue-log {
+    max-height: none;
+    height: 100%;
+    min-height: 8rem;
+  }
+}
+/* Narrow: history below choices */
+@media (max-width: 719px) {
+  #dialoguePanel .dialogue-card {
+    flex-direction: column;
+  }
+  #dialoguePanel .dialogue-history {
+    order: 2;
+  }
+  #dialoguePanel .dialogue-main {
+    order: 1;
+  }
+}
+#dialoguePanel .dialogue-log-row {
+  font-size: clamp(0.9rem, 2.1vw, 1.08rem);
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+#dialoguePanel .dialogue-log-claudia {
+  color: #ffc08a;
+}
+#dialoguePanel .dialogue-log-you {
+  color: #d7e2ff;
+  opacity: 0.95;
+  padding-left: 0.35rem;
+  border-left: 2px solid rgba(215, 226, 255, 0.35);
+}
+#dialoguePanel .dialogue-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+#dialoguePanel .dialogue-choice,
+#dialoguePanel .dialogue-close {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  text-align: left;
+  background: rgba(40, 18, 0, 0.94);
+  border: 1px solid var(--dashboard-border-color);
+  border-radius: 0.55em;
+  color: var(--dashboard-light-color);
+  padding: 0.6em 0.75em;
+  font-size: clamp(0.88rem, 1.9vw, 1.02rem);
+  line-height: 1.3;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(255, 192, 138, 0.25);
+  touch-action: manipulation;
+}
+#dialoguePanel .dialogue-choice-letter {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35em;
+  height: 1.35em;
+  border-radius: 0.3em;
+  background: rgba(255, 192, 138, 0.16);
+  color: #ffc08a;
+  font-weight: 700;
+  font-size: 0.92em;
+}
+#dialoguePanel .dialogue-choice-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#dialoguePanel .dialogue-choice:hover,
+#dialoguePanel .dialogue-choice:focus-visible,
+#dialoguePanel .dialogue-close:hover,
+#dialoguePanel .dialogue-close:focus-visible {
+  background: rgba(80, 36, 0, 0.98);
+  outline: none;
+}
+#dialoguePanel .dialogue-close {
+  margin-top: 0.15rem;
+  text-align: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+#musicMenu {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5em;
+  transform: translateX(-50%);
+  min-width: 14rem;
+  max-width: 92vw;
+  background: rgba(10, 4, 0, 0.92);
+  border: 0.2em solid var(--dashboard-border-color);
+  border-radius: 0.8em;
+  padding: 0.6rem;
+  z-index: 21;
+  font-family: sans-serif;
+  color: var(--dashboard-light-color);
+}
+#musicMenu[hidden] { display: none !important; }
+#musicMenu .music-empty {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  padding: 0.4rem 0.5rem;
+}
+#musicMenu .music-track {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0.4em;
+  color: inherit;
+  padding: 0.45em 0.55em;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+#musicMenu .music-track:hover,
+#musicMenu .music-track.playing {
+  background: rgba(80, 36, 0, 0.95);
+}
+
+/* Show music button even on wide screens (no embedded playlist in this fork). */
+div#buttons button#button_music {
+  display: block;
+}
+
+#musicMenu .music-skip {
+  display: block;
+  width: 100%;
+  margin-top: 0.45rem;
+  text-align: center;
+  background: rgba(80, 36, 0, 0.85);
+  border: 1px solid var(--dashboard-border-color);
+  border-radius: 0.4em;
+  color: inherit;
+  padding: 0.5em 0.55em;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+#musicMenu .music-skip:hover {
+  background: rgba(110, 50, 0, 0.95);
+}
+
+/* --- Music transport in the button bar --- */
+#musicTransport {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border-left: 0.15em solid var(--dashboard-border-color);
+  border-right: 0.15em solid var(--dashboard-border-color);
+  max-width: min(42vw, 18rem);
+}
+#musicTransport button {
+  padding: 0 0.7em !important;
+  border: none !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+#musicTransport .music-title {
+  padding: 0 0.65em 0 0.2em;
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 9.5em;
+  color: var(--dashboard-light-color);
+  opacity: 0.92;
+}
+
+#controlsMenu {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5em;
+  transform: translateX(-50%);
+  min-width: 12rem;
+  background: rgba(10, 4, 0, 0.92);
+  border: 0.2em solid var(--dashboard-border-color);
+  border-radius: 0.8em;
+  padding: 0.45rem;
+  z-index: 22;
+  font-family: sans-serif;
+  color: var(--dashboard-light-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+#controlsMenu[hidden] { display: none !important; }
+#controlsMenu .controls-option {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0.4em;
+  color: inherit;
+  padding: 0.5em 0.65em;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+#controlsMenu .controls-option:hover,
+#controlsMenu .controls-option.active {
+  background: rgba(80, 36, 0, 0.95);
+}
+
+/* Portrait phone: full 16:9 drive view, chrome (buttons / Talk) below */
+body.portrait-letterbox {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+body.portrait-letterbox #viewStage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+body.portrait-letterbox #viewStage canvas#renderer {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+/* Chrome stack: view (above) → button bar → Talk panel in the free lower half */
+body.portrait-letterbox #buttonsContainer.claudia-only {
+  position: relative;
+  bottom: auto;
+  flex: 0 0 auto;
+  opacity: 1;
+  transition: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.65em 0.4em 0.45em;
+  background: #050200;
+  z-index: 15;
+  width: 100%;
+}
+body.portrait-letterbox #buttonsContainer.claudia-only #buttons {
+  font-size: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 96vw;
+  border-radius: 1.4em;
+}
+body.portrait-letterbox #musicTransport {
+  max-width: min(70vw, 16rem);
+}
+body.portrait-letterbox #musicTransport .music-title {
+  max-width: 7.5em;
+}
+body.portrait-letterbox #dialoguePanel {
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  transform: none;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.35rem 0.5rem 1rem;
+  pointer-events: none;
+  z-index: 20;
+  overflow-y: auto;
+  min-height: 0;
+  background: #050200;
+}
+body.portrait-letterbox #dialoguePanel[hidden] {
+  display: none !important;
+}
+body.portrait-letterbox #dialoguePanel .dialogue-card {
+  pointer-events: auto;
+  width: min(36rem, 94vw);
+  max-height: min(58vh, 26rem);
+  margin: 0 auto;
+  flex-direction: column;
+}
+body.portrait-letterbox #dialoguePanel .dialogue-history {
+  order: 2;
+  max-width: none;
+  border-left: 0;
+  padding-left: 0;
+  border-top: 1px solid rgba(255, 192, 138, 0.14);
+  padding-top: 0.45rem;
+}
+body.portrait-letterbox #dialoguePanel .dialogue-main {
+  order: 1;
+}
+body.portrait-letterbox #dialoguePanel .dialogue-log {
+  max-height: 7.5rem;
+}
+body.portrait-letterbox #controlsMenu,
+body.portrait-letterbox #musicMenu {
+  /* Sit just under the button bar (view 16:9 + bar ~3.2rem) */
+  top: calc(100vw * 9 / 16 + 3.4rem);
+  bottom: auto;
+}
+
+
+/* Compact volume slider in music transport */
+#musicTransport .music-vol {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.35em 0 0.15em;
+  margin: 0;
+  cursor: pointer;
+}
+#musicTransport .music-vol input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 3.6em;
+  height: 1.1em;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  touch-action: none;
+}
+#musicTransport .music-vol input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.28em;
+  background: var(--dashboard-border-color);
+  border-radius: 999px;
+}
+#musicTransport .music-vol input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.85em;
+  height: 0.85em;
+  margin-top: -0.28em;
+  border-radius: 50%;
+  background: var(--dashboard-light-color);
+  border: 0;
+  box-shadow: 0 0 0.35em var(--dashboard-light-color);
+}
+#musicTransport .music-vol input[type="range"]::-moz-range-track {
+  height: 0.28em;
+  background: var(--dashboard-border-color);
+  border-radius: 999px;
+}
+#musicTransport .music-vol input[type="range"]::-moz-range-thumb {
+  width: 0.85em;
+  height: 0.85em;
+  border-radius: 50%;
+  background: var(--dashboard-light-color);
+  border: 0;
+}
+body.portrait-letterbox #musicTransport .music-vol input[type="range"] {
+  width: 3.1em;
+}
+body.portrait-letterbox #musicTransport {
+  max-width: min(92vw, 22rem);
+}
+
+
+/* GPL source download — discreet, non-interactive with the drive HUD */
+a.gpl-source {
+  position: fixed;
+  left: 0.75em;
+  bottom: 0.75em;
+  z-index: 30;
+  font: 11px/1.2 system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  pointer-events: auto;
+}
+a.gpl-source:hover,
+a.gpl-source:focus-visible {
+  color: rgba(255, 255, 255, 0.85);
+}

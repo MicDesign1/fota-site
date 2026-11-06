@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Encore — Claudia Night Drive</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07080c;
+      --fg: #e8ecf5;
+      --muted: #9aa3b5;
+      --accent: #f0c27a;
+      --panel: rgba(16, 18, 28, 0.82);
+      --line: rgba(240, 194, 122, 0.35);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font: 15px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body {
+      background:
+        radial-gradient(120% 80% at 70% 10%, rgba(240,194,122,0.12), transparent 55%),
+        radial-gradient(90% 70% at 10% 90%, rgba(80,110,180,0.18), transparent 50%),
+        linear-gradient(180deg, #0b0d14 0%, #07080c 100%);
+    }
+    .wrap {
+      height: 100%;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 0;
+    }
+    .stage {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .poster {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.05) contrast(1.05);
+      transform: scale(1.02);
+    }
+    .veil {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7,8,12,0.15) 0%, rgba(7,8,12,0.55) 55%, rgba(7,8,12,0.88) 100%);
+      pointer-events: none;
+    }
+    .play-hit {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .play-hit[hidden] { display: none; }
+    .disc {
+      width: min(22vw, 88px);
+      height: min(22vw, 88px);
+      min-width: 64px;
+      min-height: 64px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(10,12,20,0.55);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+      transition: transform 120ms ease, background 120ms ease;
+    }
+    .play-hit:hover .disc, .play-hit:focus-visible .disc {
+      transform: scale(1.04);
+      background: rgba(20,24,36,0.7);
+      outline: none;
+    }
+    .tri {
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 12px 0 12px 20px;
+      border-color: transparent transparent transparent var(--accent);
+      margin-left: 4px;
+    }
+    .bar {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      background: var(--panel);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+    }
+    .meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 0;
+    }
+    .title {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sub { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button.ctrl {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--fg);
+      border-radius: 999px;
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button.ctrl:disabled { opacity: 0.35; cursor: default; }
+    button.ctrl.primary {
+      width: 48px;
+      border-color: var(--line);
+      color: var(--accent);
+    }
+    .progress {
+      flex: 1;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #c9954a, var(--accent));
+    }
+    .time {
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      color: var(--muted);
+      min-width: 7.5ch;
+      text-align: right;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    /* Keep layout usable at card-like sizes */
+    @media (max-height: 220px) {
+      .disc { min-width: 48px; min-height: 48px; }
+      .tri { border-width: 9px 0 9px 15px; }
+      .bar { padding: 8px 10px; gap: 6px; }
+      button.ctrl { width: 34px; height: 34px; }
+      button.ctrl.primary { width: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="stage">
+      <img class="poster" src="./assets/xcard/amber-current-poster.jpg" alt="" width="1200" height="675" decoding="async" />
+      <div class="veil" aria-hidden="true"></div>
+      <button type="button" class="play-hit" id="startHit" aria-label="Play Encore">
+        <span class="disc" aria-hidden="true"><span class="tri"></span></span>
+      </button>
+    </div>
+    <div class="bar">
+      <div class="meta">
+        <div class="title" id="title">Encore</div>
+        <div class="sub">Claudia Night Drive</div>
+      </div>
+      <div class="controls">
+        <button type="button" class="ctrl primary" id="toggle" aria-label="Play" disabled>▶</button>
+        <div class="progress" aria-hidden="true"><i id="fill"></i></div>
+        <div class="time" id="time">0:00</div>
+      </div>
+      <div class="hint" id="hint">Tap play — audio loads only after you start.</div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      // Single track only. No eager download: Audio is created without src until gesture.
+      const TRACK = {
+        title: "Encore",
+        src: "./assets/music/05-night-drive-with-claudia.mp3",
+      };
+      const startHit = document.getElementById("startHit");
+      const toggle = document.getElementById("toggle");
+      const fill = document.getElementById("fill");
+      const timeEl = document.getElementById("time");
+      const hint = document.getElementById("hint");
+      let audio = null;
+      let started = false;
+
+      const fmt = (s) => {
+        if (!Number.isFinite(s)) return "0:00";
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return m + ":" + String(sec).padStart(2, "0");
+      };
+
+      const syncUI = () => {
+        if (!audio) {
+          toggle.textContent = "▶";
+          toggle.setAttribute("aria-label", "Play");
+          return;
+        }
+        const playing = !audio.paused && !audio.ended;
+        toggle.textContent = playing ? "❚❚" : "▶";
+        toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
+        const dur = audio.duration || 0;
+        const cur = audio.currentTime || 0;
+        fill.style.width = dur ? ((cur / dur) * 100).toFixed(2) + "%" : "0%";
+        timeEl.textContent = fmt(cur) + (dur ? " / " + fmt(dur) : "");
+      };
+
+      const ensureAudio = () => {
+        if (audio) return audio;
+        audio = new Audio();
+        audio.preload = "none";
+        audio.playsInline = true;
+        audio.volume = 0.25;
+        audio.addEventListener("timeupdate", syncUI);
+        audio.addEventListener("loadedmetadata", syncUI);
+        audio.addEventListener("play", syncUI);
+        audio.addEventListener("pause", syncUI);
+        audio.addEventListener("ended", () => {
+          syncUI();
+          hint.textContent = "Ended — tap play to hear it again.";
+        });
+        return audio;
+      };
+
+      const startFromGesture = async () => {
+        const a = ensureAudio();
+        if (!a.src) a.src = TRACK.src; // first network request for the MP3
+        started = true;
+        startHit.hidden = true;
+        toggle.disabled = false;
+        hint.textContent = "Playing Encore";
+        try {
+          if (navigator.mediaSession) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title: TRACK.title,
+              artist: "Claudia Night Drive",
+              album: "Night Drive",
+            });
+          }
+        } catch (_) {}
+        try {
+          await a.play();
+        } catch (err) {
+          hint.textContent = "Could not start audio in this frame. Try again.";
+          startHit.hidden = false;
+          console.warn(err);
+        }
+        syncUI();
+      };
+
+      startHit.addEventListener("click", (e) => {
+        e.preventDefault();
+        startFromGesture();
+      });
+      toggle.addEventListener("click", async () => {
+        if (!started) return startFromGesture();
+        const a = ensureAudio();
+        if (a.paused) {
+          try { await a.play(); } catch (_) {}
+        } else {
+          a.pause();
+        }
+        syncUI();
+      });
+
+      // Soft block accidental top-level escapes from any future links.
+      document.addEventListener("click", (e) => {
+        const a = e.target.closest && e.target.closest("a[href]");
+        if (!a) return;
+        if (a.target === "_top" || a.target === "_parent") {
+          e.preventDefault();
+        }
+      }, true);
+
+      syncUI();
+    })();
+  </script>
+</body>
+</html>
