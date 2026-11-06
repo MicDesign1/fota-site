@@ -26,8 +26,16 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=20261106w";
+import DialoguePanel from "./DialoguePanel.js?v=rive1";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
+import {
+  createRiveSession,
+  opener as riveOpener,
+  reply as riveReply,
+} from "./claudia-rive.js?v=rive1";
+
+/** Typed (RiveScript) replies change expression less often than A/B/C. */
+const TYPED_EXPRESSION_CHANCE = 0.2;
 
 /** Chance that a Talk answer soft-toggles Claudia's eyes (0–1). Override with ?exprchance=0.5 */
 const EXPRESSION_CHANGE_CHANCE = 0.3;
@@ -270,10 +278,14 @@ export default class Drivey {
     this.talkMode = false;
     this.expressionChangeChance = EXPRESSION_CHANGE_CHANCE;
 
+    this._elizaSession = null;
+    this._elizaOpened = false;
     this.dialoguePanel = new DialoguePanel({
       onChoose: (index) => this.onDialogueChoose(index),
       onClose: () => this.closeTalkPanel({ returnToRoad: true }),
       onDrive: () => this.goDrive(),
+      onTypedSubmit: (text) => this.onElizaSubmit(text),
+      onModeChange: (mode) => this.onTalkModeChange(mode),
     });
 
     this.dialogue = new Dialogue({
@@ -704,7 +716,7 @@ export default class Drivey {
   }
 
   /** Explicit story mood → eyes always; otherwise chance-based soft toggle. */
-  _maybeChangeExpression(view) {
+  _maybeChangeExpression(view, chanceOverride = null) {
     if (!this.claudia) return;
     const mood = view?.mood;
     const forced = mood != null ? MOOD_TO_EYES[mood] : null;
@@ -714,12 +726,54 @@ export default class Drivey {
       }
       return;
     }
-    const chance = Number.isFinite(this.expressionChangeChance)
+    const chance = Number.isFinite(chanceOverride)
+      ? chanceOverride
+      : Number.isFinite(this.expressionChangeChance)
       ? this.expressionChangeChance
       : EXPRESSION_CHANGE_CHANCE;
     if (Math.random() < chance && typeof this.claudia.toggleEyesSoft === "function") {
       this.claudia.toggleEyesSoft(0.3);
     }
+  }
+
+
+  onTalkModeChange(mode) {
+    if (mode === "typed") {
+      this._ensureRive().then(() => {
+        if (!this._riveOpened) {
+          this._riveOpened = true;
+          const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
+          this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
+        }
+      });
+    } else if (mode === "choices") {
+      const view =
+        this.dialogue.currentId != null ? this.dialogue.resume() : this.dialogue.start(dialogueStartId);
+      if (view) this.dialoguePanel.show(view);
+    }
+  }
+
+  _ensureRive() {
+    if (!this._rivePromise) {
+      this._rivePromise = createRiveSession().then((s) => {
+        this._riveSession = s;
+        return s;
+      });
+    }
+    return this._rivePromise;
+  }
+
+  async onElizaSubmit(raw) {
+    await this._ensureRive();
+    if (!this._riveOpened) {
+      this._riveOpened = true;
+      const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
+      this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
+    }
+    const result = await riveReply(this._riveSession, raw);
+    this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
+    if (!result.distressMode) this._maybeChangeExpression(null, TYPED_EXPRESSION_CHANCE);
+    this._lastTypedKind = result.kind;
   }
 
   closeTalkPanel({ returnToRoad = true } = {}) {
