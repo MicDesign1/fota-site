@@ -1,3 +1,8 @@
-# Canonical game URL is /night-drive/. Keep deep links working.
+# Old preview URLs → canonical
 /night-drive-preview/*  /night-drive/:splat  301
 /night-drive-preview    /night-drive/         301
+
+# Until the sync Action dest is updated (needs workflow scope), serve
+# /night-drive/* from the Action-maintained night-drive-preview tree.
+/night-drive/*          /night-drive-preview/:splat  200!
+/night-drive            /night-drive-preview/         200!
