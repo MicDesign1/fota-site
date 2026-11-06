@@ -61,3 +61,24 @@ export const SOCIAL_PUBLISH_RE = /^(can you (post|tweet|publish|share) (this|it|
 export const SOCIAL_PUBLISH_LINE = "I can help with the wording, but I can't publish it from this game.";
 export const SOCIAL_BARE_X_RE = /^x$/;
 export const SOCIAL_BARE_X_LINE = "Do you mean the platform?";
+
+// Contains/keyword routing for natural phrasings (exact rules above are tried first).
+// Bare "x", "post" or "follow" never match: a platform word or a specific account phrase is required.
+const PLATFORM_RE = /\b(x com|xcom|twitter|tweets?|tiktok|instagram|insta|youtube|social media|socials|social accounts?)\b|\bon x\b/;
+const ACCOUNT_RE = /\b(are you on|you on|do you (have|use|post|tweet|go on)|have you got|your (handle|account|accounts|page|profile|channel|username|twitter|instagram|insta|tiktok|youtube|socials|social media|x)|who do you follow|do you follow|follow you|can i follow|where can i follow|what is your)\b/;
+export function socialIdFor(norm) {
+  if (/^(who do you follow|who are you following|what is your handle|whats your handle|do you have socials|do you have a handle)$/.test(norm)) return "account";
+  if (!PLATFORM_RE.test(norm)) return null;
+  if (/\b(politic\w*|religio\w*|god|vote|election)\b/.test(norm)) return null; // boundaries win
+  if (/\bhow many\b/.test(norm) && /\b(followers|likes|views|reposts|retweets|subscribers)\b/.test(norm)) return "counts";
+  if (/\b(trending|trends|popular (right )?now)\b/.test(norm)) return "trends";
+  if (/\b(see|read|open|look at|check) (my|this) (post|tweet|profile|video|link|reel)\b/.test(norm)) return "seepost";
+  if (/\bwhat should i (post|tweet)\b|\bhelp me write a (post|tweet)\b/.test(norm)) return "whatpost";
+  if (/\btweet or (a )?post\b|\bpost or (a )?tweet\b|\bstill (say|call it) tweet/.test(norm)) return "tweet";
+  if (ACCOUNT_RE.test(norm)) return "account";
+  if (/\btiktok\b/.test(norm)) return "tiktok";
+  if (/\b(instagram|insta)\b/.test(norm)) return "instagram";
+  if (/\byoutube\b/.test(norm)) return "youtube";
+  if (/\b(x com|xcom|twitter)\b/.test(norm) || /^(what|is|do you know)\b.*\bon x\b/.test(norm)) return "x";
+  return null;
+}
