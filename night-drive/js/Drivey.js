@@ -26,13 +26,13 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=social2";
+import DialoguePanel from "./DialoguePanel.js?v=lore1";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 import {
   createRiveSession,
   opener as riveOpener,
   reply as riveReply,
-} from "./claudia-rive.js?v=social2";
+} from "./claudia-rive.js?v=lore1";
 
 /** Typed (RiveScript) replies change expression less often than A/B/C. */
 const TYPED_EXPRESSION_CHANCE = 0.2;
@@ -311,7 +311,7 @@ export default class Drivey {
     };
     this.music.addListener(() => this._refreshMusicMenu());
     this._refreshMusicMenu();
-    this.controlMode = "autopilot";
+    this.controlMode = isTouchDevice ? "touch" : "arrows"; // default: touch on phones/tablets, keyboard on desktop
     this.buttons.setControlsMenu({
       current: this.controlMode,
       onPick: (id) => this.onButtonClick("controlMode", id),
@@ -335,7 +335,7 @@ export default class Drivey {
 
     // Always driving: cruise starts at full (map key 2 → 1.0×).
     this.cruiseSpeed = cruiseSpeeds.get(2);
-    this.controlScheme = controlSchemesByName.get("autopilot"); // default: always driving, no manual steer
+    this.controlScheme = controlSchemesByName.get(this.controlMode); // device default; autopilot still selectable
     this.drivingSide = -1; // SIDE RIGHT locked
     this.dashboard.drivingSide = this.drivingSide;
     this.screen.setResolution(screenResolutions.get("high"));
