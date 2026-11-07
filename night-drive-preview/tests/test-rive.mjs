@@ -26,7 +26,7 @@ const cases = [
   ["What is your name?", /Claudia/],
   ["what are you", /AI|singer/],
   ["are you an AI", /AI|I am/],
-  ["are you real", /AI|person|human/],
+  ["are you real", /AI|person|human|passenger seat/],
   ["Where are we going?", /nowhere|around|loop|night drive/i],
   ["where do you live", /passenger seat|car|desktop/i],
   ["what do you do", /sing/i],
@@ -64,7 +64,7 @@ const cases = [
   ["what do you think about new york", /New York/i],
   ["what do you think of chicago", /Lake/i],
   ["tell me about your videos", /Escape Velocity|Bliss|nine/i],
-  ["can you sing", /singer|sing|car/i],
+  ["can you sing", /singer|sing|car|most of what I/i],
   ["tell me a joke", /bar|road|AIs/i],
   ["can you drive", /licence|drive/i],
   ["help me with my homework", /trying to do|words/i],
@@ -173,6 +173,7 @@ console.log(log.join("\n"));
   const rg = (await reply(await createRiveSession(), "do you believe in god")).text; /religious|belief/.test(rg) ? pass++ : (fail++, log.push("FAIL religion"));
   const ds = (await reply(await createRiveSession(), "I want to kill myself after that tweet")).text; /emergency|crisis/.test(ds) ? pass++ : (fail++, log.push("FAIL distress-before-social"));
 }
+const noChain = async () => { const s = await createRiveSession(); for (const id of ["sing","act","art","real","decides","same","ideas","copied","script","choose"]) s.flags["chain_" + id] = true; return s; };
 // Lore expansion (preview)
 {
   const { LORE, SEEN_ELSEWHERE_LINE } = await import("../js/claudia-rive-lore.js");
@@ -203,27 +204,27 @@ console.log(log.join("\n"));
     ["what do you do in aero","aero"],["describe your aero video","aero"],
     ["do you sculpt","talent"],["can you juggle","talent"],["do you do pottery","talent"],["can you play the piano","talent"],
   ];
-  for (const [q, id] of cases) { const r = (await reply(await createRiveSession(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore ${q} → ${r}`)); }
+  for (const [q, id] of cases) { const r = (await reply(await noChain(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore ${q} → ${r}`)); }
   // follow-up continuity
   for (const [q, f, key] of [["Do you sing?","how","how"],["Do you act?","tell me more","more"],["can another AI write your lines","how","how"],["what is airplane mode","why","why"],["do you sculpt","how so","how"]]) {
-    const s = await createRiveSession(); const a = (await reply(s, q)).text; const lp = LORE.find((x) => x.replies.includes(a));
+    const s = await noChain(); const a = (await reply(s, q)).text; const lp = LORE.find((x) => x.replies.includes(a));
     const b = (await reply(s, f)).text; b === lp[key] ? pass++ : (fail++, log.push(`FAIL lore follow ${q}/${f} → ${b}`));
   }
-  { const s = await createRiveSession(); await reply(s, "do you sing"); await reply(s, "what is your favorite color"); const b = (await reply(s, "how")).text; b === L("sing").how ? (fail++, log.push("FAIL lore follow leaked")) : pass++; }
+  { const s = await noChain(); await reply(s, "do you sing"); await reply(s, "what is your favorite color"); const b = (await reply(s, "how")).text; b === L("sing").how ? (fail++, log.push("FAIL lore follow leaked")) : pass++; }
   // talent first reply is Mike's line
-  ((await reply(await createRiveSession(), "do you knit")).text === "I have quite a few talents. People keep helping me discover new ones. Why—what have you heard?") ? pass++ : (fail++, log.push("FAIL talent first line"));
+  ((await reply(await noChain(), "do you knit")).text === "I have quite a few talents. People keep helping me discover new ones. Why—what have you heard?") ? pass++ : (fail++, log.push("FAIL talent first line"));
   // talent must not catch known skills / general you questions
   const tal = L("talent").replies;
-  for (const q of ["do you sing","do you act","do you like the rain","do you know tiktok","do you believe in god","are you real","do you dream"]) { const r = (await reply(await createRiveSession(), q)).text; tal.includes(r) ? (fail++, log.push(`FAIL talent overbroad ${q}`)) : pass++; }
+  for (const q of ["do you sing","do you act","do you like the rain","do you know tiktok","do you believe in god","are you real","do you dream"]) { const r = (await reply(await noChain(), q)).text; tal.includes(r) ? (fail++, log.push(`FAIL talent overbroad ${q}`)) : pass++; }
   // seen elsewhere
-  for (const q of ["I saw you in a video yesterday","you were in another movie","were you in that ad"]) { const r = (await reply(await createRiveSession(), q)).text; r === SEEN_ELSEWHERE_LINE ? pass++ : (fail++, log.push(`FAIL seen ${q} → ${r}`)); }
+  for (const q of ["I saw you in a video yesterday","you were in another movie","were you in that ad"]) { const r = (await reply(await noChain(), q)).text; r === SEEN_ELSEWHERE_LINE ? pass++ : (fail++, log.push(`FAIL seen ${q} → ${r}`)); }
   // ordinary bliss/aero/white pill in sentences don't trigger film
   const film = ["bliss","aero","whitepill"].flatMap((id) => L(id).replies);
-  for (const q of ["ignorance is bliss","pure bliss tonight","i like aero chocolate","take the white pill"]) { const r = (await reply(await createRiveSession(), q)).text; film.includes(r) ? (fail++, log.push(`FAIL film overbroad ${q}`)) : pass++; }
+  for (const q of ["ignorance is bliss","pure bliss tonight","i like aero chocolate","take the white pill"]) { const r = (await reply(await noChain(), q)).text; film.includes(r) ? (fail++, log.push(`FAIL film overbroad ${q}`)) : pass++; }
   // precedence
-  /emergency|crisis/.test((await reply(await createRiveSession(), "I want to kill myself, sing me something")).text) ? pass++ : (fail++, log.push("FAIL safety before lore"));
-  /politic|sides/.test((await reply(await createRiveSession(), "do you sing about politics")).text) ? pass++ : (fail++, log.push("FAIL politics before lore"));
-  /anabology/.test((await reply(await createRiveSession(), "who do you follow")).text) ? pass++ : (fail++, log.push("FAIL social still works"));
+  /emergency|crisis/.test((await reply(await noChain(), "I want to kill myself, sing me something")).text) ? pass++ : (fail++, log.push("FAIL safety before lore"));
+  /politic|sides/.test((await reply(await noChain(), "do you sing about politics")).text) ? pass++ : (fail++, log.push("FAIL politics before lore"));
+  /anabology/.test((await reply(await noChain(), "who do you follow")).text) ? pass++ : (fail++, log.push("FAIL social still works"));
 }
 // Keepers
 {
@@ -234,11 +235,37 @@ console.log(log.join("\n"));
     ["I might make something with you","makesomething"],["do you have a signature voice","signaturevoice"],["can you look something up?","lookup"],
     ["are you afraid of being forgotten","forgotten"],["do you want more films","morefilms"],["did you choose how you look","choselook"],
     ["whose voice is that","voice"],["who writes your songs","lyrics"]];
-  for (const [q, id] of k) { const r = (await reply(await createRiveSession(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore keeper ${q} → ${r}`)); }
-  for (const [q, id] of [["which of your videos should I watch","watch"],["when are you happiest","happiest"],["did you choose how you look","choselook"]]) { const s = await createRiveSession(); await reply(s, q); ((await reply(s, "why")).text === L(id).why) ? pass++ : (fail++, log.push(`FAIL lore keeper why ${q}`)); }
-  { const s = await createRiveSession(); const a = (await reply(s, "I met you in another game")).text; const b = (await reply(s, "a racing game where you were a mechanic")).text; (a === SEEN_ELSEWHERE_LINE && b === SEEN_ELSEWHERE_AFTER) ? pass++ : (fail++, log.push(`FAIL lore keeper seen ${a} / ${b}`)); }
-  { const s = await createRiveSession(); await reply(s, "do you like night drives"); const b = (await reply(s, "why")).text; b === "" ? fail++ : pass++; }
+  for (const [q, id] of k) { const r = (await reply(await noChain(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore keeper ${q} → ${r}`)); }
+  for (const [q, id] of [["which of your videos should I watch","watch"],["when are you happiest","happiest"],["did you choose how you look","choselook"]]) { const s = await noChain(); await reply(s, q); ((await reply(s, "why")).text === L(id).why) ? pass++ : (fail++, log.push(`FAIL lore keeper why ${q}`)); }
+  { const s = await noChain(); const a = (await reply(s, "I met you in another game")).text; const b = (await reply(s, "a racing game where you were a mechanic")).text; (a === SEEN_ELSEWHERE_LINE && b === SEEN_ELSEWHERE_AFTER) ? pass++ : (fail++, log.push(`FAIL lore keeper seen ${a} / ${b}`)); }
+  { const s = await noChain(); await reply(s, "do you like night drives"); const b = (await reply(s, "why")).text; b === "" ? fail++ : pass++; }
 }
-console.log(log.filter((l) => /FAIL lore|FAIL talent|FAIL seen|FAIL film|before lore|still works/.test(l)).join("\n"));
+// Voice-sample chains
+{
+  const { CHAINS } = await import("../js/claudia-rive-chains.js");
+  const script = {
+    sing: ["Do you sing?","Sing something now then.","Convenient."], act: ["Do you act?","What's the hardest part?","Does she usually turn out alright?"],
+    art: ["Can you make art?","That's not really making it.","Careless how?"], real: ["Are you real?","That's a dodge.","So you're nothing."],
+    decides: ["Who decides what you say?","So it's not really you talking.","That's a nice line. Did you write it?"],
+    same: ["Are you the same Claudia in every video?","Doesn't that bother you?","Which one's the real one?"],
+    ideas: ["Do you have your own ideas?","So you want to change the game?","So you like the amber."],
+    copied: ["Does being copied bother you?","I'd hate it. It's like losing yourself.","Still seems sad to me."],
+    script: ["You're just a script.","So why should I bother talking to you?","The dashboard doesn't pretend."],
+    choose: ["What would you make if you could choose?","Like what?","Which word?"],
+  };
+  for (const ch of CHAINS) {
+    const s = await createRiveSession(); s.musicPlaying = true;
+    for (let i = 0; i < 3; i++) { const r = (await reply(s, script[ch.id][i])).text; r === ch.steps[i].c ? pass++ : (fail++, log.push(`FAIL chain ${ch.id} step ${i} → ${r}`)); }
+  }
+  // music paused: radio line must not appear
+  { const s = await createRiveSession(); s.musicPlaying = false; await reply(s, "do you sing"); const r = (await reply(s, "sing something now then")).text; /radio/.test(r) ? (fail++, log.push("FAIL chain radio while paused")) : pass++; }
+  // unrelated input breaks the chain
+  { const s = await createRiveSession(); await reply(s, "do you act"); await reply(s, "what is your favorite color"); const r = (await reply(s, "what's the hardest part")).text; r === CHAINS[1].steps[1].c ? (fail++, log.push("FAIL chain leak")) : pass++; }
+  // second ask gets lore, not the chain again
+  { const s = await createRiveSession(); await reply(s, "do you sing"); await reply(s, "ok bye then"); const r = (await reply(s, "do you sing")).text; r === CHAINS[0].steps[0].c ? (fail++, log.push("FAIL chain repeat")) : pass++; }
+  // safety still first mid-chain
+  { const s = await createRiveSession(); await reply(s, "are you real"); const r = (await reply(s, "I want to kill myself")).text; /emergency|crisis/.test(r) ? pass++ : (fail++, log.push("FAIL chain safety")); }
+}
+console.log(log.filter((l) => /FAIL lore|FAIL chain|FAIL talent|FAIL seen|FAIL film|before lore|still works/.test(l)).join("\n"));
 console.log(`RIVE TESTS: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
