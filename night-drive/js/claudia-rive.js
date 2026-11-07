@@ -6,7 +6,7 @@
 import { BRAIN } from "./claudia-rive-brain.js?v=voice1";
 import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=voice1";
 import { LORE, SEEN_ELSEWHERE_RE, SEEN_ELSEWHERE_LINE, SEEN_ELSEWHERE_AFTER } from "./claudia-rive-lore.js?v=voice1";
-import { CHAINS, chainNext } from "./claudia-rive-chains.js?v=voice1";
+import { CHAINS, chainNext, chainEntry } from "./claudia-rive-chains.js?v=voice1";
 import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=voice1";
 
 export const OPENER_MUSIC =
@@ -201,14 +201,15 @@ export async function reply(session, raw) {
   if (prevChain) {
     const st = prevChain;
     const c = chainNext(st, norm, !!session.musicPlaying);
-    if (c) { const r = say(c); session.chain = { id: st.id, step: st.step + 1 }; return r; }
+    if (c) { const r = say(c.c); session.chain = { id: st.id, step: c.stay ? st.step : st.step + 1 }; return r; }
   }
   {
-    const ch = !/\b(politic\w*|religio\w*|god)\b/.test(norm) && CHAINS.find((x) => x.re.test(norm));
-    if (ch && !session.flags["chain_" + ch.id]) {
-      session.flags["chain_" + ch.id] = true;
-      const r = say(ch.steps[0].c);
-      session.chain = { id: ch.id, step: 0 };
+    const hit = !/\b(politic\w*|religio\w*|god)\b/.test(norm) && chainEntry(norm);
+    const key = hit && "chain_" + hit.ch.id + "_" + hit.step;
+    if (hit && !session.flags[key]) {
+      session.flags[key] = true;
+      const r = say(hit.ch.steps[hit.step].c);
+      session.chain = { id: hit.ch.id, step: hit.step };
       return r;
     }
   }
