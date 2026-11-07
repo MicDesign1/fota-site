@@ -19,6 +19,7 @@ export default class Buttons {
     this.musicGroup = document.createElement("div");
     this.musicGroup.id = "musicTransport";
     this.musicGroup.innerHTML = `
+      <button type="button" id="button_musicMute" title="Sound off" aria-label="Sound off"><div class="label">🔊</div></button>
       <button type="button" id="button_musicPrev" title="Previous"><div class="label">⏮</div></button>
       <button type="button" id="button_musicToggle" title="Play/Pause"><div class="label">▶</div></button>
       <button type="button" id="button_musicNext" title="Next"><div class="label">⏭</div></button>
@@ -28,6 +29,8 @@ export default class Buttons {
       <div id="musicTitle" class="music-title"></div>
     `;
     this.element.appendChild(this.musicGroup);
+    this.musicMuteBtn = this.musicGroup.querySelector("#button_musicMute");
+    this.musicMuteBtn.addEventListener("click", (e) => { e.stopPropagation(); this.dispatch("musicMute", "trigger"); });
     this.musicGroup.querySelector("#button_musicPrev").addEventListener("click", () => this.dispatch("musicPrev", "trigger"));
     this.musicGroup.querySelector("#button_musicToggle").addEventListener("click", () => this.dispatch("musicToggle", "trigger"));
     this.musicGroup.querySelector("#button_musicNext").addEventListener("click", () => this.dispatch("musicNext", "trigger"));
@@ -99,6 +102,13 @@ export default class Buttons {
     this.musicTitleEl.title = st.title || "";
     if (this.musicToggleBtn) {
       this.musicToggleBtn.textContent = !st.userStarted || st.paused ? "▶" : "❚❚";
+    }
+    if (this.musicMuteBtn) {
+      const off = !!st.muted;
+      this.musicMuteBtn.querySelector(".label").textContent = off ? "🔇" : "🔊";
+      this.musicMuteBtn.title = off ? "Sound on" : "Sound off";
+      this.musicMuteBtn.setAttribute("aria-label", off ? "Sound on" : "Sound off");
+      this.musicMuteBtn.classList.toggle("muted", off);
     }
     if (this.musicVolEl && typeof st.volume === "number") {
       const v = String(Math.round(st.volume * 100) / 100);
