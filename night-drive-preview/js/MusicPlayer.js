@@ -3,7 +3,7 @@
   and loops the list. Prev / next / play-pause live in the button bar.
 */
 
-import { musicTracks } from "./music-tracks.js?v=20261107a";
+import { musicTracks } from "./music-tracks.js?v=20261107b";
 
 export default class MusicPlayer {
   constructor({ tracks = musicTracks } = {}) {

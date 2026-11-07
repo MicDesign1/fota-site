@@ -25,9 +25,9 @@ import Car from "./Car.js?v=20261106e";
 import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261107a";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261107b";
 import DialoguePanel from "./DialoguePanel.js?v=voice1";
-import MusicPlayer from "./MusicPlayer.js?v=20261107a";
+import MusicPlayer from "./MusicPlayer.js?v=20261107b";
 import {
   createRiveSession,
   opener as riveOpener,
@@ -640,6 +640,10 @@ export default class Drivey {
         break;
       case "controls":
         this.buttons.toggleControlsMenu();
+        this.buttons.wakeUp();
+        break;
+      case "vibe":
+        this.buttons.toggleVibeMenu();
         this.buttons.wakeUp();
         break;
       case "controlMode":

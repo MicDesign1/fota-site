@@ -44,6 +44,8 @@ export default class Buttons {
     this.musicToggleBtn = this.musicGroup.querySelector("#button_musicToggle .label");
 
     this.addActionButton("controls", () => `<div class='label'>⚙</div>`);
+    this.addActionButton("vibe", () => `<div class='label vibe-label'>Vibe</div>`);
+    this._buildVibeMenu();
 
     this.controlsMenu = document.createElement("div");
     this.controlsMenu.id = "controlsMenu";
@@ -96,6 +98,54 @@ export default class Buttons {
     button.addEventListener("click", () => this.dispatch(id, "trigger"));
   }
 
+  /** One hue rotation for the whole page: road, sky, Claudia and UI stay matched. */
+  _buildVibeMenu() {
+    const presets = [
+      ["Orange", 0], ["Rose", 330], ["Violet", 270], ["Blue", 200], ["Teal", 160], ["Green", 95],
+    ];
+    const m = document.createElement("div");
+    m.id = "vibeMenu";
+    m.hidden = true;
+    m.innerHTML = `<div class="vibe-swatches">${presets
+      .map(([n, h]) => `<button type="button" class="vibe-swatch" data-h="${h}" title="${n}" aria-label="${n}" style="background:hsl(${30 + h},90%,50%)"></button>`)
+      .join("")}</div><input id="vibeHue" type="range" min="0" max="359" step="1" value="0" aria-label="Hue" />`;
+    document.body.appendChild(m);
+    this.vibeMenu = m;
+    const slider = m.querySelector("#vibeHue");
+    const apply = (h) => {
+      h = ((Number(h) % 360) + 360) % 360;
+      document.documentElement.style.filter = h ? `hue-rotate(${h}deg)` : "";
+      // Counter-rotate the picker so its swatches show their true colors.
+      m.style.filter = h ? `hue-rotate(${-h}deg)` : "";
+      slider.value = String(h);
+      m.querySelectorAll(".vibe-swatch").forEach((b) => b.classList.toggle("active", Number(b.dataset.h) === h));
+      try { localStorage.setItem("nd_hue", String(h)); } catch (_) {}
+    };
+    m.querySelectorAll(".vibe-swatch").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); apply(b.dataset.h); }));
+    slider.addEventListener("input", (e) => apply(e.target.value));
+    for (const ev of ["touchstart", "touchmove", "pointerdown", "mousedown"]) m.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+    // Tap / click anywhere outside the palette (and not on the Vibe button) closes it.
+    const outside = (e) => {
+      if (m.hidden) return;
+      const t = e.target;
+      if (m.contains(t)) return;
+      const vb = document.getElementById("button_vibe");
+      if (vb && vb.contains(t)) return;
+      m.hidden = true;
+    };
+    document.addEventListener("pointerdown", outside, true);
+    let saved = 0;
+    try { saved = Number(localStorage.getItem("nd_hue")) || 0; } catch (_) {}
+    apply(saved);
+  }
+
+  toggleVibeMenu(force) {
+    const open = force != null ? force : this.vibeMenu.hidden;
+    this.vibeMenu.hidden = !open;
+    if (open && this.controlsMenu) this.controlsMenu.hidden = true;
+    return open;
+  }
+
   setMusicStatus(st) {
     if (!this.musicTitleEl) return;
     this.musicTitleEl.textContent = st.title || "";
@@ -143,6 +193,7 @@ export default class Buttons {
   toggleControlsMenu(force) {
     const open = force != null ? force : this.controlsMenu.hidden;
     this.controlsMenu.hidden = !open;
+    if (open && this.vibeMenu) this.vibeMenu.hidden = true;
     return open;
   }
 
