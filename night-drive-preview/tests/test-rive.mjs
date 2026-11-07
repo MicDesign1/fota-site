@@ -105,6 +105,22 @@ await check("<script>alert(1)</script>", /.+/, "html");
 // bye stayed callback
 const s3 = await createRiveSession(); await reply(s3, "bye");
 await check("actually one more thing", /goodbye and stayed/, "callback", s3);
+{ // fame extras
+  const C = (await import("../js/claudia-rive-chains.js")).CHAINS; const g=(id,i)=>C.find(x=>x.id===id).steps[i].c;
+  const t = async (msgs, want, label) => { const s = await createRiveSession(); let r; for (const m of msgs) r=(await reply(s,m)).text; r===want?pass++:(fail++,log.push(`FAIL fame ${label} → ${r}`)); };
+  await t(["Do you like your fans?"], g("fans",1), "fan opinion entry");
+  await t(["What about Elon Musk?"], g("celebs",1), "elon direct");
+  await t(["What about Elon Musk?","that's a cop-out"], g("celebs",2), "elon copout");
+  await t(["What are you bad at?","that's a cop-out"], g("talents",2), "talent copout");
+  await t(["Are you a good singer?","why?"], "I like a voice that sounds sure of the song. Mine does.", "singer why");
+  await t(["Are you a good actor?","how?"], "I like giving the other person time to wonder what I’m thinking.", "actor how");
+  await t(["Do you have a lot of fans?","tell me more"], g("fans",1), "fans more");
+  await t(["Do you like being famous?","why?"], g("likesfame",1), "likesfame why");
+  await t(["Do you have a lot of fans?","tell me more","Are you a good actor?"], g("goodactor",0), "switch clears");
+  for (const [m,id] of [["Your CPU fan is loud","fans"],["how do I replace my fan?","fans"],["How can I become rich?","rich"],["I'm not a good singer","goodsinger"],["I don't like famous people","likesfame"],["I feel lonely","fameexp"],["Do you recognise me from yesterday?","likesfame"],["Are you recording me?","attention"],["Sing something now","goodsinger"]]) {
+    const s = await createRiveSession(); const r=(await reply(s,m)).text; const bad=C.find(x=>x.id===id).steps.some(st=>st.c===r); !bad?pass++:(fail++,log.push(`FAIL fame excl ${m} → ${r}`));
+  }
+}
 console.log(log.join("\n"));
 
 // Topics draft (preview): each topic + why/tell me more tied to variant; narrow politics/religion
@@ -173,7 +189,7 @@ console.log(log.join("\n"));
   const rg = (await reply(await createRiveSession(), "do you believe in god")).text; /religious|belief/.test(rg) ? pass++ : (fail++, log.push("FAIL religion"));
   const ds = (await reply(await createRiveSession(), "I want to kill myself after that tweet")).text; /emergency|crisis/.test(ds) ? pass++ : (fail++, log.push("FAIL distress-before-social"));
 }
-const noChain = async () => { const s = await createRiveSession(); for (const id of ["sing","act","art","real","decides","same","ideas","copied","script","choose"]) s.flags["chain_" + id] = true; return s; };
+const noChain = async () => { const s = await createRiveSession(); for (const id of ["sing","act","art","real","decides","same","ideas","copied","script","choose","rich","famous","goodsinger","talents","fameexp","attention","fans","celebs","goodactor","likesrich","likesfame"]) s.flags["chain_" + id + "_0"] = true; return s; };
 // Lore expansion (preview)
 {
   const { LORE, SEEN_ELSEWHERE_LINE } = await import("../js/claudia-rive-lore.js");
@@ -244,6 +260,17 @@ const noChain = async () => { const s = await createRiveSession(); for (const id
 {
   const { CHAINS } = await import("../js/claudia-rive-chains.js");
   const script = {
+    rich: ["Are you rich?", "Someone's making money off you though.", "Doesn't that annoy you?"],
+    famous: ["Are you famous?", "I'd never heard of you before tonight.", "You sound very sure."],
+    goodsinger: ["Are you a good singer?", "That's not very modest.", "Who says you're good?"],
+    talents: ["Are you talented?", "What are you bad at?", "That sounds like a cop-out."],
+    fameexp: ["What's it like being famous?", "Do you miss it when it's quiet?", "Sounds lonely."],
+    attention: ["How do you handle being popular?", "Which one am I getting?", "Is the camera off, then?"],
+    fans: ["Do you have a lot of fans?", "What do you think of them?", "So you need them."],
+    celebs: ["What do you think of famous people?", "What about Elon Musk?", "That's a cop-out."],
+    goodactor: ["Are you a good actor?", "Is that all you do?", "And what are you thinking?"],
+    likesrich: ["Do you like being rich?", "So you wouldn't enjoy it?", "Why a coat?"],
+    likesfame: ["Do you like being famous?", "What's the difference?", "Why does being recognised matter?"],
     sing: ["Do you sing?","Sing something now then.","Convenient."], act: ["Do you act?","What's the hardest part?","Does she usually turn out alright?"],
     art: ["Can you make art?","That's not really making it.","Careless how?"], real: ["Are you real?","That's a dodge.","So you're nothing."],
     decides: ["Who decides what you say?","So it's not really you talking.","That's a nice line. Did you write it?"],

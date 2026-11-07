@@ -1,0 +1,2 @@
+# Desired Action body (needs `workflow` OAuth scope to push).
+# DEST must be fota-site/night-drive; see repo history / parent agent notes.

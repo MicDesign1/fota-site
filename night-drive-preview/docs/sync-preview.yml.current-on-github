@@ -1,0 +1,68 @@
+name: Sync preview to fota-site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sync-fota-preview
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout claudia-night-drive
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Checkout fota-site
+        uses: actions/checkout@v4
+        with:
+          repository: MicDesign1/fota-site
+          ssh-key: ${{ secrets.FOTA_DEPLOY_KEY }}
+          path: fota-site
+
+      - name: Sync night-drive-preview
+        id: sync
+        run: |
+          set -euo pipefail
+          SHORT_SHA=$(git -C app rev-parse --short HEAD)
+          FULL_SHA=$(git -C app rev-parse HEAD)
+          DEST=fota-site/night-drive-preview
+
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'shots/' \
+            --exclude 'legacy/' \
+            --exclude '.gitignore' \
+            app/ "$DEST/"
+
+          # Automatic cache-bust: stamp short SHA into asset query strings
+          if [ -f "$DEST/index.html" ]; then
+            sed -i -E "s/(\?v=)[^\"'[:space:]]+/\1${SHORT_SHA}/g" "$DEST/index.html"
+          fi
+
+          printf '%s\n' "$SHORT_SHA" > "$DEST/VERSION"
+          printf 'synced_from=%s\nshort=%s\n' "$FULL_SHA" "$SHORT_SHA" > "$DEST/SYNC.txt"
+
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "Synced to night-drive-preview at $SHORT_SHA"
+
+      - name: Commit and push to fota-site
+        working-directory: fota-site
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add night-drive-preview
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          SHORT="${{ steps.sync.outputs.short_sha }}"
+          git commit -m "Sync night-drive-preview from claudia-night-drive@${SHORT}"
+          git push origin HEAD:main
