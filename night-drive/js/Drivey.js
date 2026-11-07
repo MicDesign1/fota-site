@@ -903,10 +903,7 @@ export default class Drivey {
         if (view) this.dialoguePanel.show(view);
       }
       // Silent glance auto-returns; Talk stays until the panel closes / branch ends.
-      if (!this.talkMode && this.checkPhaseT >= this.checkHoldSec) {
-        this.checkPhase = "out";
-        this.checkPhaseT = 0;
-      }
+      // Stays on Claudia until the player presses Drive (no auto-return).
     } else if (this.checkPhase === "out") {
       const u = Math.min(1, this.checkPhaseT / this.checkDissolveSec);
       this.screen.viewBlend = 1 - u * u * (3 - 2 * u);
