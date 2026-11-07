@@ -311,7 +311,7 @@ export default class Drivey {
     };
     this.music.addListener(() => this._refreshMusicMenu());
     this._refreshMusicMenu();
-    this.controlMode = "autopilot";
+    this.controlMode = isTouchDevice ? "touch" : "arrows"; // default: touch on phones/tablets, keyboard on desktop
     this.buttons.setControlsMenu({
       current: this.controlMode,
       onPick: (id) => this.onButtonClick("controlMode", id),
@@ -335,7 +335,7 @@ export default class Drivey {
 
     // Always driving: cruise starts at full (map key 2 → 1.0×).
     this.cruiseSpeed = cruiseSpeeds.get(2);
-    this.controlScheme = controlSchemesByName.get("autopilot"); // default: always driving, no manual steer
+    this.controlScheme = controlSchemesByName.get(this.controlMode); // device default; autopilot still selectable
     this.drivingSide = -1; // SIDE RIGHT locked
     this.dashboard.drivingSide = this.drivingSide;
     this.screen.setResolution(screenResolutions.get("high"));
