@@ -26,13 +26,13 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=lore2";
+import DialoguePanel from "./DialoguePanel.js?v=voice1";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 import {
   createRiveSession,
   opener as riveOpener,
   reply as riveReply,
-} from "./claudia-rive.js?v=lore2";
+} from "./claudia-rive.js?v=voice1";
 
 /** Typed (RiveScript) replies change expression less often than A/B/C. */
 const TYPED_EXPRESSION_CHANCE = 0.2;
@@ -770,6 +770,7 @@ export default class Drivey {
       const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
       this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
     }
+    this._riveSession.musicPlaying = !!(this.music && this.music.userStarted && !this.music.audio.paused);
     const result = await riveReply(this._riveSession, raw);
     this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
     if (!result.distressMode) this._maybeChangeExpression(null, TYPED_EXPRESSION_CHANCE);
