@@ -3,7 +3,7 @@
   and loops the list. Prev / next / play-pause live in the button bar.
 */
 
-import { musicTracks } from "./music-tracks.js?v=20261106v";
+import { musicTracks } from "./music-tracks.js?v=20261107a";
 
 export default class MusicPlayer {
   constructor({ tracks = musicTracks } = {}) {
@@ -46,6 +46,7 @@ export default class MusicPlayer {
       paused: this.audio.paused,
       userStarted: this.userStarted,
       volume: this.audio.volume,
+      muted: this.audio.muted,
     };
   }
 
@@ -138,6 +139,31 @@ export default class MusicPlayer {
 
   getVolume() {
     return this.audio.volume;
+  }
+
+  /** Autoplay: try now; if the browser blocks sound, start on the first tap or key anywhere. */
+  autoStart() {
+    if (this.tracks.length === 0) return;
+    try { if (localStorage.getItem("nd_muted") === "1") this.audio.muted = true; } catch (_) {}
+    const go = () => {
+      if (this.userStarted && !this.audio.paused) return;
+      this._playIndex(this.index, { fromUser: true });
+    };
+    const first = () => { off(); if (!this._autoOK) go(); };
+    const evs = ["pointerdown", "touchstart", "keydown", "click"];
+    const off = () => evs.forEach((ev) => window.removeEventListener(ev, first, true));
+    evs.forEach((ev) => window.addEventListener(ev, first, { capture: true, passive: true }));
+    this._playIndex(this.index, { fromUser: true });
+    const p = this.audio.play();
+    if (p && p.then) p.then(() => { this._autoOK = true; off(); this._emit(); }).catch(() => { this._emit(); });
+  }
+
+  toggleMute() {
+    this.audio.muted = !this.audio.muted;
+    try { localStorage.setItem("nd_muted", this.audio.muted ? "1" : "0"); } catch (_) {}
+    if (!this.audio.muted && (this.audio.paused || !this.userStarted)) this._playIndex(this.index, { fromUser: true });
+    this._emit();
+    return this.status();
   }
 
   stop() {

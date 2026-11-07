@@ -820,3 +820,5 @@ a.gpl-source:hover,
 a.gpl-source:focus-visible {
   color: rgba(255, 255, 255, 0.85);
 }
+#button_musicMute .label { font-size: 1.15em; }
+#button_musicMute.muted { background: rgba(255,80,80,0.35); border-color: rgba(255,120,120,0.8); }

@@ -25,9 +25,9 @@ import Car from "./Car.js?v=20261106e";
 import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261107a";
 import DialoguePanel from "./DialoguePanel.js?v=voice1";
-import MusicPlayer from "./MusicPlayer.js?v=20261106v";
+import MusicPlayer from "./MusicPlayer.js?v=20261107a";
 import {
   createRiveSession,
   opener as riveOpener,
@@ -311,6 +311,7 @@ export default class Drivey {
     };
     this.music.addListener(() => this._refreshMusicMenu());
     this._refreshMusicMenu();
+    this.music.autoStart();
     this.controlMode = isTouchDevice ? "touch" : "arrows"; // default: touch on phones/tablets, keyboard on desktop
     this.buttons.setControlsMenu({
       current: this.controlMode,
@@ -611,6 +612,10 @@ export default class Drivey {
       case "talkClaudia":
         this.startClaudiaGlance({ talk: true });
         break;
+      case "musicMute":
+        this.music.toggleMute();
+        this._refreshMusicMenu();
+        break;
       case "musicToggle":
         this.music.toggleFromUser();
         this._refreshMusicMenu();
@@ -742,7 +747,7 @@ export default class Drivey {
       this._ensureRive().then(() => {
         if (!this._riveOpened) {
           this._riveOpened = true;
-          const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
+          const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused && !this.music.audio.muted));
           this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
         }
       });
@@ -767,10 +772,10 @@ export default class Drivey {
     await this._ensureRive();
     if (!this._riveOpened) {
       this._riveOpened = true;
-      const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused));
+      const line = riveOpener(this._riveSession, !!(this.music && this.music.userStarted && !this.music.audio.paused && !this.music.audio.muted));
       this.dialoguePanel.setTypedState({ line, log: [{ role: "claudia", text: line }] });
     }
-    this._riveSession.musicPlaying = !!(this.music && this.music.userStarted && !this.music.audio.paused);
+    this._riveSession.musicPlaying = !!(this.music && this.music.userStarted && !this.music.audio.paused && !this.music.audio.muted);
     const result = await riveReply(this._riveSession, raw);
     this.dialoguePanel.appendTypedTurn(String(raw ?? ""), result.text);
     if (!result.distressMode) this._maybeChangeExpression(null, TYPED_EXPRESSION_CHANCE);
