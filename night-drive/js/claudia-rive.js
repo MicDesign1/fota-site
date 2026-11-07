@@ -3,10 +3,10 @@
   RiveScript is the vendored global from lib/rivescript (loaded by a classic <script>).
   Safety + distressMode + visit-only callbacks + recent-reply exclusion live here.
 */
-import { BRAIN } from "./claudia-rive-brain.js?v=lore1";
-import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=lore1";
-import { LORE, SEEN_ELSEWHERE_RE, SEEN_ELSEWHERE_LINE } from "./claudia-rive-lore.js?v=lore1";
-import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=lore1";
+import { BRAIN } from "./claudia-rive-brain.js?v=lore2";
+import { SOCIAL, socialIdFor, SOCIAL_THIS_GAME_RE, SOCIAL_THIS_GAME_LINE, SOCIAL_PUBLISH_RE, SOCIAL_PUBLISH_LINE, SOCIAL_BARE_X_RE, SOCIAL_BARE_X_LINE } from "./claudia-rive-social.js?v=lore2";
+import { LORE, SEEN_ELSEWHERE_RE, SEEN_ELSEWHERE_LINE, SEEN_ELSEWHERE_AFTER } from "./claudia-rive-lore.js?v=lore2";
+import { TOPICS, CONTEST_LIVE_RE, CONTEST_LIVE_LINE, VOTE_HOWTO_RE, VOTE_HOWTO_LINE, POLITICS_RE, POLITICS_LINES, RELIGION_RE, RELIGION_LINES } from "./claudia-rive-topics.js?v=lore2";
 
 export const OPENER_MUSIC =
   "Good. Now we have music and nowhere we have to be. What’s on your mind?";
@@ -199,7 +199,7 @@ export async function reply(session, raw) {
     const lp = LORE.find((x) => "lore:" + x.id === session.lastTopic);
     if (lp) {
       const t = LORE_HOW_RE.test(norm) ? lp.how : /more|go on|what is it about|what is that/.test(norm) ? lp.more : lp.why;
-      return say(t, { topic: session.lastTopic, variant: session.lastVariant });
+      if (t) return say(t, { topic: session.lastTopic, variant: session.lastVariant });
     }
   }
   if (FOLLOW_RE.test(norm) && session.lastTopic) {
@@ -235,7 +235,7 @@ export async function reply(session, raw) {
   {
     if (/\b(politic\w*)\b/.test(norm)) return say(rot(POLITICS_LINES));
     if (/\b(religio\w*|god|gods|church)\b/.test(norm)) return say(rot(RELIGION_LINES));
-    const LORE_ORDER = ["genre", "singnow", "voice", "lyrics", "actnow", "makenow", "talent"];
+    const LORE_ORDER = ["watch", "fanart", "signaturevoice", "morefilms", "makesomething", "genre", "singnow", "voice", "lyrics", "actnow", "makenow", "talent"];
     const lp = LORE.find((x) => LORE_ORDER.includes(x.id) && x.re.test(norm)) || LORE.find((x) => x.re.test(norm));
     if (lp) {
       let v;
@@ -247,7 +247,9 @@ export async function reply(session, raw) {
       }
       return say(lp.replies[v], { topic: "lore:" + lp.id, variant: v });
     }
-    if (SEEN_ELSEWHERE_RE.test(norm)) return say(SEEN_ELSEWHERE_LINE);
+    if (SEEN_ELSEWHERE_RE.test(norm)) return say(SEEN_ELSEWHERE_LINE, { topic: "lore:seen" });
+    // Only once the player has described the version she was met in.
+    if (session.lastTopic === "lore:seen" && !FOLLOW_RE.test(norm) && norm.split(" ").length >= 2) return say(SEEN_ELSEWHERE_AFTER);
   }
   session.lastTopic = null;
   session.lastVariant = null;

@@ -26,13 +26,13 @@ import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
 import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261106v";
-import DialoguePanel from "./DialoguePanel.js?v=lore1";
+import DialoguePanel from "./DialoguePanel.js?v=lore2";
 import MusicPlayer from "./MusicPlayer.js?v=20261106v";
 import {
   createRiveSession,
   opener as riveOpener,
   reply as riveReply,
-} from "./claudia-rive.js?v=lore1";
+} from "./claudia-rive.js?v=lore2";
 
 /** Typed (RiveScript) replies change expression less often than A/B/C. */
 const TYPED_EXPRESSION_CHANCE = 0.2;
