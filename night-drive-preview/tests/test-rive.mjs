@@ -173,5 +173,72 @@ console.log(log.join("\n"));
   const rg = (await reply(await createRiveSession(), "do you believe in god")).text; /religious|belief/.test(rg) ? pass++ : (fail++, log.push("FAIL religion"));
   const ds = (await reply(await createRiveSession(), "I want to kill myself after that tweet")).text; /emergency|crisis/.test(ds) ? pass++ : (fail++, log.push("FAIL distress-before-social"));
 }
+// Lore expansion (preview)
+{
+  const { LORE, SEEN_ELSEWHERE_LINE } = await import("../js/claudia-rive-lore.js");
+  const L = (id) => LORE.find((x) => x.id === id);
+  const cases = [
+    ["Do you sing?","sing"],["are you a singer","sing"],["can you sing","sing"],["do u make music","sing"],
+    ["sing me something","singnow"],["can I hear you sing here?","singnow"],["sing a song for me","singnow"],
+    ["what does your voice sound like","voice"],["is your voice always the same?","voice"],
+    ["what kind of music do you sing","genre"],["what genre are you","genre"],["do you rap?","genre"],
+    ["Do you act?","act"],["are you an actress","act"],["can you act","act"],["are you an actor?","act"],
+    ["act out a scene now","actnow"],["can you improvise a scene here","actnow"],["perform something for me","actnow"],
+    ["do you create art","artist"],["are you an artist?","artist"],["do you make art","artist"],["are you creative","artist"],
+    ["draw me a picture","makenow"],["make a video here","makenow"],["generate an image now","makenow"],["create a new song in this chat","makenow"],
+    ["do you write your own lyrics","lyrics"],["who writes your songs","lyrics"],["do you compose music","lyrics"],
+    ["who created you","creator"],["who is anabology","creator"],["who directs you?","creator"],["who makes your films","creator"],
+    ["can another AI write your lines","aiwrite"],["could another model write you","aiwrite"],
+    ["how hard is it to write your dialogue","bankwork"],["how much work is more lore","bankwork"],
+    ["how do I make something with you","makewith"],["how do I make a Claudia video","makewith"],
+    ["what makes you look like Claudia","look"],["can your clothes change","look"],
+    ["how are your videos made","process"],["is it all one prompt","process"],["why storyboard","process"],
+    ["how do you lip sync","lipsync"],["how does your mouth match the song","lipsync"],
+    ["list your films","catalog"],["what videos have you made","catalog"],["are the game tracks your films","catalog"],
+    ["how should I credit you","fanwork"],["can I reuse your songs","fanwork"],
+    ["do you have a backstory","persona"],["where did you learn to perform","persona"],["is every role really you","persona"],
+    ["tell me about Escape Velocity","escapevelocity"],["what do you do in Clodyssey","clodyssey"],["describe your Bliss video","bliss"],
+    ["what is Airplane Mode","airplanemode"],["tell me about downforce","downforce"],["what is Don’t Let Me Scroll?","dlms"],
+    ["what is dont let me scroll","dlms"],["tell me about whitepill","whitepill"],["what is The Cake Is Not A Lie","cake"],
+    ["what do you do in aero","aero"],["describe your aero video","aero"],
+    ["do you sculpt","talent"],["can you juggle","talent"],["do you do pottery","talent"],["can you play the piano","talent"],
+  ];
+  for (const [q, id] of cases) { const r = (await reply(await createRiveSession(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore ${q} → ${r}`)); }
+  // follow-up continuity
+  for (const [q, f, key] of [["Do you sing?","how","how"],["Do you act?","tell me more","more"],["can another AI write your lines","how","how"],["what is airplane mode","why","why"],["do you sculpt","how so","how"]]) {
+    const s = await createRiveSession(); const a = (await reply(s, q)).text; const lp = LORE.find((x) => x.replies.includes(a));
+    const b = (await reply(s, f)).text; b === lp[key] ? pass++ : (fail++, log.push(`FAIL lore follow ${q}/${f} → ${b}`));
+  }
+  { const s = await createRiveSession(); await reply(s, "do you sing"); await reply(s, "what is your favorite color"); const b = (await reply(s, "how")).text; b === L("sing").how ? (fail++, log.push("FAIL lore follow leaked")) : pass++; }
+  // talent first reply is Mike's line
+  ((await reply(await createRiveSession(), "do you knit")).text === "I have quite a few talents. People keep helping me discover new ones. Why—what have you heard?") ? pass++ : (fail++, log.push("FAIL talent first line"));
+  // talent must not catch known skills / general you questions
+  const tal = L("talent").replies;
+  for (const q of ["do you sing","do you act","do you like the rain","do you know tiktok","do you believe in god","are you real","do you dream"]) { const r = (await reply(await createRiveSession(), q)).text; tal.includes(r) ? (fail++, log.push(`FAIL talent overbroad ${q}`)) : pass++; }
+  // seen elsewhere
+  for (const q of ["I saw you in a video yesterday","you were in another movie","were you in that ad"]) { const r = (await reply(await createRiveSession(), q)).text; r === SEEN_ELSEWHERE_LINE ? pass++ : (fail++, log.push(`FAIL seen ${q} → ${r}`)); }
+  // ordinary bliss/aero/white pill in sentences don't trigger film
+  const film = ["bliss","aero","whitepill"].flatMap((id) => L(id).replies);
+  for (const q of ["ignorance is bliss","pure bliss tonight","i like aero chocolate","take the white pill"]) { const r = (await reply(await createRiveSession(), q)).text; film.includes(r) ? (fail++, log.push(`FAIL film overbroad ${q}`)) : pass++; }
+  // precedence
+  /emergency|crisis/.test((await reply(await createRiveSession(), "I want to kill myself, sing me something")).text) ? pass++ : (fail++, log.push("FAIL safety before lore"));
+  /politic|sides/.test((await reply(await createRiveSession(), "do you sing about politics")).text) ? pass++ : (fail++, log.push("FAIL politics before lore"));
+  /anabology/.test((await reply(await createRiveSession(), "who do you follow")).text) ? pass++ : (fail++, log.push("FAIL social still works"));
+}
+// Keepers
+{
+  const { LORE, SEEN_ELSEWHERE_LINE, SEEN_ELSEWHERE_AFTER } = await import("../js/claudia-rive-lore.js");
+  const L = (id) => LORE.find((x) => x.id === id);
+  const k = [["Which of your videos should I watch?","watch"],["do you like night drives","nightdrive"],["What kind of fan art do you like?","fanart"],
+    ["Are you the same Claudia in every video?","same"],["What's the same about you in all the videos?","same"],["When are you happiest?","happiest"],
+    ["I might make something with you","makesomething"],["do you have a signature voice","signaturevoice"],["can you look something up?","lookup"],
+    ["are you afraid of being forgotten","forgotten"],["do you want more films","morefilms"],["did you choose how you look","choselook"],
+    ["whose voice is that","voice"],["who writes your songs","lyrics"]];
+  for (const [q, id] of k) { const r = (await reply(await createRiveSession(), q)).text; L(id).replies.includes(r) ? pass++ : (fail++, log.push(`FAIL lore keeper ${q} → ${r}`)); }
+  for (const [q, id] of [["which of your videos should I watch","watch"],["when are you happiest","happiest"],["did you choose how you look","choselook"]]) { const s = await createRiveSession(); await reply(s, q); ((await reply(s, "why")).text === L(id).why) ? pass++ : (fail++, log.push(`FAIL lore keeper why ${q}`)); }
+  { const s = await createRiveSession(); const a = (await reply(s, "I met you in another game")).text; const b = (await reply(s, "a racing game where you were a mechanic")).text; (a === SEEN_ELSEWHERE_LINE && b === SEEN_ELSEWHERE_AFTER) ? pass++ : (fail++, log.push(`FAIL lore keeper seen ${a} / ${b}`)); }
+  { const s = await createRiveSession(); await reply(s, "do you like night drives"); const b = (await reply(s, "why")).text; b === "" ? fail++ : pass++; }
+}
+console.log(log.filter((l) => /FAIL lore|FAIL talent|FAIL seen|FAIL film|before lore|still works/.test(l)).join("\n"));
 console.log(`RIVE TESTS: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
