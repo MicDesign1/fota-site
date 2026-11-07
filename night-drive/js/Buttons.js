@@ -124,6 +124,16 @@ export default class Buttons {
     m.querySelectorAll(".vibe-swatch").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); apply(b.dataset.h); }));
     slider.addEventListener("input", (e) => apply(e.target.value));
     for (const ev of ["touchstart", "touchmove", "pointerdown", "mousedown"]) m.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+    // Tap / click anywhere outside the palette (and not on the Vibe button) closes it.
+    const outside = (e) => {
+      if (m.hidden) return;
+      const t = e.target;
+      if (m.contains(t)) return;
+      const vb = document.getElementById("button_vibe");
+      if (vb && vb.contains(t)) return;
+      m.hidden = true;
+    };
+    document.addEventListener("pointerdown", outside, true);
     let saved = 0;
     try { saved = Number(localStorage.getItem("nd_hue")) || 0; } catch (_) {}
     apply(saved);
