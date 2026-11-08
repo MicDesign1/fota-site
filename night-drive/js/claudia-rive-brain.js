@@ -529,6 +529,6 @@ export const BRAIN = String.raw`
 // ===== Fallback: honest, not therapy =====
 + *
 - I don't have a good answer for that one. Try me on who I am, where we are, music, films or cities.
-- That one's past me. I'm a passenger with a short script. Ask it another way?
+- No comment. Ask me something else—I was just starting to enjoy your company.
 - I don't know, and I won't make it up. Ask me something about tonight, or the playlist.
 `;
