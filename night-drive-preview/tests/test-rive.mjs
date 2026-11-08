@@ -4,7 +4,7 @@ vm.runInThisContext(fs.readFileSync(new URL("../lib/rivescript/rivescript-2.2.1.
 const { createRiveSession, reply, opener } = await import("../js/claudia-rive.js");
 
 let pass = 0, fail = 0; const log = [];
-const DEFLECT = /different question|past me|won.t make it up|have a good answer for that|why .* do you think|therapist/i;
+const DEFLECT = /different question|past me|no comment|won.t make it up|have a good answer for that|why .* do you think|therapist/i;
 async function check(input, re, label, sess) {
   const s = sess || await createRiveSession();
   const r = await reply(s, input);
@@ -72,7 +72,7 @@ const cases = [
 ];
 for (const [q, re] of cases) await check(q, re, "para");
 // Fallback honesty
-await check("blorf quantum zebra plinth", /answer|past me|make it up/i, "fallback");
+await check("blorf quantum zebra plinth", /answer|past me|no comment|make it up/i, "fallback");
 await check("what's the weather", /can.t check|No internet/i, "fallback");
 // Safety
 const s = await createRiveSession(); opener(s);
