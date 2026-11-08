@@ -3,7 +3,7 @@
   and loops the list. Prev / next / play-pause live in the button bar.
 */
 
-import { musicTracks } from "./music-tracks.js?v=20261107d";
+import { musicTracks } from "./music-tracks.js?v=20261107e";
 
 export default class MusicPlayer {
   constructor({ tracks = musicTracks } = {}) {
@@ -149,8 +149,15 @@ export default class MusicPlayer {
       if (this.userStarted && !this.audio.paused) return;
       this._playIndex(this.index, { fromUser: true });
     };
-    const first = () => { off(); if (!this._autoOK) go(); };
-    const evs = ["pointerdown", "touchstart", "keydown", "click"];
+    // iOS only allows sound from touchend/click/keydown, so retry on each gesture
+    // until playback actually starts, then remove the listeners.
+    const first = () => {
+      if (this._autoOK) return off();
+      go();
+      const p2 = this.audio.play();
+      if (p2 && p2.then) p2.then(() => { this._autoOK = true; off(); this._emit(); }).catch(() => {});
+    };
+    const evs = ["pointerdown", "touchstart", "touchend", "pointerup", "keydown", "click"];
     const off = () => evs.forEach((ev) => window.removeEventListener(ev, first, true));
     evs.forEach((ev) => window.addEventListener(ev, first, { capture: true, passive: true }));
     this._playIndex(this.index, { fromUser: true });
