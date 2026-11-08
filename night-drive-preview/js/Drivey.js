@@ -25,9 +25,9 @@ import Car from "./Car.js?v=20261106e";
 import buildCar from "./buildCar.js?v=20261106e";
 import Dashboard from "./Dashboard.js?v=20261106e";
 import ClaudiaPassenger from "./ClaudiaPassenger.js?v=20261106e";
-import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261107c";
+import Dialogue, { script as dialogueScript, startId as dialogueStartId } from "./dialogue.js?v=20261107e";
 import DialoguePanel from "./DialoguePanel.js?v=voice1";
-import MusicPlayer from "./MusicPlayer.js?v=20261107c";
+import MusicPlayer from "./MusicPlayer.js?v=20261107e";
 import {
   createRiveSession,
   opener as riveOpener,
@@ -313,6 +313,7 @@ export default class Drivey {
     this._refreshMusicMenu();
     this.music.autoStart();
     this.controlMode = isTouchDevice ? "touch" : "arrows"; // default: touch on phones/tablets, keyboard on desktop
+    this._showControlsHint();
     this.buttons.setControlsMenu({
       current: this.controlMode,
       onPick: (id) => this.onButtonClick("controlMode", id),
@@ -663,6 +664,37 @@ export default class Drivey {
     // Prevent dialogue onExit from double-triggering return.
     this.beginReturnToRoad();
     this.buttons.wakeUp();
+  }
+
+  /** Device-matched controls hint; fades on first steer key or touch. */
+  _showControlsHint() {
+    if (this._hintEl || typeof document === "undefined") return;
+    const touch = this.controlMode === "touch";
+    if (this.controlMode !== "touch" && this.controlMode !== "arrows") return;
+    const el = document.createElement("div");
+    el.id = "controlsHint";
+    el.setAttribute("role", "status");
+    el.textContent = touch
+      ? "Touch to steer, accelerate and brake"
+      : "Use the arrow keys to steer, speed up and slow down";
+    document.body.appendChild(el);
+    this._hintEl = el;
+    requestAnimationFrame(() => el.classList.add("show"));
+    const KEYS = /^(Arrow(Up|Down|Left|Right)|[wasdWASD])$/;
+    const hide = () => {
+      window.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("touchstart", hide, true);
+      window.removeEventListener("pointerdown", onPtr, true);
+      clearTimeout(t);
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 700);
+    };
+    const onKey = (e) => { if (KEYS.test(e.key)) hide(); };
+    const onPtr = (e) => { if (e.pointerType !== "mouse" || touch) hide(); };
+    window.addEventListener("keydown", onKey, true);
+    window.addEventListener("touchstart", hide, { capture: true, passive: true });
+    window.addEventListener("pointerdown", onPtr, true);
+    const t = setTimeout(hide, 15000);
   }
 
   setControlMode(id) {
