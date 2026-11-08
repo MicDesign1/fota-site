@@ -294,7 +294,7 @@ export async function reply(session, raw) {
   if (/\b(bye|goodbye|good night|goodnight|see you|gotta go)\b/.test(norm)) session.flags.said_bye = true;
   if (/\b(song|music|track|playlist|playing)\b/.test(norm)) session.flags.mentioned_music = true;
 
-  const kind = /have a good answer for that|past me\. I.m a passenger|I won.t make it up\. Ask me something about tonight/i.test(text)
+  const kind = /have a good answer for that|No comment\. Ask me something else|I won.t make it up\. Ask me something about tonight/i.test(text)
     ? "fallback"
     : "rive";
   if (pickFor(text)) session.lastPickText = text;

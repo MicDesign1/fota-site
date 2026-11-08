@@ -25,7 +25,7 @@
   No AI calls. Advancement is start() / choose(index) only.
 */
 
-import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261107b";
+import { script as defaultScript, startId as defaultStartId } from "./dialogue-script.js?v=20261107d";
 
 /** @typedef {{ label: string, next: string | null, setFlags?: Record<string, unknown>, requireFlags?: Record<string, unknown> }} DialogueChoice */
 /**
