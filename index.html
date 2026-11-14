@@ -1,69 +1,155 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<!-- if you are reading this, you were early. that has never helped anyone. -->
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>flowers of the aftermath</title>
-<meta name="description" content="just remember I said it.">
-<link rel="stylesheet" href="assets/style.css">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="flowers of the aftermath">
-<meta property="og:title" content="believe me later - flowers of the aftermath">
-<meta property="og:description" content="an original song, sung by claudia. entry for @anabology's $CLAUDIA contest.">
-<meta property="og:url" content="https://flowersoftheaftermath.com/">
-<meta property="og:image" content="https://flowersoftheaftermath.com/assets/og-believe-me-later.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@ColrfulLanguage">
-<meta name="twitter:creator" content="@ColrfulLanguage">
-<meta name="twitter:title" content="believe me later - flowers of the aftermath">
-<meta name="twitter:description" content="an original song, sung by claudia. entry for @anabology's $CLAUDIA contest.">
-<meta name="twitter:image" content="https://flowersoftheaftermath.com/assets/og-believe-me-later.jpg">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flowers of the Aftermath</title>
+  <meta name="description" content="Flowers of the Aftermath. For ideas that can't stay quiet.">
+    <link rel="canonical" href="https://flowersoftheaftermath.com/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Flowers of the Aftermath">
+  <meta property="og:title" content="Flowers of the Aftermath">
+  <meta property="og:description" content="For ideas that can't stay quiet.">
+  <meta property="og:url" content="https://flowersoftheaftermath.com/">
+  <meta property="og:image" content="https://flowersoftheaftermath.com/assets/studio/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Flowers of the Aftermath">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ColrfulLanguage">
+  <meta name="twitter:title" content="Flowers of the Aftermath">
+  <meta name="twitter:description" content="For ideas that can't stay quiet.">
+  <meta name="twitter:image" content="https://flowersoftheaftermath.com/assets/studio/og.jpg">
+  <meta name="theme-color" content="#0a0908">
+  <link rel="preload" href="assets/studio/fonts/BigShoulders.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/studio/style.css?v=launch1">
 </head>
 <body>
-<div class="grain"></div><div class="scan"></div>
-<div class="stills" aria-hidden="true">
-  <img src="assets/still1.jpg" alt=""><img src="assets/still2.jpg" alt=""><img src="assets/still3.jpg" alt=""><img src="assets/still4.jpg" alt=""><img src="assets/still5.jpg" alt=""><img src="assets/still6.jpg" alt="">
-</div>
-<main>
-  <!-- BELIEVE ME LATER: X post embed -->
-  <section class="xpost" id="video">
-    <blockquote class="twitter-tweet" data-theme="dark" data-dnt="true" data-align="center"><p lang="en" dir="ltr">believe me later 🖤 @anabology</p>&mdash; FOTA~ (@ColrfulLanguage) <a href="https://x.com/ColrfulLanguage/status/2117996839488106762">watch on x</a></blockquote>
-    <p class="entry">an original song, sung by claudia. entry for @anabology's $CLAUDIA contest.</p>
-    <p class="credit">Claudia is an open character by <a href="https://x.com/anabology" target="_blank" rel="noopener">@anabology</a> <span class="dim">&middot;</span> <a href="https://claudia.gallery" target="_blank" rel="noopener">claudia.gallery</a></p>
-    <p class="follow"><a href="https://x.com/ColrfulLanguage" target="_blank" rel="noopener">follow @ColrfulLanguage on x &rarr;</a></p>
-    <p class="studio">flowers of the aftermath is an AI music studio.</p>
-  </section>
-  <header>
-    <h1 class="mark" data-alt="she said it first">flowers of the aftermath</h1>
-    <p class="meta"><span id="clock">--:--:--</span> <span class="dim">/</span> <span id="status">signal: faint</span></p>
+  <a class="skip" href="#works">Skip to the works</a>
+
+  <header class="nav">
+    <a class="nav-mark" href="#top" aria-label="Flowers of the Aftermath, top of page">FotA</a>
+    <nav aria-label="Main">
+      <a href="#works">Works</a>
+      <a href="#information">Information</a>
+      <a href="https://x.com/ColrfulLanguage" rel="noopener">X ↗</a>
+    </nav>
   </header>
 
-  <section class="tx" id="tx" aria-live="polite"></section>
+  <main id="top">
+    <section class="hero" aria-label="Showreel">
+      <video id="reel" class="bg-video" muted autoplay loop playsinline preload="auto"
+             poster="assets/studio/media/reel-poster.jpg"
+             aria-label="Silent reel cutting between My Dear Red, Night Drive and Believe Me Later">
+        <source src="assets/studio/media/reel.webm" type="video/webm">
+        <source src="assets/studio/media/reel.mp4" type="video/mp4">
+      </video>
+      <script>
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          var v = document.getElementById('reel'); v.removeAttribute('autoplay'); v.pause();
+          document.documentElement.classList.add('reduce');
+        }
+      </script>
+      <div class="shade hero-shade" aria-hidden="true"></div>
+      <h1 class="hero-mark" id="wordmark">
+        <span class="fit line-a">Flowers</span>
+        <span class="line-b">of the</span>
+        <span class="fit line-c">Aftermath</span>
+      </h1>
+      <div class="hero-foot">
+        <p class="hero-line">For ideas that can&rsquo;t stay quiet.</p>
+        <button class="reel-toggle" id="reel-toggle" type="button" aria-pressed="false">Pause</button>
+      </div>
+    </section>
 
-  <section class="count">
-    <div class="label" id="countLabel">transmission received</div>
-    <div class="digits" id="count">out now</div>
-    <div class="sub">believe me later &middot; <a href="https://x.com/ColrfulLanguage/status/2117996839488106762" target="_blank" rel="noopener">watch on x</a></div>
-  </section>
+    <div id="works">
+      <article class="poster" id="w-mdr">
+        <video class="bg-video" muted loop playsinline preload="auto" poster="assets/studio/media/still-mdr.jpg"
+               aria-label="My Dear Red, a woman in a red coat on a foggy beach at dusk">
+          <source src="assets/studio/media/clip-mdr.mp4" type="video/mp4">
+        </video>
+        <div class="shade poster-shade" aria-hidden="true"></div>
+        <div class="poster-body">
+          <p class="billing">
+            <span>001</span>
+            <span>Film</span>
+            <span>Period mystery</span>
+            <span>2026</span>
+          </p>
+          <h2 class="fit title">My Dear Red</h2>
+          <p class="tag">A period mystery. Jane Austen meets Red Riding Hood.</p>
+          <a class="go" href="https://mydearred.com/">mydearred.com ↗</a>
+        </div>
+      </article>
 
-  <section class="chat">
-    <div id="log"></div>
-    <form id="f" autocomplete="off"><span class="caret">&gt;</span><input id="q" maxlength="140" placeholder="say something to her" aria-label="message"></form>
-  </section>
+      <p class="claudia-band">
+        <span>Claudia</span>
+        <span>An open character by <a href="https://x.com/anabology" rel="noopener">@anabology</a> · <a href="https://claudia.gallery" rel="noopener">claudia.gallery</a></span>
+      </p>
 
-  <p class="whisper">nobody argued with the prophecy. <span class="sel">they just said it used too many words.</span></p>
-  <p class="whisper hid2">&#8203;<span>a girl who talks in futures</span></p>
-</main>
-<footer>
-  <nav class="who"><a href="cassandra.html">who is cassandra</a> <span class="dim">&middot;</span> <a href="https://claudia.gallery" target="_blank" rel="noopener">who is claudia</a> <span class="dim">&mdash; built by <a href="https://x.com/anabology" target="_blank" rel="noopener">@anabology</a></span></nav>
-  <a href="https://x.com/ColrfulLanguage" rel="noopener">x</a> <span class="dim">&middot;</span>
-  <a href="https://claudia.gallery" rel="noopener">made with claudia.gallery</a>
-  <!-- they sent her back with a message. the message was this page. -->
-</footer>
-<script src="assets/main.js"></script>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <article class="poster" id="w-bml">
+        <video class="bg-video" muted loop playsinline preload="auto" poster="assets/studio/media/still-bml.jpg"
+               aria-label="Believe Me Later, close-up of Claudia">
+          <source src="assets/studio/media/clip-bml.mp4" type="video/mp4">
+        </video>
+        <div class="shade poster-shade" aria-hidden="true"></div>
+        <div class="poster-body">
+          <p class="billing">
+            <span>002</span>
+            <span>Song · Claudia</span>
+            <span>2026</span>
+          </p>
+          <h2 class="fit title">Believe Me Later</h2>
+          <p class="tag">An original song, sung by Claudia.</p>
+          <a class="go" href="https://x.com/ColrfulLanguage/status/2117996839488106762" rel="noopener">Watch on X ↗</a>
+        </div>
+      </article>
+
+      <article class="poster" id="w-nd">
+        <video class="bg-video" muted loop playsinline preload="auto" poster="assets/studio/media/still-nd.jpg"
+               aria-label="Night Drive, Claudia in the passenger seat at night">
+          <source src="assets/studio/media/clip-nd.mp4" type="video/mp4">
+        </video>
+        <div class="shade poster-shade" aria-hidden="true"></div>
+        <div class="poster-body">
+          <p class="billing">
+            <span>003</span>
+            <span>Game · Claudia</span>
+            <span>2026</span>
+          </p>
+          <h2 class="fit title">Night Drive</h2>
+          <p class="tag">A night drive, with Claudia as passenger.</p>
+          <a class="go" href="https://flowersoftheaftermath.com/night-drive/">Play in the browser ↗</a>
+        </div>
+      </article>
+    </div>
+
+    <section class="info" id="information" aria-labelledby="info-title">
+      <h2 id="info-title" class="fit info-word">Information</h2>
+      <div class="info-grid">
+        <div>
+          <h3>About</h3>
+          <p>Flowers of the Aftermath is a small studio making films, songs and a game. Each work lives at its own home; this page points to them.</p>
+        </div>
+        <div>
+          <h3>Contact</h3>
+          <p><a href="https://x.com/ColrfulLanguage" rel="noopener">@ColrfulLanguage</a> on X</p>
+        </div>
+        <div>
+          <h3>Credits</h3>
+          <p>Claudia is an open character by <a href="https://x.com/anabology" rel="noopener">@anabology</a>.</p>
+          <p>Night Drive is built on <a href="https://github.com/Rezmason/drivey" rel="noopener">Drivey</a> (Mark Pursey, ported by rezmason), GPL-3.</p>
+        </div>
+      </div>
+      <footer class="foot">
+        <p>Flowers of the Aftermath · 2026</p>
+        <a href="#top">Back to top ↑</a>
+      </footer>
+    </section>
+  </main>
+  <script src="assets/studio/js/main.js?v=launch1" defer></script>
 </body>
 </html>

@@ -1,0 +1,10 @@
+Webfonts in this folder are SIL Open Font License 1.1 families, subset (Latin)
+to WOFF2 from the box font collection at /usr/share/fonts/truetype/sand-box/google/.
+None of them are Mike's commercial fonts.
+
+- Big Shoulders (variable: opsz 10–72, wght 100–900) — XO Type Co (Patric King).
+  Wordmark, work titles, billing, UI. Chosen for condensed, theatrical poster impact.
+  Source: https://github.com/xotypeco/big_shoulders
+
+License: SIL Open Font License 1.1
+https://openfontlicense.org/open-font-license-official-text/
