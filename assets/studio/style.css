@@ -90,3 +90,5 @@ a:hover{color:#fff}
   *,*::before,*::after{animation:none!important;transition:none!important}
   html.reduce .poster .bg-video[poster], html.reduce .hero .bg-video{/* stills remain */}
 }
+/* outlined hero wordmark: footage shows through the letters */
+.hero-mark .fit{color:transparent;-webkit-text-stroke:max(1.5px,.008em) var(--bone);text-stroke:max(1.5px,.008em) var(--bone)}
