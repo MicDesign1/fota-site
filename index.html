@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://flowersoftheaftermath.com/assets/studio/og.jpg">
   <meta name="theme-color" content="#0a0908">
   <link rel="preload" href="assets/studio/fonts/BigShoulders.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/studio/style.css?v=outline1">
+  <link rel="stylesheet" href="assets/studio/style.css?v=embeds1">
 </head>
 <body>
   <a class="skip" href="#works">Skip to the works</a>
@@ -80,8 +80,11 @@
             <span>2026</span>
           </p>
           <h2 class="fit title">My Dear Red</h2>
+          <p class="actions">
+            <button class="play-btn" type="button" data-lightbox="teaser-box" aria-haspopup="dialog">Play teaser</button>
+            <a class="go" href="https://mydearred.com/">mydearred.com ↗</a>
+          </p>
           <p class="tag">A period mystery. Jane Austen meets Red Riding Hood.</p>
-          <a class="go" href="https://mydearred.com/">mydearred.com ↗</a>
         </div>
       </article>
 
@@ -104,7 +107,7 @@
           </p>
           <h2 class="fit title">Believe Me Later</h2>
           <p class="tag">An original song, sung by Claudia.</p>
-          <a class="go" href="https://x.com/ColrfulLanguage/status/2117996839488106762" rel="noopener">Watch on X ↗</a>
+          <a class="go" href="/believe-me-later/">Watch ↗</a>
         </div>
       </article>
 
@@ -149,6 +152,18 @@
       </footer>
     </section>
   </main>
-  <script src="assets/studio/js/main.js?v=launch1" defer></script>
+
+  <!-- My Dear Red teaser lightbox: one native player, sound only after the click. -->
+  <dialog class="lightbox" id="teaser-box" aria-label="My Dear Red teaser">
+    <div class="lb-frame">
+      <video class="lb-video" controls playsinline preload="none"
+             poster="assets/studio/media/teaser-mdr-poster.jpg"
+             aria-label="My Dear Red teaser">
+        <source src="assets/studio/media/teaser-mdr.mp4" type="video/mp4">
+      </video>
+    </div>
+    <button class="lb-close" type="button" aria-label="Close the teaser">Close ✕</button>
+  </dialog>
+  <script src="assets/studio/js/main.js?v=embeds1" defer></script>
 </body>
 </html>

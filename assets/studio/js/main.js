@@ -25,7 +25,7 @@
         el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * s) + 'px';
       });
     }
-    document.querySelectorAll('.poster .title').forEach(el => fit(el, 1.0));
+    document.querySelectorAll('.poster .title, .page-title').forEach(el => fit(el, 1.0));
     const info = document.querySelector('.info-word');
     if (info) fit(info, 1.0);
   };
@@ -41,6 +41,29 @@
     reel.addEventListener('play', sync); reel.addEventListener('pause', sync);
     if (reduce) { reel.pause(); sync(); }
   }
+
+  // Teaser lightbox: native <dialog> (focus trap, Esc closes); sound only starts from the click.
+  document.querySelectorAll('[data-lightbox]').forEach(btn => {
+    const box = document.getElementById(btn.dataset.lightbox);
+    if (!box || typeof box.showModal !== 'function') return;
+    const vid = box.querySelector('video');
+    const close = box.querySelector('.lb-close');
+    const shut = () => { if (box.open) box.close(); };
+    btn.addEventListener('click', () => {
+      box.showModal();
+      document.documentElement.classList.add('lb-open');
+      document.querySelectorAll('.poster .bg-video, #reel').forEach(v => v.pause());
+      if (close) close.focus();
+      if (vid) { const p = vid.play(); if (p && p.catch) p.catch(() => {}); }
+    });
+    if (close) close.addEventListener('click', shut);
+    box.addEventListener('click', e => { if (e.target === box) shut(); });
+    box.addEventListener('close', () => {
+      if (vid) vid.pause();
+      document.documentElement.classList.remove('lb-open');
+      btn.focus();
+    });
+  });
 
   if (!reduce) {
     const io = new IntersectionObserver(entries => {
